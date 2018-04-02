@@ -7,7 +7,8 @@ import Hzfengsy.Parser.*;
 
 public class Main {
 
-    public static void run(String expr) throws Exception{
+    public static void run(String expr) throws Exception
+    {
 
         //对每一个输入的字符串，构造一个 ANTLRStringStream 流 in
         ANTLRInputStream in = new ANTLRInputStream(expr);
@@ -28,14 +29,14 @@ public class Main {
     public static void main(String[] args) throws Exception{
 
         String[] testStr={
-                "2",
-                "a+b+3",
-                "(a-b)+3",
-                "a+(b*3"
+                "int a = 2;",
+                "int t = a+b+3;",
+                "int x = (a-b)+3;",
+                "int kk = a+(b*3);"
         };
 
         for (String s:testStr){
-            System.out.println("Inpußt expr:"+s);
+            System.out.println("Input expr:"+s);
             run(s);
         }
     }
