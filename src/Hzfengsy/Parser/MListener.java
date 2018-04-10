@@ -446,25 +446,53 @@ public interface MListener extends ParseTreeListener {
 	 */
 	void exitIdentity(MParser.IdentityContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MParser#expr_list}.
+	 * Enter a parse tree produced by the {@code ExprListCombine}
+	 * labeled alternative in {@link MParser#expr_list}.
 	 * @param ctx the parse tree
 	 */
-	void enterExpr_list(MParser.Expr_listContext ctx);
+	void enterExprListCombine(MParser.ExprListCombineContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link MParser#expr_list}.
+	 * Exit a parse tree produced by the {@code ExprListCombine}
+	 * labeled alternative in {@link MParser#expr_list}.
 	 * @param ctx the parse tree
 	 */
-	void exitExpr_list(MParser.Expr_listContext ctx);
+	void exitExprListCombine(MParser.ExprListCombineContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MParser#stat_list}.
+	 * Enter a parse tree produced by the {@code ExprList}
+	 * labeled alternative in {@link MParser#expr_list}.
 	 * @param ctx the parse tree
 	 */
-	void enterStat_list(MParser.Stat_listContext ctx);
+	void enterExprList(MParser.ExprListContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link MParser#stat_list}.
+	 * Exit a parse tree produced by the {@code ExprList}
+	 * labeled alternative in {@link MParser#expr_list}.
 	 * @param ctx the parse tree
 	 */
-	void exitStat_list(MParser.Stat_listContext ctx);
+	void exitExprList(MParser.ExprListContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code StatList}
+	 * labeled alternative in {@link MParser#stat_list}.
+	 * @param ctx the parse tree
+	 */
+	void enterStatList(MParser.StatListContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code StatList}
+	 * labeled alternative in {@link MParser#stat_list}.
+	 * @param ctx the parse tree
+	 */
+	void exitStatList(MParser.StatListContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code StatListCombine}
+	 * labeled alternative in {@link MParser#stat_list}.
+	 * @param ctx the parse tree
+	 */
+	void enterStatListCombine(MParser.StatListCombineContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code StatListCombine}
+	 * labeled alternative in {@link MParser#stat_list}.
+	 * @param ctx the parse tree
+	 */
+	void exitStatListCombine(MParser.StatListCombineContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MParser#assign}.
 	 * @param ctx the parse tree
@@ -476,15 +504,29 @@ public interface MListener extends ParseTreeListener {
 	 */
 	void exitAssign(MParser.AssignContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MParser#define}.
+	 * Enter a parse tree produced by the {@code Assign_Define}
+	 * labeled alternative in {@link MParser#define}.
 	 * @param ctx the parse tree
 	 */
-	void enterDefine(MParser.DefineContext ctx);
+	void enterAssign_Define(MParser.Assign_DefineContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link MParser#define}.
+	 * Exit a parse tree produced by the {@code Assign_Define}
+	 * labeled alternative in {@link MParser#define}.
 	 * @param ctx the parse tree
 	 */
-	void exitDefine(MParser.DefineContext ctx);
+	void exitAssign_Define(MParser.Assign_DefineContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Id_Define}
+	 * labeled alternative in {@link MParser#define}.
+	 * @param ctx the parse tree
+	 */
+	void enterId_Define(MParser.Id_DefineContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Id_Define}
+	 * labeled alternative in {@link MParser#define}.
+	 * @param ctx the parse tree
+	 */
+	void exitId_Define(MParser.Id_DefineContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code RAWID}
 	 * labeled alternative in {@link MParser#id}.
@@ -532,15 +574,29 @@ public interface MListener extends ParseTreeListener {
 	 */
 	void exitClass_name(MParser.Class_nameContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MParser#class_stat}.
+	 * Enter a parse tree produced by the {@code Array}
+	 * labeled alternative in {@link MParser#class_stat}.
 	 * @param ctx the parse tree
 	 */
-	void enterClass_stat(MParser.Class_statContext ctx);
+	void enterArray(MParser.ArrayContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link MParser#class_stat}.
+	 * Exit a parse tree produced by the {@code Array}
+	 * labeled alternative in {@link MParser#class_stat}.
 	 * @param ctx the parse tree
 	 */
-	void exitClass_stat(MParser.Class_statContext ctx);
+	void exitArray(MParser.ArrayContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code SingleClass}
+	 * labeled alternative in {@link MParser#class_stat}.
+	 * @param ctx the parse tree
+	 */
+	void enterSingleClass(MParser.SingleClassContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code SingleClass}
+	 * labeled alternative in {@link MParser#class_stat}.
+	 * @param ctx the parse tree
+	 */
+	void exitSingleClass(MParser.SingleClassContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MParser#class_new}.
 	 * @param ctx the parse tree

@@ -276,14 +276,28 @@ public class MBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements MVis
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitExpr_list(MParser.Expr_listContext ctx) { return visitChildren(ctx); }
+	@Override public T visitExprListCombine(MParser.ExprListCombineContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitStat_list(MParser.Stat_listContext ctx) { return visitChildren(ctx); }
+	@Override public T visitExprList(MParser.ExprListContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitStatList(MParser.StatListContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitStatListCombine(MParser.StatListCombineContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -297,7 +311,14 @@ public class MBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements MVis
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitDefine(MParser.DefineContext ctx) { return visitChildren(ctx); }
+	@Override public T visitAssign_Define(MParser.Assign_DefineContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitId_Define(MParser.Id_DefineContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -332,7 +353,14 @@ public class MBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements MVis
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitClass_stat(MParser.Class_statContext ctx) { return visitChildren(ctx); }
+	@Override public T visitArray(MParser.ArrayContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitSingleClass(MParser.SingleClassContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

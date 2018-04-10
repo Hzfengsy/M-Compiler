@@ -460,25 +460,49 @@ public class MBaseListener implements MListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterExpr_list(MParser.Expr_listContext ctx) { }
+	@Override public void enterExprListCombine(MParser.ExprListCombineContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitExpr_list(MParser.Expr_listContext ctx) { }
+	@Override public void exitExprListCombine(MParser.ExprListCombineContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterStat_list(MParser.Stat_listContext ctx) { }
+	@Override public void enterExprList(MParser.ExprListContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitStat_list(MParser.Stat_listContext ctx) { }
+	@Override public void exitExprList(MParser.ExprListContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterStatList(MParser.StatListContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitStatList(MParser.StatListContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterStatListCombine(MParser.StatListCombineContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitStatListCombine(MParser.StatListCombineContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -496,13 +520,25 @@ public class MBaseListener implements MListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterDefine(MParser.DefineContext ctx) { }
+	@Override public void enterAssign_Define(MParser.Assign_DefineContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitDefine(MParser.DefineContext ctx) { }
+	@Override public void exitAssign_Define(MParser.Assign_DefineContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterId_Define(MParser.Id_DefineContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitId_Define(MParser.Id_DefineContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -556,13 +592,25 @@ public class MBaseListener implements MListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterClass_stat(MParser.Class_statContext ctx) { }
+	@Override public void enterArray(MParser.ArrayContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitClass_stat(MParser.Class_statContext ctx) { }
+	@Override public void exitArray(MParser.ArrayContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSingleClass(MParser.SingleClassContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSingleClass(MParser.SingleClassContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

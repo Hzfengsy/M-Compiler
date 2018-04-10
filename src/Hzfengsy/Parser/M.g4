@@ -45,18 +45,18 @@ expr: expr op=('++'|'--')                  # Postfix
     | assign                               # Assignment
     ;
 
-expr_list: expr_list ',' expr
-         | expr?
+expr_list: expr_list ',' expr_list         # ExprListCombine
+         | expr?                           # ExprList
          ;
 
-stat_list: stat_list ',' class_stat id
-         | (class_stat id)?
+stat_list: stat_list ',' stat_list         # StatListCombine
+         | (class_stat id)?                # StatList
          ;
 
 assign: id '=' expr;
-define:
-     class_stat assign ';'
-    |class_stat id ';'
+define: class_stat assign ';'          # Assign_Define
+      | class_stat id ';'              # Id_Define
+
     ;
 
 id: NAME                            # RAWID
@@ -71,7 +71,9 @@ class_name: BOOL
           | NAME
           ;
 
-class_stat: class_name '[]'*;
+class_stat: class_stat '[]'         # Array
+          | class_name              # SingleClass
+          ;
 
 class_new : class_name (('[' expr']')+ ('[]')*)?;
 

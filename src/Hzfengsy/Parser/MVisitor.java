@@ -267,17 +267,33 @@ public interface MVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitIdentity(MParser.IdentityContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MParser#expr_list}.
+	 * Visit a parse tree produced by the {@code ExprListCombine}
+	 * labeled alternative in {@link MParser#expr_list}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitExpr_list(MParser.Expr_listContext ctx);
+	T visitExprListCombine(MParser.ExprListCombineContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MParser#stat_list}.
+	 * Visit a parse tree produced by the {@code ExprList}
+	 * labeled alternative in {@link MParser#expr_list}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitStat_list(MParser.Stat_listContext ctx);
+	T visitExprList(MParser.ExprListContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code StatList}
+	 * labeled alternative in {@link MParser#stat_list}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStatList(MParser.StatListContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code StatListCombine}
+	 * labeled alternative in {@link MParser#stat_list}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStatListCombine(MParser.StatListCombineContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MParser#assign}.
 	 * @param ctx the parse tree
@@ -285,11 +301,19 @@ public interface MVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitAssign(MParser.AssignContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MParser#define}.
+	 * Visit a parse tree produced by the {@code Assign_Define}
+	 * labeled alternative in {@link MParser#define}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitDefine(MParser.DefineContext ctx);
+	T visitAssign_Define(MParser.Assign_DefineContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Id_Define}
+	 * labeled alternative in {@link MParser#define}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitId_Define(MParser.Id_DefineContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code RAWID}
 	 * labeled alternative in {@link MParser#id}.
@@ -318,11 +342,19 @@ public interface MVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitClass_name(MParser.Class_nameContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MParser#class_stat}.
+	 * Visit a parse tree produced by the {@code Array}
+	 * labeled alternative in {@link MParser#class_stat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitClass_stat(MParser.Class_statContext ctx);
+	T visitArray(MParser.ArrayContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code SingleClass}
+	 * labeled alternative in {@link MParser#class_stat}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSingleClass(MParser.SingleClassContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MParser#class_new}.
 	 * @param ctx the parse tree
