@@ -16,6 +16,23 @@ public class MyListener extends MBaseListener
     private Vector<Map<String, String>> localVar = new Vector<>();
     private Stack<Vector<IRBaseNode>> IRStack = new Stack<>();
     private Classes classes = new Classes();
+
+    private Boolean equalClass(baseType a, baseType b)
+    {
+        return a.getClass().equals(b.getClass());
+    }
+
+    private Boolean checkType(Vector<IRBaseNode> parameter, baseType ... args)
+    {
+        if (parameter.size() != args.length) return false;
+        for (int i = 0; i < args.length; i++)
+        {
+            baseType realType = parameter.elementAt(i).getType();
+            baseType requestType = args[i];
+            if (!equalClass(realType, requestType)) return false;
+        }
+        return true;
+    }
     public MyListener()
     {
 
@@ -161,14 +178,10 @@ public class MyListener extends MBaseListener
     @Override public void exitSubscript(MParser.SubscriptContext ctx)
     {
         Vector<IRBaseNode> parameter = IRStack.peek();
-        assert (parameter.size() == 1);
-        baseType idType = parameter.elementAt(0).getType();
-        if (!(idType instanceof arrayType)) {
-            System.out.println("variable " + ctx.id().getText() + " is not a array type");
-            return;
-        }
+        Boolean checked = checkType(parameter, new arrayType(new voidType()), new intType());
         IRStack.pop();
-        IRStack.peek().add(new IRTypeNode(idType.getBaseTYpe()));
+        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        else IRStack.peek().add(new IRTypeNode(parameter.elementAt(0).getType().getBaseTYpe()));
     }
 
     @Override public void enterStatList(MParser.StatListContext ctx)
@@ -190,5 +203,194 @@ public class MyListener extends MBaseListener
     }
 
     //EXPR
+    @Override public void enterPostfix(MParser.PostfixContext ctx)
+    {
+        IRStack.push(new Vector<>());
+    }
+    @Override public void exitPostfix(MParser.PostfixContext ctx)
+    {
+        Vector<IRBaseNode> parameter = IRStack.peek();
+        Boolean checked = checkType(parameter, new intType());
+        IRStack.pop();
+        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        else IRStack.peek().add(new IRTypeNode(new intType()));
+    }
 
+
+    @Override public void enterPrefix(MParser.PrefixContext ctx)
+    {
+        IRStack.push(new Vector<>());
+    }
+    @Override public void exitPrefix(MParser.PrefixContext ctx)
+    {
+        Vector<IRBaseNode> parameter = IRStack.peek();
+        Boolean checked = checkType(parameter, new intType());
+        IRStack.pop();
+        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        else IRStack.peek().add(new IRTypeNode(new intType()));
+    }
+
+    @Override public void enterUnary(MParser.UnaryContext ctx)
+    {
+        IRStack.push(new Vector<>());
+    }
+    @Override public void exitUnary(MParser.UnaryContext ctx)
+    {
+        Vector<IRBaseNode> parameter = IRStack.peek();
+        Boolean checked = checkType(parameter, new intType());
+        IRStack.pop();
+        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        else IRStack.peek().add(new IRTypeNode(new intType()));
+    }
+
+    @Override public void enterNot(MParser.NotContext ctx)
+    {
+        IRStack.push(new Vector<>());
+    }
+    @Override public void exitNot(MParser.NotContext ctx)
+    {
+        Vector<IRBaseNode> parameter = IRStack.peek();
+        Boolean checked = checkType(parameter, ctx.op.getText() == "!" ? new boolType() : new intType());
+        IRStack.pop();
+        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        else IRStack.peek().add(new IRTypeNode(ctx.op.getText() == "!" ? new boolType() : new intType()));
+    }
+
+    @Override public void enterMulDivMod(MParser.MulDivModContext ctx)
+    {
+        IRStack.push(new Vector<>());
+    }
+    @Override public void exitMulDivMod(MParser.MulDivModContext ctx)
+    {
+        Vector<IRBaseNode> parameter = IRStack.peek();
+        Boolean checked = checkType(parameter, new intType(), new intType());
+        IRStack.pop();
+        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        else IRStack.peek().add(new IRTypeNode(new intType()));
+    }
+
+    @Override public void enterAddSub(MParser.AddSubContext ctx)
+    {
+        IRStack.push(new Vector<>());
+    }
+    @Override public void exitAddSub(MParser.AddSubContext ctx)
+    {
+        Vector<IRBaseNode> parameter = IRStack.peek();
+        Boolean checked = checkType(parameter, new intType(), new intType());
+        IRStack.pop();
+        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        else IRStack.peek().add(new IRTypeNode(new intType()));
+    }
+
+    @Override public void enterBitwise(MParser.BitwiseContext ctx)
+    {
+        IRStack.push(new Vector<>());
+    }
+    @Override public void exitBitwise(MParser.BitwiseContext ctx)
+    {
+        Vector<IRBaseNode> parameter = IRStack.peek();
+        Boolean checked = checkType(parameter, new intType(), new intType());
+        IRStack.pop();
+        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        else IRStack.peek().add(new IRTypeNode(new intType()));
+    }
+
+    @Override public void enterCompare(MParser.CompareContext ctx)
+    {
+        IRStack.push(new Vector<>());
+    }
+    @Override public void exitCompare(MParser.CompareContext ctx)
+    {
+        Vector<IRBaseNode> parameter = IRStack.peek();
+        Boolean checked = checkType(parameter, new intType(), new intType())
+                        | checkType(parameter, new stringType(), new stringType());
+        IRStack.pop();
+        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        else IRStack.peek().add(new IRTypeNode(new boolType()));
+    }
+
+    @Override public void enterNumber(MParser.NumberContext ctx)
+    {
+        IRStack.peek().add(new IRTypeNode(new intType()));
+    }
+
+    @Override public void enterEqual(MParser.EqualContext ctx)
+    {
+        IRStack.push(new Vector<>());
+    }
+    @Override public void exitEqual(MParser.EqualContext ctx)
+    {
+        Vector<IRBaseNode> parameter = IRStack.peek();
+        Boolean checked = checkType(parameter, new intType(), new intType())
+                | checkType(parameter, new stringType(), new stringType())
+                | checkType(parameter, new boolType(), new boolType());
+        IRStack.pop();
+        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        else IRStack.peek().add(new IRTypeNode(new boolType()));
+    }
+
+    @Override public void enterAnd(MParser.AndContext ctx)
+    {
+        IRStack.push(new Vector<>());
+    }
+    @Override public void exitAnd(MParser.AndContext ctx)
+    {
+        Vector<IRBaseNode> parameter = IRStack.peek();
+        Boolean checked = checkType(parameter, new intType(), new intType());
+        IRStack.pop();
+        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        else IRStack.peek().add(new IRTypeNode(new intType()));
+    }
+
+    @Override public void enterXor(MParser.XorContext ctx)
+    {
+        IRStack.push(new Vector<>());
+    }
+    @Override public void exitXor(MParser.XorContext ctx)
+    {
+        Vector<IRBaseNode> parameter = IRStack.peek();
+        Boolean checked = checkType(parameter, new intType(), new intType());
+        IRStack.pop();
+        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        else IRStack.peek().add(new IRTypeNode(new intType()));
+    }
+
+    @Override public void enterOr(MParser.OrContext ctx)
+    {
+        IRStack.push(new Vector<>());
+    }
+    @Override public void exitOr(MParser.OrContext ctx)
+    {
+        Vector<IRBaseNode> parameter = IRStack.peek();
+        Boolean checked = checkType(parameter, new intType(), new intType());
+        IRStack.pop();
+        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        else IRStack.peek().add(new IRTypeNode(new intType()));
+    }
+
+    @Override public void enterLAnd(MParser.LAndContext ctx)
+    {
+        IRStack.push(new Vector<>());
+    }
+    @Override public void exitLAnd(MParser.LAndContext ctx)
+    {
+        Vector<IRBaseNode> parameter = IRStack.peek();
+        Boolean checked = checkType(parameter, new boolType(), new boolType());
+        IRStack.pop();
+        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        else IRStack.peek().add(new IRTypeNode(new boolType()));
+    }
+
+    @Override public void enterLOr(MParser.LOrContext ctx)
+    {
+        IRStack.push(new Vector<>());
+    }
+    @Override public void exitLOr(MParser.LOrContext ctx)
+    {
+        Vector<IRBaseNode> parameter = IRStack.peek();
+        Boolean checked = checkType(parameter, new boolType(), new boolType());
+        IRStack.pop();
+        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        else IRStack.peek().add(new IRTypeNode(new boolType()));
+    }
 }

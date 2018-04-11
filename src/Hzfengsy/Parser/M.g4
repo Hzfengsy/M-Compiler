@@ -54,10 +54,9 @@ stat_list: stat_list ',' stat_list         # StatListCombine
          ;
 
 assign: id '=' expr;
-define: class_stat assign ';'          # Assign_Define
-      | class_stat id ';'              # Id_Define
-
-    ;
+define: class_stat assign ';'              # Assign_Define
+      | class_stat id ';'                  # Id_Define
+      ;
 
 id: NAME                            # RAWID
   | id '[' expr ']'                 # Subscript
@@ -108,5 +107,5 @@ MUL  : '*' ; // assigns token name to '*' used above in grammar
 DIV  : '/' ;
 ADD  : '+' ;
 SUB  : '-' ;
-NAME : [a-zA-Z_]+ ;
+NAME : [a-zA-Z][a-zA-Z0-9_]* ;
 WS   : [ \t\n\r]+ -> skip;
