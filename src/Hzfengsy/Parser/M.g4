@@ -13,7 +13,7 @@ stat: IF '(' expr ')' stat                         # If_Stat
     | RETRN expr? ';'                              # Return_Stat
     | BREAK ';'                                    # Break_Stat
     | CONTI ';'                                    # Continue_Stat
-    | '{' stat+ '}'                                # Segment_Stat
+    | '{' stat* '}'                                # Segment_Stat
     | expr ';'                                     # Expr_Stat
     | define                                       # Define_Stat
     ;

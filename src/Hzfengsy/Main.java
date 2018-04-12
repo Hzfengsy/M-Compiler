@@ -7,11 +7,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Scanner;
+import java.io.*;
 
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
@@ -20,11 +16,24 @@ public class Main {
 
     private static String readFromStdin()
     {
-        String ans = "";
-        Scanner in = new Scanner(System.in);
-        while(in.hasNextLine())
-        {
-            ans += in.nextLine();
+        String ans = new String();
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new InputStreamReader(System.in));
+            String tempString = null;
+            while ((tempString = reader.readLine()) != null) {
+                ans += tempString + '\n';
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e1) {
+                }
+            }
         }
         return ans;
     }
