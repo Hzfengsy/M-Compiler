@@ -7,6 +7,7 @@ import Hzfengsy.Type.*;
 import Hzfengsy.utility.IRBaseNode;
 import Hzfengsy.utility.IRTypeNode;
 
+import java.awt.desktop.SystemEventListener;
 import java.util.*;
 
 public class MyListener extends MBaseListener
@@ -96,8 +97,8 @@ public class MyListener extends MBaseListener
         }
         catch (Exception e)
         {
-            System.out.println(e.getMessage());
-            return;
+            System.err.println(e.getMessage());
+            System.exit(1);
         }
     }
     @Override public void exitFunc(MParser.FuncContext ctx)
@@ -111,8 +112,8 @@ public class MyListener extends MBaseListener
         String className = ctx.class_stat().getText();
         if (localVar.elementAt(localVar.size() - 1).containsKey(varName))
         {
-            System.out.println("variable " + varName + " has been defined");
-            return;
+            System.err.println("variable " + varName + " has been defined");
+            System.exit(1);
         }
         String mappingName = variables.rename(varName);
         try
@@ -121,8 +122,8 @@ public class MyListener extends MBaseListener
         }
         catch (Exception e)
         {
-            System.out.println(e.getMessage());
-            return;
+            System.err.println(e.getMessage());
+            System.exit(1);
         }
         localVar.elementAt(localVar.size() - 1).put(varName, mappingName);
     }
@@ -137,8 +138,8 @@ public class MyListener extends MBaseListener
         }
         catch (Exception e)
         {
-            System.out.println(e.getMessage());
-            return;
+            System.err.println(e.getMessage());
+            System.exit(1);
         }
         localVar.elementAt(localVar.size() - 1).put(varName, mappingName);
     }
@@ -164,10 +165,15 @@ public class MyListener extends MBaseListener
         }
         catch (Exception e)
         {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
+            System.exit(1);
         }
         found |= functions.contain(varName);
-        if (!found) System.out.println(("variable " + varName + " has not been defined"));
+        if (!found)
+        {
+            System.err.println(("variable " + varName + " has not been defined"));
+            System.exit(1);
+        }
     }
 
     @Override public void enterSubscript(MParser.SubscriptContext ctx)
@@ -180,7 +186,11 @@ public class MyListener extends MBaseListener
         Vector<IRBaseNode> parameter = IRStack.peek();
         Boolean checked = checkType(parameter, new arrayType(new voidType()), new intType());
         IRStack.pop();
-        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        if (!checked)
+        {
+            System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+            System.exit(1);
+        }
         else IRStack.peek().add(new IRTypeNode(parameter.elementAt(0).getType().getBaseTYpe()));
     }
 
@@ -196,8 +206,8 @@ public class MyListener extends MBaseListener
         }
         catch (Exception e)
         {
-            System.out.println(e.getMessage());
-            return;
+            System.err.println(e.getMessage());
+            System.exit(1);
         }
         localVar.elementAt(localVar.size() - 1).put(varName, mappingName);
     }
@@ -212,7 +222,11 @@ public class MyListener extends MBaseListener
         Vector<IRBaseNode> parameter = IRStack.peek();
         Boolean checked = checkType(parameter, new intType());
         IRStack.pop();
-        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        if (!checked)
+        {
+            System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+            System.exit(1);
+        }
         else IRStack.peek().add(new IRTypeNode(new intType()));
     }
 
@@ -226,7 +240,11 @@ public class MyListener extends MBaseListener
         Vector<IRBaseNode> parameter = IRStack.peek();
         Boolean checked = checkType(parameter, new intType());
         IRStack.pop();
-        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        if (!checked)
+        {
+            System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+            System.exit(1);
+        }
         else IRStack.peek().add(new IRTypeNode(new intType()));
     }
 
@@ -239,7 +257,11 @@ public class MyListener extends MBaseListener
         Vector<IRBaseNode> parameter = IRStack.peek();
         Boolean checked = checkType(parameter, new intType());
         IRStack.pop();
-        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        if (!checked)
+        {
+            System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+            System.exit(1);
+        }
         else IRStack.peek().add(new IRTypeNode(new intType()));
     }
 
@@ -252,7 +274,11 @@ public class MyListener extends MBaseListener
         Vector<IRBaseNode> parameter = IRStack.peek();
         Boolean checked = checkType(parameter, ctx.op.getText() == "!" ? new boolType() : new intType());
         IRStack.pop();
-        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        if (!checked)
+        {
+            System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");            System.exit(1);
+            System.exit(1);
+        }
         else IRStack.peek().add(new IRTypeNode(ctx.op.getText() == "!" ? new boolType() : new intType()));
     }
 
@@ -265,7 +291,11 @@ public class MyListener extends MBaseListener
         Vector<IRBaseNode> parameter = IRStack.peek();
         Boolean checked = checkType(parameter, new intType(), new intType());
         IRStack.pop();
-        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        if (!checked)
+        {
+            System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+            System.exit(1);
+        }
         else IRStack.peek().add(new IRTypeNode(new intType()));
     }
 
@@ -278,7 +308,11 @@ public class MyListener extends MBaseListener
         Vector<IRBaseNode> parameter = IRStack.peek();
         Boolean checked = checkType(parameter, new intType(), new intType());
         IRStack.pop();
-        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        if (!checked)
+        {
+            System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+            System.exit(1);
+        }
         else IRStack.peek().add(new IRTypeNode(new intType()));
     }
 
@@ -291,7 +325,11 @@ public class MyListener extends MBaseListener
         Vector<IRBaseNode> parameter = IRStack.peek();
         Boolean checked = checkType(parameter, new intType(), new intType());
         IRStack.pop();
-        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        if (!checked)
+        {
+            System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+            System.exit(1);
+        }
         else IRStack.peek().add(new IRTypeNode(new intType()));
     }
 
@@ -305,7 +343,11 @@ public class MyListener extends MBaseListener
         Boolean checked = checkType(parameter, new intType(), new intType())
                         | checkType(parameter, new stringType(), new stringType());
         IRStack.pop();
-        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        if (!checked)
+        {
+            System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+            System.exit(1);
+        }
         else IRStack.peek().add(new IRTypeNode(new boolType()));
     }
 
@@ -325,7 +367,11 @@ public class MyListener extends MBaseListener
                 | checkType(parameter, new stringType(), new stringType())
                 | checkType(parameter, new boolType(), new boolType());
         IRStack.pop();
-        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        if (!checked)
+        {
+            System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+            System.exit(1);
+        }
         else IRStack.peek().add(new IRTypeNode(new boolType()));
     }
 
@@ -338,7 +384,11 @@ public class MyListener extends MBaseListener
         Vector<IRBaseNode> parameter = IRStack.peek();
         Boolean checked = checkType(parameter, new intType(), new intType());
         IRStack.pop();
-        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        if (!checked)
+        {
+            System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+            System.exit(1);
+        }
         else IRStack.peek().add(new IRTypeNode(new intType()));
     }
 
@@ -351,7 +401,11 @@ public class MyListener extends MBaseListener
         Vector<IRBaseNode> parameter = IRStack.peek();
         Boolean checked = checkType(parameter, new intType(), new intType());
         IRStack.pop();
-        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        if (!checked)
+        {
+            System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+            System.exit(1);
+        }
         else IRStack.peek().add(new IRTypeNode(new intType()));
     }
 
@@ -364,7 +418,11 @@ public class MyListener extends MBaseListener
         Vector<IRBaseNode> parameter = IRStack.peek();
         Boolean checked = checkType(parameter, new intType(), new intType());
         IRStack.pop();
-        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        if (!checked)
+        {
+            System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+            System.exit(1);
+        }
         else IRStack.peek().add(new IRTypeNode(new intType()));
     }
 
@@ -377,7 +435,11 @@ public class MyListener extends MBaseListener
         Vector<IRBaseNode> parameter = IRStack.peek();
         Boolean checked = checkType(parameter, new boolType(), new boolType());
         IRStack.pop();
-        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        if (!checked)
+        {
+            System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+            System.exit(1);
+        }
         else IRStack.peek().add(new IRTypeNode(new boolType()));
     }
 
@@ -390,7 +452,11 @@ public class MyListener extends MBaseListener
         Vector<IRBaseNode> parameter = IRStack.peek();
         Boolean checked = checkType(parameter, new boolType(), new boolType());
         IRStack.pop();
-        if (!checked) System.out.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+        if (!checked)
+        {
+            System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+            System.exit(1);
+        }
         else IRStack.peek().add(new IRTypeNode(new boolType()));
     }
 }

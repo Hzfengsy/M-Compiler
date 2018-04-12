@@ -11,13 +11,25 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Scanner;
 
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 
 public class Main {
 
-    public static String readTestFile(String filePath) {
+    private static String readFromStdin()
+    {
+        String ans = "";
+        Scanner in = new Scanner(System.in);
+        while(in.hasNextLine())
+        {
+            ans += in.nextLine();
+        }
+        return ans;
+    }
+
+    private static String readTestFile(String filePath) {
         String ans = new String();
         File file = new File(filePath);
         BufferedReader reader = null;
@@ -61,9 +73,11 @@ public class Main {
         walker.walk(new MyListener(), tree);
     }
 
-    public static void main(String[] args) throws Exception{
-
-        String testStr=readTestFile("testdata");
-        run(testStr);
+    public static void main(String[] args) throws Exception
+    {
+        String program;
+        if (args.length == 1) program = readTestFile(args[0]);
+        else program = readFromStdin();
+        run(program);
     }
 }
