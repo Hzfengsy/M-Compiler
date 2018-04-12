@@ -14,29 +14,29 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class Main {
 
-    private static String readFromStdin()
-    {
-        String ans = new String();
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new InputStreamReader(System.in));
-            String tempString = null;
-            while ((tempString = reader.readLine()) != null) {
-                ans += tempString + '\n';
-            }
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e1) {
-                }
-            }
-        }
-        return ans;
-    }
+//    private static String readFromStdin()
+//    {
+//        String ans = new String();
+//        BufferedReader reader = null;
+//        try {
+//            reader = new BufferedReader(new InputStreamReader(System.in));
+//            String tempString = null;
+//            while ((tempString = reader.readLine()) != null) {
+//                ans += tempString + '\n';
+//            }
+//            reader.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            if (reader != null) {
+//                try {
+//                    reader.close();
+//                } catch (IOException e1) {
+//                }
+//            }
+//        }
+//        return ans;
+//    }
 
     private static String readTestFile(String filePath) {
         String ans = new String();
@@ -86,7 +86,7 @@ public class Main {
     {
         String program;
         if (args.length == 1) program = readTestFile(args[0]);
-        else program = readFromStdin();
+        else program = readTestFile("program.txt");
         run(program);
     }
 }
