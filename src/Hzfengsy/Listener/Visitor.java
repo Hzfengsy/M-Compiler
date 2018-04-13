@@ -355,12 +355,13 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         parameter.add(visit(ctx.expr(0)));
         parameter.add(visit(ctx.expr(1)));
         Boolean checked = checkType(parameter, new intType(), new intType());
+        if (ctx.op.getType() == MParser.ADD) checked |= checkType(parameter, new stringType(), new stringType());
         if (!checked)
         {
             System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
             System.exit(1);
         }
-        return new IRTypeNode(new intType());
+        return new IRTypeNode(parameter.elementAt(0).getType());
     }
 
     @Override public IRBaseNode visitBitwise(MParser.BitwiseContext ctx)
