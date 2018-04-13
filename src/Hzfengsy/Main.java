@@ -14,30 +14,6 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class Main {
 
-//    private static String readFromStdin()
-//    {
-//        String ans = new String();
-//        BufferedReader reader = null;
-//        try {
-//            reader = new BufferedReader(new InputStreamReader(System.in));
-//            String tempString = null;
-//            while ((tempString = reader.readLine()) != null) {
-//                ans += tempString + '\n';
-//            }
-//            reader.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            if (reader != null) {
-//                try {
-//                    reader.close();
-//                } catch (IOException e1) {
-//                }
-//            }
-//        }
-//        return ans;
-//    }
-
     private static String readTestFile(String filePath) {
         String ans = new String();
         File file = new File(filePath);
@@ -74,12 +50,12 @@ public class Main {
         MParser parser = new MParser(tokens);
 
         ParseTree tree = parser.prog();
-//        Visitor eval = new Visitor();
-//        eval.visit(tree);
 
+        Visitor eval = new Visitor();
+        eval.visit(tree);
 
-        ParseTreeWalker walker = new ParseTreeWalker();
-        walker.walk(new MyListener(), tree);
+//        ParseTreeWalker walker = new ParseTreeWalker();
+//        walker.walk(new MyListener(), tree);
     }
 
     public static void main(String[] args) throws Exception

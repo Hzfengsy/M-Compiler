@@ -4,8 +4,7 @@ import Hzfengsy.Parser.MBaseListener;
 import Hzfengsy.Parser.MParser;
 import Hzfengsy.Exceptions.*;
 import Hzfengsy.Type.*;
-import Hzfengsy.utility.IRBaseNode;
-import Hzfengsy.utility.IRTypeNode;
+import Hzfengsy.utility.*;
 
 import java.util.*;
 
@@ -33,10 +32,7 @@ public class MyListener extends MBaseListener
         }
         return true;
     }
-    public MyListener()
-    {
 
-    }
     @Override public void enterProg(MParser.ProgContext ctx)
     {
         localVar.add(new HashMap<>());
@@ -88,11 +84,21 @@ public class MyListener extends MBaseListener
     @Override public void enterFunc(MParser.FuncContext ctx)
     {
         localVar.add(new HashMap<>());
+        IRStack.push(new Vector<>());
+    }
+    @Override public void exitFunc(MParser.FuncContext ctx)
+    {
+        IRStack.pop();
+        Vector<IRBaseNode> parameter = IRStack.peek();
+        if (parameter.size() != 1) System.exit(1);
+        localVar.remove(localVar.size() - 1);
         String funcName = ctx.id().getText();
         String className = ctx.class_stat().getText();
+        Vector<baseType> list = parameter.elementAt(0).getTypeList();
         try
         {
-            functions.insert(funcName, classes.getClass(className));
+            funcType type = new funcType(classes.getClass(className), list);
+            functions.insert(funcName, type);
         }
         catch (Exception e)
         {
@@ -100,10 +106,22 @@ public class MyListener extends MBaseListener
             System.exit(1);
         }
     }
-    @Override public void exitFunc(MParser.FuncContext ctx)
+
+    @Override public void enterStatListCombine(MParser.StatListCombineContext ctx)
     {
-        localVar.remove(localVar.size() - 1);
+        IRStack.push(new Vector<>());
     }
+
+    @Override public void exitStatListCombine(MParser.StatListCombineContext ctx)
+    {
+        Vector<IRBaseNode> parameter = IRStack.peek();
+        IRStack.pop();
+        Vector<baseType> list = parameter.elementAt(0).getTypeList();
+        list.addAll(parameter.elementAt(1).getTypeList());
+        IRStack.peek().add(new IRTypeListNode(list));
+    }
+
+
 
     //DEFINE
     @Override public void enterAssign_Define(MParser.Assign_DefineContext ctx) {

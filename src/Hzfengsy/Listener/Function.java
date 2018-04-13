@@ -2,21 +2,22 @@ package Hzfengsy.Listener;
 
 import Hzfengsy.Exceptions.semanticException;
 import Hzfengsy.Type.baseType;
+import Hzfengsy.Type.funcType;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Function {
 
-    private Map<String, baseType> funcList = new HashMap<String, baseType>();
+    private Map<String, funcType> funcList = new HashMap();
 
-    public void insert (String varName, baseType varType)
+    public void insert (String funcName, funcType type)
     {
-        assert (!funcList.containsKey(varName));
-        funcList.put(varName, varType);
+        assert (!funcList.containsKey(funcName));
+        funcList.put(funcName, type);
     }
 
-    public baseType query (String funcName) throws Exception
+    public funcType query (String funcName) throws Exception
     {
         if (!funcList.containsKey(funcName))
             throw new semanticException("Undefined Functions");
@@ -28,11 +29,5 @@ public class Function {
         return funcList.containsKey(funcName);
     }
 
-//    public String rename (String funcName)
-//    {
-//        if (!funcList.containsKey(funcName)) return funcName;
-//        else for (int i = 0;; i++)
-//            if (!funcList.containsKey(funcName + String.valueOf(i))) return funcName;
-//    }
 
 }
