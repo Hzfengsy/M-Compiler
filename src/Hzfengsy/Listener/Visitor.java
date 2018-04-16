@@ -14,6 +14,7 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     private Function functions = new Function();
     private Vector<Map<String, String>> localVar = new Vector<>();
     private Classes classes = new Classes();
+    private Stack<baseType> nowClass = new Stack<>();
 
     private funcType func_getInt()
     {
@@ -76,6 +77,22 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         localVar.add(new HashMap<>());
         loadInsideFunction();
         return visitChildren(ctx);
+    }
+
+    @Override public IRBaseNode visitClas(MParser.ClasContext ctx)
+    {
+        baseType clas = null;
+        try
+        {
+            clas = classes.defineClass(ctx.id().getText());
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+            System.exit(1);
+        }
+        nowClass.push(clas);
+        return visit(ctx.prog());
     }
 
     //IF STATEMENT
@@ -252,7 +269,7 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         Vector<IRBaseNode> parameter = new Vector<>();
         parameter.add(visit(ctx.expr(0)));
         parameter.add(visit(ctx.expr(1)));
-        Boolean checked = checkType(parameter, new arrayType(classes.getClass("void")), classes.getClass("int"));
+        Boolean checked = checkType(parameter, new arrayType(null), classes.getClass("int"));
         if (!checked)
         {
             System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
@@ -266,7 +283,7 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         Vector<IRBaseNode> parameter = new Vector<>();
         parameter.add(visit(ctx.expr()));
         parameter.add(visit(ctx.id()));
-        Boolean checked = checkType(parameter, new arrayType(classes.getClass("void")), classes.getClass("int"));
+        Boolean checked = checkType(parameter, new arrayType(null), classes.getClass("int"));
         if (!checked)
         {
             System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");

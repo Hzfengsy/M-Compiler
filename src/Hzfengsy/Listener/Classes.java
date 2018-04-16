@@ -16,11 +16,13 @@ public class Classes
         classList.put("void", new voidType());
     }
 
-    public void defineClass(String className) throws Exception
+    public baseType defineClass(String className) throws Exception
     {
         if (classList.containsKey(className))
             throw new semanticException("already has a class named" + "\"" + className + "\"");
-        classList.put(className, new userType(className));
+        baseType clas = new userType(className);
+        classList.put(className, clas);
+        return clas;
     }
 
     public baseType getClass(String className)
