@@ -166,7 +166,7 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
 
     @Override public IRBaseNode visitAssign_Define(MParser.Assign_DefineContext ctx)
     {
-        String varName = ctx.assign().id().getText();
+        String varName = ctx.id().getText();
         String className = ctx.class_stat().getText();
         if (localVar.elementAt(localVar.size() - 1).containsKey(varName))
         {
@@ -250,8 +250,8 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     @Override public IRBaseNode visitSubscript(MParser.SubscriptContext ctx)
     {
         Vector<IRBaseNode> parameter = new Vector<>();
-        parameter.add(visit(ctx.id()));
-        parameter.add(visit(ctx.expr()));
+        parameter.add(visit(ctx.expr(0)));
+        parameter.add(visit(ctx.expr(1)));
         Boolean checked = checkType(parameter, new arrayType(new voidType()), new intType());
         if (!checked)
         {

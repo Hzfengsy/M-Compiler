@@ -38,10 +38,6 @@ public class MyListener extends MBaseListener
         localVar.add(new HashMap<>());
         IRStack.push(new Vector<>());
     }
-    @Override public void enterAssign(MParser.AssignContext ctx)
-    {
-
-    }
 
     //IF STATEMENT
     @Override public void enterIf_Stat(MParser.If_StatContext ctx)
@@ -125,7 +121,7 @@ public class MyListener extends MBaseListener
 
     //DEFINE
     @Override public void enterAssign_Define(MParser.Assign_DefineContext ctx) {
-        String varName = ctx.assign().id().getText();
+        String varName = ctx.id().getText();
         String className = ctx.class_stat().getText();
         if (localVar.elementAt(localVar.size() - 1).containsKey(varName))
         {

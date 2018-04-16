@@ -194,18 +194,6 @@ public interface MListener extends ParseTreeListener {
 	 */
 	void exitOr(MParser.OrContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code AddSub}
-	 * labeled alternative in {@link MParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterAddSub(MParser.AddSubContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code AddSub}
-	 * labeled alternative in {@link MParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitAddSub(MParser.AddSubContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code Parens}
 	 * labeled alternative in {@link MParser#expr}.
 	 * @param ctx the parse tree
@@ -242,6 +230,18 @@ public interface MListener extends ParseTreeListener {
 	 */
 	void exitTrue(MParser.TrueContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code Subscript}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterSubscript(MParser.SubscriptContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Subscript}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitSubscript(MParser.SubscriptContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code Prefix}
 	 * labeled alternative in {@link MParser#expr}.
 	 * @param ctx the parse tree
@@ -265,18 +265,6 @@ public interface MListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFalse(MParser.FalseContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code Unary}
-	 * labeled alternative in {@link MParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterUnary(MParser.UnaryContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code Unary}
-	 * labeled alternative in {@link MParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitUnary(MParser.UnaryContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code LOr}
 	 * labeled alternative in {@link MParser#expr}.
@@ -326,18 +314,6 @@ public interface MListener extends ParseTreeListener {
 	 */
 	void exitFunction(MParser.FunctionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code Not}
-	 * labeled alternative in {@link MParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterNot(MParser.NotContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code Not}
-	 * labeled alternative in {@link MParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitNot(MParser.NotContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code MulDivMod}
 	 * labeled alternative in {@link MParser#expr}.
 	 * @param ctx the parse tree
@@ -349,30 +325,6 @@ public interface MListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitMulDivMod(MParser.MulDivModContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code Postfix}
-	 * labeled alternative in {@link MParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterPostfix(MParser.PostfixContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code Postfix}
-	 * labeled alternative in {@link MParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitPostfix(MParser.PostfixContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code Bitwise}
-	 * labeled alternative in {@link MParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterBitwise(MParser.BitwiseContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code Bitwise}
-	 * labeled alternative in {@link MParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitBitwise(MParser.BitwiseContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code Number}
 	 * labeled alternative in {@link MParser#expr}.
@@ -398,18 +350,6 @@ public interface MListener extends ParseTreeListener {
 	 */
 	void exitEqual(MParser.EqualContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code And}
-	 * labeled alternative in {@link MParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterAnd(MParser.AndContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code And}
-	 * labeled alternative in {@link MParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitAnd(MParser.AndContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code Compare}
 	 * labeled alternative in {@link MParser#expr}.
 	 * @param ctx the parse tree
@@ -422,18 +362,6 @@ public interface MListener extends ParseTreeListener {
 	 */
 	void exitCompare(MParser.CompareContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code Xor}
-	 * labeled alternative in {@link MParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterXor(MParser.XorContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code Xor}
-	 * labeled alternative in {@link MParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitXor(MParser.XorContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code Identity}
 	 * labeled alternative in {@link MParser#expr}.
 	 * @param ctx the parse tree
@@ -445,6 +373,102 @@ public interface MListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitIdentity(MParser.IdentityContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Member}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterMember(MParser.MemberContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Member}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitMember(MParser.MemberContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code AddSub}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterAddSub(MParser.AddSubContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code AddSub}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitAddSub(MParser.AddSubContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Unary}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterUnary(MParser.UnaryContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Unary}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitUnary(MParser.UnaryContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Not}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterNot(MParser.NotContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Not}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitNot(MParser.NotContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Postfix}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterPostfix(MParser.PostfixContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Postfix}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitPostfix(MParser.PostfixContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Bitwise}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterBitwise(MParser.BitwiseContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Bitwise}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitBitwise(MParser.BitwiseContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code And}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterAnd(MParser.AndContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code And}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitAnd(MParser.AndContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Xor}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterXor(MParser.XorContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Xor}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitXor(MParser.XorContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code ExprListCombine}
 	 * labeled alternative in {@link MParser#expr_list}.
@@ -494,16 +518,6 @@ public interface MListener extends ParseTreeListener {
 	 */
 	void exitStatListCombine(MParser.StatListCombineContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MParser#assign}.
-	 * @param ctx the parse tree
-	 */
-	void enterAssign(MParser.AssignContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MParser#assign}.
-	 * @param ctx the parse tree
-	 */
-	void exitAssign(MParser.AssignContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code Assign_Define}
 	 * labeled alternative in {@link MParser#define}.
 	 * @param ctx the parse tree
@@ -539,30 +553,6 @@ public interface MListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitRAWID(MParser.RAWIDContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code Subscript}
-	 * labeled alternative in {@link MParser#id}.
-	 * @param ctx the parse tree
-	 */
-	void enterSubscript(MParser.SubscriptContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code Subscript}
-	 * labeled alternative in {@link MParser#id}.
-	 * @param ctx the parse tree
-	 */
-	void exitSubscript(MParser.SubscriptContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code Member}
-	 * labeled alternative in {@link MParser#id}.
-	 * @param ctx the parse tree
-	 */
-	void enterMember(MParser.MemberContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code Member}
-	 * labeled alternative in {@link MParser#id}.
-	 * @param ctx the parse tree
-	 */
-	void exitMember(MParser.MemberContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MParser#class_name}.
 	 * @param ctx the parse tree

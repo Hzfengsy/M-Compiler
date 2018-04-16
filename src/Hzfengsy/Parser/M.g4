@@ -21,6 +21,8 @@ stat: IF '(' expr ')' stat                         # If_Stat
 
 expr: expr op=('++'|'--')                  # Postfix
     | id '(' expr_list ')'                 # Function
+    | expr '[' expr ']'                    # Subscript
+    | expr '.' expr                        # Member
     | op=('++'|'--') expr                  # Prefix
     | op=('+'|'-') expr                    # Unary
     | op=('!'|'~') expr                    # Not
@@ -42,7 +44,7 @@ expr: expr op=('++'|'--')                  # Postfix
     | STR                                  # Str
     | id                                   # Identity
     | '(' expr ')'                         # Parens
-    | assign                               # Assignment
+    | expr '=' expr                        # Assignment
     ;
 
 expr_list: expr_list ',' expr_list         # ExprListCombine
@@ -53,14 +55,13 @@ stat_list: stat_list ',' stat_list         # StatListCombine
          | (class_stat id)?                # StatList
          ;
 
-assign: id '=' expr;
-define: class_stat assign ';'              # Assign_Define
+define: class_stat id '=' expr ';'         # Assign_Define
       | class_stat id ';'                  # Id_Define
       ;
 
 id: NAME                            # RAWID
-  | id '[' expr ']'                 # Subscript
-  | id '.' id                       # Member
+//  | expr '[' expr ']'                 # Subscript
+//  | id '.' id                       # Member
   ;
 
 class_name: BOOL

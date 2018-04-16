@@ -120,13 +120,6 @@ public interface MVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitOr(MParser.OrContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code AddSub}
-	 * labeled alternative in {@link MParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAddSub(MParser.AddSubContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code Parens}
 	 * labeled alternative in {@link MParser#expr}.
 	 * @param ctx the parse tree
@@ -148,6 +141,13 @@ public interface MVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitTrue(MParser.TrueContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code Subscript}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSubscript(MParser.SubscriptContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code Prefix}
 	 * labeled alternative in {@link MParser#expr}.
 	 * @param ctx the parse tree
@@ -161,13 +161,6 @@ public interface MVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitFalse(MParser.FalseContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code Unary}
-	 * labeled alternative in {@link MParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitUnary(MParser.UnaryContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code LOr}
 	 * labeled alternative in {@link MParser#expr}.
@@ -197,33 +190,12 @@ public interface MVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFunction(MParser.FunctionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code Not}
-	 * labeled alternative in {@link MParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNot(MParser.NotContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code MulDivMod}
 	 * labeled alternative in {@link MParser#expr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitMulDivMod(MParser.MulDivModContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code Postfix}
-	 * labeled alternative in {@link MParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitPostfix(MParser.PostfixContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code Bitwise}
-	 * labeled alternative in {@link MParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitBitwise(MParser.BitwiseContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code Number}
 	 * labeled alternative in {@link MParser#expr}.
@@ -239,13 +211,6 @@ public interface MVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitEqual(MParser.EqualContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code And}
-	 * labeled alternative in {@link MParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAnd(MParser.AndContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code Compare}
 	 * labeled alternative in {@link MParser#expr}.
 	 * @param ctx the parse tree
@@ -253,19 +218,68 @@ public interface MVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCompare(MParser.CompareContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code Xor}
-	 * labeled alternative in {@link MParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitXor(MParser.XorContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code Identity}
 	 * labeled alternative in {@link MParser#expr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitIdentity(MParser.IdentityContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Member}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMember(MParser.MemberContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code AddSub}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAddSub(MParser.AddSubContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Unary}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitUnary(MParser.UnaryContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Not}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNot(MParser.NotContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Postfix}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPostfix(MParser.PostfixContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Bitwise}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBitwise(MParser.BitwiseContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code And}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAnd(MParser.AndContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Xor}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitXor(MParser.XorContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code ExprListCombine}
 	 * labeled alternative in {@link MParser#expr_list}.
@@ -295,12 +309,6 @@ public interface MVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStatListCombine(MParser.StatListCombineContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MParser#assign}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAssign(MParser.AssignContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code Assign_Define}
 	 * labeled alternative in {@link MParser#define}.
 	 * @param ctx the parse tree
@@ -321,20 +329,6 @@ public interface MVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitRAWID(MParser.RAWIDContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code Subscript}
-	 * labeled alternative in {@link MParser#id}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSubscript(MParser.SubscriptContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code Member}
-	 * labeled alternative in {@link MParser#id}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitMember(MParser.MemberContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MParser#class_name}.
 	 * @param ctx the parse tree
