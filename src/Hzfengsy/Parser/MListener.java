@@ -350,6 +350,30 @@ public interface MListener extends ParseTreeListener {
 	 */
 	void exitEqual(MParser.EqualContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code Memberfunc}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterMemberfunc(MParser.MemberfuncContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Memberfunc}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitMemberfunc(MParser.MemberfuncContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code This}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterThis(MParser.ThisContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code This}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitThis(MParser.ThisContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code Compare}
 	 * labeled alternative in {@link MParser#expr}.
 	 * @param ctx the parse tree
@@ -374,17 +398,17 @@ public interface MListener extends ParseTreeListener {
 	 */
 	void exitIdentity(MParser.IdentityContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code Member}
+	 * Enter a parse tree produced by the {@code Membervar}
 	 * labeled alternative in {@link MParser#expr}.
 	 * @param ctx the parse tree
 	 */
-	void enterMember(MParser.MemberContext ctx);
+	void enterMembervar(MParser.MembervarContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code Member}
+	 * Exit a parse tree produced by the {@code Membervar}
 	 * labeled alternative in {@link MParser#expr}.
 	 * @param ctx the parse tree
 	 */
-	void exitMember(MParser.MemberContext ctx);
+	void exitMembervar(MParser.MembervarContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code AddSub}
 	 * labeled alternative in {@link MParser#expr}.

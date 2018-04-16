@@ -14,7 +14,7 @@ stat: IF '(' expr ')' stat                         # If_Stat
     | BREAK ';'                                    # Break_Stat
     | CONTI ';'                                    # Continue_Stat
     | '{' stat* '}'                                # Segment_Stat
-    | expr ';'                                     # Expr_Stat
+    | (expr)? ';'                                  # Expr_Stat
     | define                                       # Define_Stat
     ;
 
@@ -22,7 +22,8 @@ stat: IF '(' expr ')' stat                         # If_Stat
 expr: expr op=('++'|'--')                  # Postfix
     | id '(' expr_list ')'                 # Function
     | expr '[' expr ']'                    # Subscript
-    | expr '.' expr                        # Member
+    | expr '.' id                          # Membervar
+    | expr '.' id '(' expr_list ')'        # Memberfunc
     | op=('++'|'--') expr                  # Prefix
     | op=('+'|'-') expr                    # Unary
     | op=('!'|'~') expr                    # Not
@@ -42,6 +43,7 @@ expr: expr op=('++'|'--')                  # Postfix
     | FALSE                                # False
     | NULL                                 # Null
     | STR                                  # Str
+    | THIS                                 # This
     | id                                   # Identity
     | '(' expr ')'                         # Parens
     | expr '=' expr                        # Assignment

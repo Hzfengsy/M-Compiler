@@ -364,6 +364,30 @@ public class MBaseListener implements MListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterMemberfunc(MParser.MemberfuncContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitMemberfunc(MParser.MemberfuncContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterThis(MParser.ThisContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitThis(MParser.ThisContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterCompare(MParser.CompareContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -388,13 +412,13 @@ public class MBaseListener implements MListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterMember(MParser.MemberContext ctx) { }
+	@Override public void enterMembervar(MParser.MembervarContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitMember(MParser.MemberContext ctx) { }
+	@Override public void exitMembervar(MParser.MembervarContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

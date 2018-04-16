@@ -261,6 +261,43 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         return new IRTypeNode(parameter.elementAt(0).getType().getBaseTYpe());
     }
 
+    @Override public IRBaseNode visitMembervar(MParser.MembervarContext ctx)
+    {
+        Vector<IRBaseNode> parameter = new Vector<>();
+        parameter.add(visit(ctx.expr()));
+        parameter.add(visit(ctx.id()));
+        Boolean checked = checkType(parameter, new arrayType(new voidType()), new intType());
+        if (!checked)
+        {
+            System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
+            System.exit(1);
+        }
+        return new IRTypeNode(parameter.elementAt(0).getType().getBaseTYpe());
+    }
+
+    @Override public IRBaseNode visitMemberfunc(MParser.MemberfuncContext ctx)
+    {
+        baseType Class = visit(ctx.expr()).getType();
+        funcType func = null;
+        try
+        {
+            func = Class.query(ctx.id().getText());
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+            System.exit(1);
+        }
+        Vector<baseType> list = func.getParameterList();
+        Vector<baseType> param = visit(ctx.expr_list()).getTypeList();
+        if (!list.equals(param))
+        {
+            System.err.println("error function call at " + ctx.id().getText());
+            System.exit(1);
+        }
+        return new IRTypeNode(func.getReturnType());
+    }
+
     @Override public IRBaseNode visitPostfix(MParser.PostfixContext ctx)
     {
         Vector<IRBaseNode> parameter = new Vector<>();

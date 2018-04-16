@@ -211,6 +211,20 @@ public interface MVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitEqual(MParser.EqualContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code Memberfunc}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMemberfunc(MParser.MemberfuncContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code This}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitThis(MParser.ThisContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code Compare}
 	 * labeled alternative in {@link MParser#expr}.
 	 * @param ctx the parse tree
@@ -225,12 +239,12 @@ public interface MVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitIdentity(MParser.IdentityContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code Member}
+	 * Visit a parse tree produced by the {@code Membervar}
 	 * labeled alternative in {@link MParser#expr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitMember(MParser.MemberContext ctx);
+	T visitMembervar(MParser.MembervarContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code AddSub}
 	 * labeled alternative in {@link MParser#expr}.
