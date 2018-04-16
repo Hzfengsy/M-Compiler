@@ -16,6 +16,20 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     private Classes classes = new Classes();
     private Stack<baseType> nowClass = new Stack<>();
 
+    private boolean checkMainFunc()
+    {
+        try
+        {
+            funcType funcMain = functions.query("main");
+            if (funcMain.getReturnType() != classes.getClass("int")) return false;
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+        return true;
+    }
+
     private funcType func_getInt()
     {
         return new funcType(classes.getClass("int"), new Vector<>());
@@ -76,7 +90,13 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     {
         localVar.add(new HashMap<>());
         loadInsideFunction();
-        return visitChildren(ctx);
+        visitChildren(ctx);
+        if (!checkMainFunc())
+        {
+            System.err.println("main function error");
+            System.exit(1);
+        }
+        return null;
     }
 
     @Override public IRBaseNode visitClas(MParser.ClasContext ctx)
@@ -185,6 +205,7 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     {
         String varName = ctx.id().getText();
         String className = ctx.class_stat().getText();
+        baseType exprType = visit(ctx.expr()).getType();
         if (localVar.elementAt(localVar.size() - 1).containsKey(varName))
         {
             System.err.println("variable " + varName + " has been defined");
@@ -194,6 +215,11 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         try
         {
             variables.insert(mappingName, classes.getClass(className));
+            if (exprType != classes.getClass(className))
+            {
+                System.err.println("define variable" + varName + "error");
+                System.exit(1);
+            }
         }
         catch (Exception e)
         {
@@ -380,7 +406,7 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     {
         Vector<IRBaseNode> parameter = new Vector<>();
         parameter.add(visit(ctx.expr()));
-        Boolean checked = checkType(parameter, ctx.op.getText() == "!" ? classes.getClass("bool") : classes.getClass("int"));
+        Boolean checked = checkType(parameter, ctx.op.getText().equals("!") ? classes.getClass("bool") : classes.getClass("int"));
         if (!checked)
         {
             System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
