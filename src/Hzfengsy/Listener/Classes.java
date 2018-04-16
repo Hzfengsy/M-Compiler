@@ -23,9 +23,8 @@ public class Classes
         classList.put(className, new userType(className));
     }
 
-    public baseType getClass(String className) throws Exception
+    public baseType getClass(String className)
     {
-        if (classList.containsKey(className)) return classList.get(className);
         if (className.substring(className.length() - 2).equals("[]"))
         {
             baseType Base = getClass(className.substring(0, className.length() - 2));
@@ -33,6 +32,11 @@ public class Classes
             classList.put(className, Type);
             return Type;
         }
-        throw new semanticException("cannot find a class named" + "\"" + className + "\"");
+        return classList.get(className);
+    }
+
+    public boolean containClass(String className)
+    {
+        return classList.containsKey(className);
     }
 }

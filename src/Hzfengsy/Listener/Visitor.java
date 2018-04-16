@@ -17,33 +17,33 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
 
     private funcType func_getInt()
     {
-        return new funcType(new intType(), new Vector<>());
+        return new funcType(classes.getClass("int"), new Vector<>());
     }
 
     private funcType func_print()
     {
         Vector<baseType> parameter = new Vector<>();
-        parameter.add(new stringType());
-        return new funcType(new voidType(), parameter);
+        parameter.add(classes.getClass("string"));
+        return new funcType(classes.getClass("string"), parameter);
     }
 
     private funcType func_println()
     {
         Vector<baseType> parameter = new Vector<>();
-        parameter.add(new stringType());
-        return new funcType(new voidType(), parameter);
+        parameter.add(classes.getClass("string"));
+        return new funcType(classes.getClass("void"), parameter);
     }
 
     private funcType func_getString()
     {
-        return new funcType(new stringType(), new Vector<>());
+        return new funcType(classes.getClass("string"), new Vector<>());
     }
 
     private funcType func_toString()
     {
         Vector<baseType> parameter = new Vector<>();
-        parameter.add(new intType());
-        return new funcType(new stringType(), parameter);
+        parameter.add(classes.getClass("int"));
+        return new funcType(classes.getClass("string"), parameter);
     }
 
     private void loadInsideFunction()
@@ -252,7 +252,7 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         Vector<IRBaseNode> parameter = new Vector<>();
         parameter.add(visit(ctx.expr(0)));
         parameter.add(visit(ctx.expr(1)));
-        Boolean checked = checkType(parameter, new arrayType(new voidType()), new intType());
+        Boolean checked = checkType(parameter, new arrayType(classes.getClass("void")), classes.getClass("int"));
         if (!checked)
         {
             System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
@@ -266,7 +266,7 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         Vector<IRBaseNode> parameter = new Vector<>();
         parameter.add(visit(ctx.expr()));
         parameter.add(visit(ctx.id()));
-        Boolean checked = checkType(parameter, new arrayType(new voidType()), new intType());
+        Boolean checked = checkType(parameter, new arrayType(classes.getClass("void")), classes.getClass("int"));
         if (!checked)
         {
             System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
@@ -302,13 +302,13 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     {
         Vector<IRBaseNode> parameter = new Vector<>();
         parameter.add(visit(ctx.expr()));
-        Boolean checked = checkType(parameter, new intType());
+        Boolean checked = checkType(parameter, classes.getClass("int"));
         if (!checked)
         {
             System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
             System.exit(1);
         }
-        return new IRTypeNode(new intType());
+        return new IRTypeNode(classes.getClass("int"));
     }
 
     @Override public IRBaseNode visitFunction(MParser.FunctionContext ctx)
@@ -337,39 +337,39 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     {
         Vector<IRBaseNode> parameter = new Vector<>();
         parameter.add(visit(ctx.expr()));
-        Boolean checked = checkType(parameter, new intType());
+        Boolean checked = checkType(parameter, classes.getClass("int"));
         if (!checked)
         {
             System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
             System.exit(1);
         }
-        return new IRTypeNode(new intType());
+        return new IRTypeNode(classes.getClass("int"));
     }
 
     @Override public IRBaseNode visitUnary(MParser.UnaryContext ctx)
     {
         Vector<IRBaseNode> parameter = new Vector<>();
         parameter.add(visit(ctx.expr()));
-        Boolean checked = checkType(parameter, new intType());
+        Boolean checked = checkType(parameter, classes.getClass("int"));
         if (!checked)
         {
             System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
             System.exit(1);
         }
-        return new IRTypeNode(new intType());
+        return new IRTypeNode(classes.getClass("int"));
     }
 
     @Override public IRBaseNode visitNot(MParser.NotContext ctx)
     {
         Vector<IRBaseNode> parameter = new Vector<>();
         parameter.add(visit(ctx.expr()));
-        Boolean checked = checkType(parameter, ctx.op.getText() == "!" ? new boolType() : new intType());
+        Boolean checked = checkType(parameter, ctx.op.getText() == "!" ? classes.getClass("bool") : classes.getClass("int"));
         if (!checked)
         {
             System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
             System.exit(1);
         }
-        return new IRTypeNode(new intType());
+        return new IRTypeNode(classes.getClass("int"));
     }
 
     @Override public IRBaseNode visitMulDivMod(MParser.MulDivModContext ctx)
@@ -377,13 +377,13 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         Vector<IRBaseNode> parameter = new Vector<>();
         parameter.add(visit(ctx.expr(0)));
         parameter.add(visit(ctx.expr(1)));
-        Boolean checked = checkType(parameter, new intType(), new intType());
+        Boolean checked = checkType(parameter, classes.getClass("int"), classes.getClass("int"));
         if (!checked)
         {
             System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
             System.exit(1);
         }
-        return new IRTypeNode(new intType());
+        return new IRTypeNode(classes.getClass("int"));
     }
 
     @Override public IRBaseNode visitAddSub(MParser.AddSubContext ctx)
@@ -391,8 +391,8 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         Vector<IRBaseNode> parameter = new Vector<>();
         parameter.add(visit(ctx.expr(0)));
         parameter.add(visit(ctx.expr(1)));
-        Boolean checked = checkType(parameter, new intType(), new intType());
-        if (ctx.op.getType() == MParser.ADD) checked |= checkType(parameter, new stringType(), new stringType());
+        Boolean checked = checkType(parameter, classes.getClass("int"), classes.getClass("int"));
+        if (ctx.op.getType() == MParser.ADD) checked |= checkType(parameter, classes.getClass("string"), classes.getClass("string"));
         if (!checked)
         {
             System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
@@ -406,13 +406,13 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         Vector<IRBaseNode> parameter = new Vector<>();
         parameter.add(visit(ctx.expr(0)));
         parameter.add(visit(ctx.expr(1)));
-        Boolean checked = checkType(parameter, new intType(), new intType());
+        Boolean checked = checkType(parameter, classes.getClass("int"), classes.getClass("int"));
         if (!checked)
         {
             System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
             System.exit(1);
         }
-        return new IRTypeNode(new intType());
+        return new IRTypeNode(classes.getClass("int"));
     }
 
     @Override public IRBaseNode visitCompare(MParser.CompareContext ctx)
@@ -420,14 +420,14 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         Vector<IRBaseNode> parameter = new Vector<>();
         parameter.add(visit(ctx.expr(0)));
         parameter.add(visit(ctx.expr(1)));
-        Boolean checked = checkType(parameter, new intType(), new intType())
-                | checkType(parameter, new stringType(), new stringType());
+        Boolean checked = checkType(parameter, classes.getClass("int"), classes.getClass("int"))
+                | checkType(parameter, classes.getClass("string"), classes.getClass("string"));
         if (!checked)
         {
             System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
             System.exit(1);
         }
-        return new IRTypeNode(new boolType());
+        return new IRTypeNode(classes.getClass("bool"));
     }
 
     @Override public IRBaseNode visitEqual(MParser.EqualContext ctx)
@@ -435,15 +435,15 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         Vector<IRBaseNode> parameter = new Vector<>();
         parameter.add(visit(ctx.expr(0)));
         parameter.add(visit(ctx.expr(1)));
-        Boolean checked = checkType(parameter, new intType(), new intType())
-                | checkType(parameter, new stringType(), new stringType())
-                | checkType(parameter, new boolType(), new boolType());
+        Boolean checked = checkType(parameter, classes.getClass("int"), classes.getClass("int"))
+                | checkType(parameter, classes.getClass("string"), classes.getClass("string"))
+                | checkType(parameter, classes.getClass("bool"), classes.getClass("bool"));
         if (!checked)
         {
             System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
             System.exit(1);
         }
-        return new IRTypeNode(new boolType());
+        return new IRTypeNode(classes.getClass("bool"));
     }
 
     @Override public IRBaseNode visitAnd(MParser.AndContext ctx)
@@ -451,13 +451,13 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         Vector<IRBaseNode> parameter = new Vector<>();
         parameter.add(visit(ctx.expr(0)));
         parameter.add(visit(ctx.expr(1)));
-        Boolean checked = checkType(parameter, new intType(), new intType());
+        Boolean checked = checkType(parameter, classes.getClass("int"), classes.getClass("int"));
         if (!checked)
         {
             System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
             System.exit(1);
         }
-        return new IRTypeNode(new intType());
+        return new IRTypeNode(classes.getClass("int"));
     }
 
     @Override public IRBaseNode visitXor(MParser.XorContext ctx)
@@ -465,13 +465,13 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         Vector<IRBaseNode> parameter = new Vector<>();
         parameter.add(visit(ctx.expr(0)));
         parameter.add(visit(ctx.expr(1)));
-        Boolean checked = checkType(parameter, new intType(), new intType());
+        Boolean checked = checkType(parameter, classes.getClass("int"), classes.getClass("int"));
         if (!checked)
         {
             System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
             System.exit(1);
         }
-        return new IRTypeNode(new intType());
+        return new IRTypeNode(classes.getClass("int"));
     }
 
     @Override public IRBaseNode visitOr(MParser.OrContext ctx)
@@ -479,13 +479,13 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         Vector<IRBaseNode> parameter = new Vector<>();
         parameter.add(visit(ctx.expr(0)));
         parameter.add(visit(ctx.expr(1)));
-        Boolean checked = checkType(parameter, new intType(), new intType());
+        Boolean checked = checkType(parameter, classes.getClass("int"), classes.getClass("int"));
         if (!checked)
         {
             System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
             System.exit(1);
         }
-        return new IRTypeNode(new intType());
+        return new IRTypeNode(classes.getClass("int"));
     }
 
     @Override public IRBaseNode visitLAnd(MParser.LAndContext ctx)
@@ -493,13 +493,13 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         Vector<IRBaseNode> parameter = new Vector<>();
         parameter.add(visit(ctx.expr(0)));
         parameter.add(visit(ctx.expr(1)));
-        Boolean checked = checkType(parameter, new boolType(), new boolType());
+        Boolean checked = checkType(parameter, classes.getClass("bool"), classes.getClass("bool"));
         if (!checked)
         {
             System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
             System.exit(1);
         }
-        return new IRTypeNode(new boolType());
+        return new IRTypeNode(classes.getClass("bool"));
     }
 
     @Override public IRBaseNode visitLOr(MParser.LOrContext ctx)
@@ -507,23 +507,23 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         Vector<IRBaseNode> parameter = new Vector<>();
         parameter.add(visit(ctx.expr(0)));
         parameter.add(visit(ctx.expr(1)));
-        Boolean checked = checkType(parameter, new boolType(), new boolType());
+        Boolean checked = checkType(parameter, classes.getClass("bool"), classes.getClass("bool"));
         if (!checked)
         {
             System.err.println("Type error occupied during expr \"" + ctx.getText() + "\"");
             System.exit(1);
         }
-        return new IRTypeNode(new boolType());
+        return new IRTypeNode(classes.getClass("bool"));
     }
 
     @Override public IRBaseNode visitNumber(MParser.NumberContext ctx)
     {
-        return new IRTypeNode(new intType());
+        return new IRTypeNode(classes.getClass("int"));
     }
 
     @Override public IRBaseNode visitStr(MParser.StrContext ctx)
     {
-        return new IRTypeNode(new stringType());
+        return new IRTypeNode(classes.getClass("string"));
     }
 
     @Override public IRBaseNode visitParens(MParser.ParensContext ctx)
