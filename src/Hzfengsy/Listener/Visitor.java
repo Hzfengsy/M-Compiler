@@ -485,6 +485,16 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         return new IRTypeNode(classes.getClass("bool"), false);
     }
 
+    @Override public IRBaseNode visitTrue(MParser.TrueContext ctx)
+    {
+        return new IRTypeNode(classes.getClass("bool"), false);
+    }
+
+    @Override public IRBaseNode visitFalse(MParser.FalseContext ctx)
+    {
+        return new IRTypeNode(classes.getClass("bool"), false);
+    }
+
     @Override public IRBaseNode visitNumber(MParser.NumberContext ctx)
     {
         return new IRTypeNode(classes.getClass("int"), false);
