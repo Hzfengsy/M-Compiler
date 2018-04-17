@@ -215,6 +215,8 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     {
         String varName = ctx.id().getText();
         String className = ctx.class_stat().getText();
+        if (localVar.elementAt(localVar.size() - 1).containsKey(varName))
+            error("variable " + varName + " redefined");
         baseType exprType = visit(ctx.expr()).getType();
         if (localVar.elementAt(localVar.size() - 1).containsKey(varName))
             error("variable " + varName + " has been defined");
@@ -245,11 +247,10 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     {
         String varName = ctx.id().getText();
         String className = ctx.class_stat().getText();
+        if (localVar.elementAt(localVar.size() - 1).containsKey(varName))
+            error("variable " + varName + " redefined");
         String mappingName = variables.rename(varName);
-        try
-        {
-            variables.insert(mappingName, classes.getClass(className));
-        }
+        try { variables.insert(mappingName, classes.getClass(className));}
         catch (Exception e) { error(e.getMessage()); }
 
         localVar.elementAt(localVar.size() - 1).put(varName, mappingName);
