@@ -27,6 +27,7 @@ public class Classes
 
     public baseType getClass(String className)
     {
+        if (classList.containsKey(className)) return classList.get(className);
         if (className.substring(className.length() - 2).equals("[]"))
         {
             baseType Base = getClass(className.substring(0, className.length() - 2));

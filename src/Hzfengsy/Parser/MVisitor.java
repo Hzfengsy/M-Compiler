@@ -364,6 +364,12 @@ public interface MVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSingleClass(MParser.SingleClassContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link MParser#dimension}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDimension(MParser.DimensionContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link MParser#class_new}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

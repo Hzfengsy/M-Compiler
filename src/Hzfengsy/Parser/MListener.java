@@ -612,6 +612,16 @@ public interface MListener extends ParseTreeListener {
 	 */
 	void exitSingleClass(MParser.SingleClassContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link MParser#dimension}.
+	 * @param ctx the parse tree
+	 */
+	void enterDimension(MParser.DimensionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MParser#dimension}.
+	 * @param ctx the parse tree
+	 */
+	void exitDimension(MParser.DimensionContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link MParser#class_new}.
 	 * @param ctx the parse tree
 	 */

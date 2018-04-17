@@ -77,7 +77,9 @@ class_stat: class_stat '[]'         # Array
           | class_name              # SingleClass
           ;
 
-class_new : class_name (('[' expr']')+ ('[]')*)?;
+dimension : '[' expr? ']';
+
+class_new : class_name dimension*;
 
 //Reserved Keywords
 BOOL  : 'bool';
