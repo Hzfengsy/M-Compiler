@@ -28,7 +28,7 @@ expr: expr op=('++'|'--')                  # Postfix
     | op=('++'|'--') expr                  # Prefix
     | op=('+'|'-') expr                    # Unary
     | op=('!'|'~') expr                    # Not
-    | 'new' class_new                      # New
+    | <assoc=right> 'new' class_new        # New
     | expr op=('*'|'/'|'%') expr           # MulDivMod
     | expr op=('+'|'-') expr               # AddSub
     | expr op=('<<'|'>>') expr             # Bitwise
@@ -78,9 +78,10 @@ class_stat: class_stat '[]'         # Array
           | class_name              # SingleClass
           ;
 
-dimension : '[' expr? ']';
+dimension : '[' expr? ']'
+          | '[]';
 
-class_new : class_name dimension*;
+class_new : class_name dimension* ;
 
 //Reserved Keywords
 BOOL  : 'bool';
