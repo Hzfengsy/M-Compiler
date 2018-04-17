@@ -15,6 +15,7 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     private Vector<Map<String, String>> localVar = new Vector<>();
     private Classes classes = new Classes();
     private Stack<baseType> nowClass = new Stack<>();
+    private Stack<IRBaseNode> loop = new Stack<>();
 
     private void error(String message)
     {
@@ -115,7 +116,10 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     @Override public IRBaseNode visitIf_Stat(MParser.If_StatContext ctx)
     {
         localVar.add(new HashMap<>());
-        IRBaseNode ans = visitChildren(ctx);
+        IRBaseNode boolcheck = visit(ctx.expr());
+        if (boolcheck.getType() != classes.getClass("bool"))
+            error("error during if stat");
+        IRBaseNode ans = visit(ctx.stat());
         localVar.remove(localVar.size() - 1);
         return ans;
     }
@@ -123,7 +127,10 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     @Override public IRBaseNode visitIfElse_Stat(MParser.IfElse_StatContext ctx)
     {
         localVar.add(new HashMap<>());
-        IRBaseNode ans = visitChildren(ctx);
+        IRBaseNode boolcheck = visit(ctx.expr());
+        if (boolcheck.getType() != classes.getClass("bool"))
+            error("error during if stat");
+        IRBaseNode ans = visit(ctx.stat(0));
         localVar.remove(localVar.size() - 1);
         return ans;
     }
@@ -131,7 +138,16 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     @Override public IRBaseNode visitFor_Stat(MParser.For_StatContext ctx)
     {
         localVar.add(new HashMap<>());
-        IRBaseNode ans = visitChildren(ctx);
+        if (ctx.second != null)
+        {
+            IRBaseNode boolcheck = visit(ctx.second);
+            if (boolcheck.getType() != classes.getClass("bool"))
+                error("error during for stat");
+        }
+        IRBaseNode ans = new IRBaseNode();
+        loop.push(ans);
+        visit(ctx.stat());
+        loop.pop();
         localVar.remove(localVar.size() - 1);
         return ans;
     }
@@ -139,7 +155,13 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     @Override public IRBaseNode visitWhile_Stat(MParser.While_StatContext ctx)
     {
         localVar.add(new HashMap<>());
-        IRBaseNode ans = visitChildren(ctx);
+        IRBaseNode boolcheck = visit(ctx.expr());
+        if (boolcheck.getType() != classes.getClass("bool"))
+            error("error during for stat");
+        IRBaseNode ans = new IRBaseNode();
+        loop.push(ans);
+        visit(ctx.stat());
+        loop.pop();
         localVar.remove(localVar.size() - 1);
         return ans;
     }
@@ -205,6 +227,18 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         catch (Exception e) { error(e.getMessage()); }
         localVar.elementAt(localVar.size() - 1).put(varName, mappingName);
         return new IRBaseNode();
+    }
+
+    @Override public IRBaseNode visitBreak_Stat(MParser.Break_StatContext ctx)
+    {
+        if (loop.empty()) error("break outside any loop");
+        return null;
+    }
+
+    @Override public IRBaseNode visitContinue_Stat(MParser.Continue_StatContext ctx)
+    {
+        if (loop.empty()) error("continue outside any loop");
+        return null;
     }
 
     @Override public IRBaseNode visitId_Define(MParser.Id_DefineContext ctx)

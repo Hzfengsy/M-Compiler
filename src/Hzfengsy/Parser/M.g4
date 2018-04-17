@@ -8,7 +8,8 @@ func: class_stat? id '(' stat_list ')' stat;
 
 stat: IF '(' expr ')' stat                         # If_Stat
     | IF '(' expr ')' stat ELSE stat               # IfElse_Stat
-    | FOR '(' expr? ';' expr? ';' expr? ')' stat   # For_Stat
+    | FOR '(' first=expr? ';' second=expr? ';' third=expr? ')' stat
+                                                   # For_Stat
     | WHILE '(' expr ')' stat                      # While_Stat
     | RETRN expr? ';'                              # Return_Stat
     | BREAK ';'                                    # Break_Stat

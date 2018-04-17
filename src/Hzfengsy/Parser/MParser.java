@@ -447,6 +447,9 @@ public class MParser extends Parser {
 		}
 	}
 	public static class For_StatContext extends StatContext {
+		public ExprContext first;
+		public ExprContext second;
+		public ExprContext third;
 		public TerminalNode FOR() { return getToken(MParser.FOR, 0); }
 		public StatContext stat() {
 			return getRuleContext(StatContext.class,0);
@@ -599,7 +602,7 @@ public class MParser extends Parser {
 				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__2) | (1L << T__5) | (1L << T__6) | (1L << T__10) | (1L << T__11) | (1L << NULL) | (1L << TRUE) | (1L << FALSE) | (1L << NEW) | (1L << THIS) | (1L << NUM) | (1L << STR) | (1L << ADD) | (1L << SUB) | (1L << NAME))) != 0)) {
 					{
 					setState(64);
-					expr(0);
+					((For_StatContext)_localctx).first = expr(0);
 					}
 				}
 
@@ -611,7 +614,7 @@ public class MParser extends Parser {
 				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__2) | (1L << T__5) | (1L << T__6) | (1L << T__10) | (1L << T__11) | (1L << NULL) | (1L << TRUE) | (1L << FALSE) | (1L << NEW) | (1L << THIS) | (1L << NUM) | (1L << STR) | (1L << ADD) | (1L << SUB) | (1L << NAME))) != 0)) {
 					{
 					setState(68);
-					expr(0);
+					((For_StatContext)_localctx).second = expr(0);
 					}
 				}
 
@@ -623,7 +626,7 @@ public class MParser extends Parser {
 				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__2) | (1L << T__5) | (1L << T__6) | (1L << T__10) | (1L << T__11) | (1L << NULL) | (1L << TRUE) | (1L << FALSE) | (1L << NEW) | (1L << THIS) | (1L << NUM) | (1L << STR) | (1L << ADD) | (1L << SUB) | (1L << NAME))) != 0)) {
 					{
 					setState(72);
-					expr(0);
+					((For_StatContext)_localctx).third = expr(0);
 					}
 				}
 
