@@ -47,7 +47,7 @@ expr: expr op=('++'|'--')                  # Postfix
     | THIS                                 # This
     | id                                   # Identity
     | '(' expr ')'                         # Parens
-    | expr '=' expr                        # Assignment
+    | <assoc=right> expr '=' expr          # Assignment
     ;
 
 expr_list: expr_list ',' expr_list         # ExprListCombine

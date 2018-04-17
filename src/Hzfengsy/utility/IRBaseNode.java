@@ -7,13 +7,20 @@ import java.util.*;
 public class IRBaseNode
 {
 
-    public baseType getType() {
+    public baseType getType()
+    {
         assert false;
         return new voidType();
     }
 
-    public Vector<baseType> getTypeList() {
+    public Vector<baseType> getTypeList()
+    {
         assert false;
         return new Vector<>();
+    }
+
+    public boolean isLeft()
+    {
+        return false;
     }
 }
