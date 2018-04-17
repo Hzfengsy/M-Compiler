@@ -77,12 +77,12 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         functions.insert("toString", func_toString());
     }
 
-    private Boolean equalClass(baseType a, baseType b)
+    private boolean equalClass(baseType a, baseType b)
     {
-        return a.getClass().equals(b.getClass());
+        return a.equals(b);
     }
 
-    private Boolean checkType(Vector<IRBaseNode> parameter, baseType ... args)
+    private boolean checkType(Vector<IRBaseNode> parameter, baseType ... args)
     {
         if (parameter.size() != args.length) return false;
         for (int i = 0; i < args.length; i++)
@@ -215,6 +215,7 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     {
         String varName = ctx.id().getText();
         String className = ctx.class_stat().getText();
+        if (className.equals("void")) error("cannot define void variable");
         if (localVar.elementAt(localVar.size() - 1).containsKey(varName))
             error("variable " + varName + " redefined");
         baseType exprType = visit(ctx.expr()).getType();
@@ -247,6 +248,7 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     {
         String varName = ctx.id().getText();
         String className = ctx.class_stat().getText();
+        if (className.equals("void")) error("cannot define void variable");
         if (localVar.elementAt(localVar.size() - 1).containsKey(varName))
             error("variable " + varName + " redefined");
         String mappingName = variables.rename(varName);
@@ -542,8 +544,13 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     {
         IRBaseNode left = visit(ctx.expr(0));
         IRBaseNode right = visit(ctx.expr(1));
-        if (left.getType() != right.getType()) error("assign type error in \"" + ctx.getText() + "\"");
+        if (!equalClass(left.getType(), right.getType())) error("assign type error in \"" + ctx.getText() + "\"");
         if (!left.isLeft()) error("left value error");
         return new IRTypeNode(left.getType(), false);
+    }
+
+    @Override public IRBaseNode visitNull(MParser.NullContext ctx)
+    {
+        return new IRTypeNode(classes.getClass("null"), false);
     }
 }

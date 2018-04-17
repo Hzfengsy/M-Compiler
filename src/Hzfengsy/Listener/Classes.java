@@ -14,6 +14,7 @@ public class Classes
         classList.put("string", new stringType());
         classList.put("bool", new boolType());
         classList.put("void", new voidType());
+        classList.put("null", new nullType());
     }
 
     public baseType defineClass(String className) throws Exception

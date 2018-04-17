@@ -13,11 +13,12 @@ abstract public class baseType
 
     public baseType getBaseTYpe() { assert false; return new intType(); }
 
-    public boolean equals(Object x)
+    @Override public boolean equals(Object x)
     {
         if(this == x) return true;
         if(x == null) return false;
-//        Boolean ans = this.getClass() == x.getClass();
+        if (x instanceof nullType && (this instanceof arrayType || this instanceof userType)) return true;
+        if (this instanceof nullType && (x instanceof arrayType || x instanceof userType)) return true;
         return this.getClass() == x.getClass();
     }
 
