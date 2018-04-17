@@ -369,7 +369,7 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         parameter.add(visit(ctx.expr()));
         Boolean checked = checkType(parameter, ctx.op.getText().equals("!") ? classes.getClass("bool") : classes.getClass("int"));
         if (!checked) error("Type error occupied during expr \"" + ctx.getText() + "\"");
-        return new IRTypeNode(classes.getClass("int"), false);
+        return new IRTypeNode(ctx.op.getText().equals("!") ? classes.getClass("bool") : classes.getClass("int"), false);
     }
 
     @Override public IRBaseNode visitNew(MParser.NewContext ctx)
