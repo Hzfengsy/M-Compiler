@@ -16,5 +16,5 @@ public class arrayType extends baseType
         memberFunc.put("size", func_size());
     }
 
-    public baseType getBaseTYpe() { return Base; }
+    public baseType getBaseType() { return Base; }
 }

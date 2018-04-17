@@ -11,7 +11,7 @@ abstract public class baseType
     Map<String, funcType> memberFunc = new HashMap<>();
     Map<String, baseType> memberVar = new HashMap<>();
 
-    public baseType getBaseTYpe() { assert false; return new intType(); }
+    public baseType getBaseType() { assert false; return null; }
 
     @Override public boolean equals(Object x)
     {
@@ -22,16 +22,23 @@ abstract public class baseType
         return this.getClass() == x.getClass();
     }
 
-    public funcType query (String funcName) throws Exception
+    public funcType queryFunc(String funcName) throws Exception
     {
         if (!memberFunc.containsKey(funcName))
-            throw new semanticException("Undefined Functions");
+            throw new semanticException("Undefined Function");
         return memberFunc.get(funcName);
     }
 
-    public Boolean contain (String funcName)
+    public baseType queryVar(String varName) throws Exception
     {
-        return memberFunc.containsKey(funcName);
+        if (!memberVar.containsKey(varName))
+            throw new semanticException("Undefined Variable");
+        return memberVar.get(varName);
+    }
+
+    public Boolean contain (String Name)
+    {
+        return memberFunc.containsKey(Name) || memberVar.containsKey(Name);
     }
 
 }

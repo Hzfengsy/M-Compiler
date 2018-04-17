@@ -174,7 +174,7 @@
 //        }
 //        try
 //        {
-//            if (found) IRStack.peek().add(new IRTypeNode(variables.query(rename)));
+//            if (found) IRStack.peek().add(new IRTypeNode(variables.queryFunc(rename)));
 //        }
 //        catch (Exception e)
 //        {
