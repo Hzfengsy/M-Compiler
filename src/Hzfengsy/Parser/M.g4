@@ -2,7 +2,7 @@ grammar M;
 
 prog: (define|func|clas)+;
 
-clas: CLASS id '{' prog '}';
+clas: CLASS id '{' prog? '}';
 
 func: class_stat? id '(' stat_list ')' '{' stat* '}';
 

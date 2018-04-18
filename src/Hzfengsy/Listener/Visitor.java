@@ -58,7 +58,7 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         baseType clas = classes.getClass(ctx.id().getText());
         IRBaseNode ans = new IRTypeNode(clas, true);
         classStack.push(ans);
-        visit(ctx.prog());
+        if (ctx.prog() != null) visit(ctx.prog());
         classStack.pop();
         return ans;
     }
@@ -318,6 +318,7 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     {
         Vector<IRBaseNode> parameter = new Vector<>();
         parameter.add(visit(ctx.expr()));
+        if (!parameter.elementAt(0).isLeft()) error("left value error in \"" + ctx.getText() + "\"");
         boolean checked = checkType(parameter, classes.getClass("int"));
         if (!checked) error("Type error occupied during expr \"" + ctx.getText() + "\"");
         return new IRTypeNode(classes.getClass("int"), false);
@@ -347,6 +348,7 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     {
         Vector<IRBaseNode> parameter = new Vector<>();
         parameter.add(visit(ctx.expr()));
+        if (!parameter.elementAt(0).isLeft()) error("left value error in \"" + ctx.getText() + "\"");
         boolean checked = checkType(parameter, classes.getClass("int"));
         if (!checked) error("Type error occupied during expr \"" + ctx.getText() + "\"");
         return new IRTypeNode(classes.getClass("int"), false);

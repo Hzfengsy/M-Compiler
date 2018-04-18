@@ -42,22 +42,23 @@ public class Main {
 
     public static void run(String expr) throws Exception
     {
-
-        ANTLRInputStream in = new ANTLRInputStream(expr);
-
-        MLexer lexer = new MLexer(in);
-
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-
-        MParser parser = new MParser(tokens);
-
-        ParseTree tree = parser.prog();
-
-        preVisitor preeval = new preVisitor(functions, classes);
-        preeval.visit(tree);
-
-        Visitor eval = new Visitor(functions, classes);
-        eval.visit(tree);
+//        try
+//        {
+            ANTLRInputStream in = new ANTLRInputStream(expr);
+            MLexer lexer = new MLexer(in);
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            MParser parser = new MParser(tokens);
+            ParseTree tree = parser.prog();
+            preVisitor preeval = new preVisitor(functions, classes);
+            preeval.visit(tree);
+            Visitor eval = new Visitor(functions, classes);
+            eval.visit(tree);
+//        }
+//        catch (IOException e)
+//        {
+//            System.err.println(e.getMessage());
+//            System.exit(1);
+//        }
 
     }
 

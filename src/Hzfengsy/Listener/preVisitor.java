@@ -103,7 +103,7 @@ public class preVisitor extends MBaseVisitor<IRBaseNode>
         catch (Exception e) { error(e.getMessage()); }
         IRBaseNode ans = new IRTypeNode(clas, true);
         classStack.push(ans);
-        visit(ctx.prog());
+        if (ctx.prog() != null) visit(ctx.prog());
         classStack.pop();
         return ans;
     }
@@ -121,7 +121,7 @@ public class preVisitor extends MBaseVisitor<IRBaseNode>
             {
                 userType userClass = (userType) classStack.peek().getType();
                 String userClassName = userClass.getName();
-                if (userClassName.equals(funcName)) className = userClassName;
+                if (userClassName.equals(funcName)) className = "void";
                 else error("error construction function.");
             }
         }
