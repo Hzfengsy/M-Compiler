@@ -30,14 +30,14 @@ abstract public class baseType
     public funcType queryFunc(String funcName) throws Exception
     {
         if (!memberFunc.containsKey(funcName))
-            throw new semanticException("Undefined Function");
+            throw new semanticException("Undefined Member Function \"" + funcName + "\"");
         return memberFunc.get(funcName);
     }
 
     public baseType queryVar(String varName) throws Exception
     {
         if (!memberVar.containsKey(varName))
-            throw new semanticException("Undefined Variable");
+            throw new semanticException("Undefined Member Variable \"" + varName + "\"");
         return memberVar.get(varName);
     }
 

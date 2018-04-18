@@ -177,7 +177,19 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     {
         localVar.add(new HashMap<>());
         String funcName = ctx.id().getText();
-        String className = ctx.class_stat().getText();
+        String className = null;
+        if (ctx.class_stat() == null)
+        {
+            if (classStack.empty()) error("error construction function.");
+            else
+            {
+                userType userClass = (userType) classStack.peek().getType();
+                String userClassName = userClass.getName();
+                if (userClassName.equals(funcName)) className = userClassName;
+                else error("error construction function.");
+            }
+        }
+        else className = ctx.class_stat().getText();
         Vector<baseType> list = visit(ctx.stat_list()).getTypeList();
         baseType returnType = null;
         try
@@ -384,7 +396,8 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
             else
             {
                 userType userClass = (userType)classStack.peek().getType();
-                func = userClass.queryFunc(ctx.id().getText());
+                try { func = userClass.queryFunc(ctx.id().getText()); }
+                catch (Exception e) { func = functions.query(ctx.id().getText()); }
             }
         }
         catch (Exception e) { error(e.getMessage()); }
