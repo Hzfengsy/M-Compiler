@@ -11,72 +11,22 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
 {
 
     private Variable variables = new Variable();
-    private Function functions = new Function();
+    private Function functions;
     private Vector<Map<String, String>> localVar = new Vector<>();
-    private Classes classes = new Classes();
-    private Stack<baseType> nowClass = new Stack<>();
+    private Classes classes;
     private Stack<IRBaseNode> loopStack = new Stack<>();
     private Stack<IRBaseNode> functionStack = new Stack<>();
     private Stack<IRBaseNode> classStack = new Stack<>();
+
+    public Visitor(Function _functions, Classes _classes)
+    {
+        functions = _functions; classes = _classes;
+    }
 
     private void error(String message)
     {
         System.err.println(message);
         System.exit(1);
-    }
-
-    private boolean checkMainFunc()
-    {
-        try
-        {
-            funcType funcMain = functions.query("main");
-            if (funcMain.getReturnType() != classes.getClass("int")) return false;
-        }
-        catch (Exception e)
-        {
-            return false;
-        }
-        return true;
-    }
-
-    private funcType func_getInt()
-    {
-        return new funcType(classes.getClass("int"), new Vector<>());
-    }
-
-    private funcType func_print()
-    {
-        Vector<baseType> parameter = new Vector<>();
-        parameter.add(classes.getClass("string"));
-        return new funcType(classes.getClass("string"), parameter);
-    }
-
-    private funcType func_println()
-    {
-        Vector<baseType> parameter = new Vector<>();
-        parameter.add(classes.getClass("string"));
-        return new funcType(classes.getClass("void"), parameter);
-    }
-
-    private funcType func_getString()
-    {
-        return new funcType(classes.getClass("string"), new Vector<>());
-    }
-
-    private funcType func_toString()
-    {
-        Vector<baseType> parameter = new Vector<>();
-        parameter.add(classes.getClass("int"));
-        return new funcType(classes.getClass("string"), parameter);
-    }
-
-    private void loadInsideFunction()
-    {
-        functions.insert("getInt", func_getInt());
-        functions.insert("print", func_print());
-        functions.insert("println", func_println());
-        functions.insert("getString", func_getString());
-        functions.insert("toString", func_toString());
     }
 
     private boolean equalClass(baseType a, baseType b)
@@ -95,23 +45,17 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         }
         return true;
     }
+
     @Override public IRBaseNode visitProg(MParser.ProgContext ctx)
     {
         localVar.add(new HashMap<>());
-        if (classStack.empty()) loadInsideFunction();
         visitChildren(ctx);
-        if (classStack.empty())
-            if (!checkMainFunc()) error("main function error");
         return null;
     }
 
     @Override public IRBaseNode visitClas(MParser.ClasContext ctx)
     {
-        baseType clas = null;
-        try
-        { clas = classes.defineClass(ctx.id().getText()); }
-        catch (Exception e) { error(e.getMessage()); }
-        nowClass.push(clas);
+        baseType clas = classes.getClass(ctx.id().getText());
         IRBaseNode ans = new IRTypeNode(clas, true);
         classStack.push(ans);
         visit(ctx.prog());
@@ -177,35 +121,19 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     {
         localVar.add(new HashMap<>());
         String funcName = ctx.id().getText();
-        String className = null;
-        if (ctx.class_stat() == null)
-        {
-            if (classStack.empty()) error("error construction function.");
-            else
-            {
-                userType userClass = (userType) classStack.peek().getType();
-                String userClassName = userClass.getName();
-                if (userClassName.equals(funcName)) className = userClassName;
-                else error("error construction function.");
-            }
-        }
-        else className = ctx.class_stat().getText();
-        Vector<baseType> list = visit(ctx.stat_list()).getTypeList();
-        baseType returnType = null;
+        funcType func = null;
         try
         {
-            returnType = classes.getClass(className);
-            funcType type = new funcType(returnType, list);
-            if (classStack.empty()) functions.insert(funcName, type);
+            if (classStack.empty()) func = functions.query(funcName);
             else
             {
                 userType userClass = (userType) classStack.peek().getType();
-                if (userClass.contain(funcName)) error("already have function in class");
-                else userClass.insertMemberFunc(funcName, type);
+                func = userClass.queryFunc(funcName);
             }
         }
-        catch (Exception e) { error(e.getMessage()); }
-        IRBaseNode ans = new IRTypeNode(returnType, false);
+        catch (Exception e) {error(e.getMessage());}
+        visit(ctx.stat_list());
+        IRBaseNode ans = new IRTypeNode(func.getReturnType(), false);
         functionStack.push(ans);
         visit(ctx.stat());
         functionStack.pop();
@@ -288,6 +216,14 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         }
         return null;
 
+    }
+
+    @Override public IRBaseNode visitSegment_Stat(MParser.Segment_StatContext ctx)
+    {
+        localVar.add(new HashMap<>());
+        visitChildren(ctx);
+        localVar.remove(localVar.size() - 1);
+        return null;
     }
 
     @Override public IRBaseNode visitId_Define(MParser.Id_DefineContext ctx)

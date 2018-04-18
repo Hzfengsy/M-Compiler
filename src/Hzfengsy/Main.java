@@ -1,6 +1,5 @@
 package Hzfengsy;
-//import Hzfengsy.Listener.MyListener;
-import Hzfengsy.Listener.Visitor;
+import Hzfengsy.Listener.*;
 import Hzfengsy.Parser.MLexer;
 import Hzfengsy.Parser.MParser;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -13,6 +12,9 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 
 public class Main {
+
+    private static Function functions = new Function();
+    private static Classes classes = new Classes();
 
     private static String readTestFile(String filePath) {
         String ans = new String();
@@ -51,11 +53,12 @@ public class Main {
 
         ParseTree tree = parser.prog();
 
-        Visitor eval = new Visitor();
+        preVisitor preeval = new preVisitor(functions, classes);
+        preeval.visit(tree);
+
+        Visitor eval = new Visitor(functions, classes);
         eval.visit(tree);
 
-//        ParseTreeWalker walker = new ParseTreeWalker();
-//        walker.walk(new MyListener(), tree);
     }
 
     public static void main(String[] args) throws Exception

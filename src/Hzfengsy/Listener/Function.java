@@ -20,7 +20,7 @@ public class Function {
     public funcType query (String funcName) throws Exception
     {
         if (!funcList.containsKey(funcName))
-            throw new semanticException("Undefined Functions");
+            throw new semanticException("Undefined Functions \"" + funcName + "\"");
         return funcList.get(funcName);
     }
 
