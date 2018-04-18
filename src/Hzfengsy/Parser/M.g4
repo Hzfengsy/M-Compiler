@@ -4,7 +4,7 @@ prog: (define|func|clas)+;
 
 clas: CLASS id '{' prog '}';
 
-func: class_stat? id '(' stat_list ')' stat;
+func: class_stat? id '(' stat_list ')' '{' stat* '}';
 
 stat: IF '(' expr ')' stat                         # If_Stat
     | IF '(' expr ')' stat ELSE stat               # IfElse_Stat

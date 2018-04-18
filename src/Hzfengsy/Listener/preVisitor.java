@@ -161,5 +161,17 @@ public class preVisitor extends MBaseVisitor<IRBaseNode>
         return new IRTypeListNode(list);
     }
 
+    @Override public IRBaseNode visitId_Define(MParser.Id_DefineContext ctx)
+    {
+        String varName = ctx.id().getText();
+        String className = ctx.class_stat().getText();
+        if (className.equals("void")) error("cannot define void variable");
+        if (!classStack.empty())
+        {
+            userType userClass = (userType)classStack.peek().getType();
+            userClass.insertMemberVar(varName, classes.getClass(className));
+        }
+        return new IRBaseNode();
+    }
 
 }
