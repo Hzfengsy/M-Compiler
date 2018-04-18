@@ -215,6 +215,8 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         String className = ctx.class_stat().getText();
         String mappingName = variables.rename(varName);
         baseType type = null;
+        if (localVar.elementAt(localVar.size() - 1).containsKey(varName) || functions.contain(varName))
+            error("variable " + varName + " has been defined");
         try
         {
             type = classes.getClass(className);
@@ -232,16 +234,14 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         String varName = ctx.id().getText();
         String className = ctx.class_stat().getText();
         if (className.equals("void")) error("cannot define void variable");
-        if (localVar.elementAt(localVar.size() - 1).containsKey(varName))
-            error("variable " + varName + " redefined");
         baseType exprType = visit(ctx.expr()).getType();
-        if (localVar.elementAt(localVar.size() - 1).containsKey(varName))
+        if (localVar.elementAt(localVar.size() - 1).containsKey(varName) || functions.contain(varName))
             error("variable " + varName + " has been defined");
         String mappingName = variables.rename(varName);
         try
         {
             variables.insert(mappingName, classes.getClass(className));
-            if (exprType != classes.getClass(className)) error("define variable " + varName + " error");
+            if (!exprType.equals(classes.getClass(className))) error("define variable " + varName + " error");
         }
         catch (Exception e) { error(e.getMessage()); }
         localVar.elementAt(localVar.size() - 1).put(varName, mappingName);
@@ -283,7 +283,7 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         String varName = ctx.id().getText();
         String className = ctx.class_stat().getText();
         if (className.equals("void")) error("cannot define void variable");
-        if (localVar.elementAt(localVar.size() - 1).containsKey(varName))
+        if (localVar.elementAt(localVar.size() - 1).containsKey(varName) || functions.contain(varName))
             error("variable " + varName + " redefined");
         String mappingName = variables.rename(varName);
         try

@@ -12,6 +12,11 @@ public class userType extends baseType
         memberFunc.put(funcName, func);
     }
 
+    public String getName()
+    {
+        return className;
+    }
+
     public void insertMemberVar(String varName, baseType var)
     {
         memberVar.put(varName, var);

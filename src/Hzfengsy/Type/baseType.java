@@ -19,6 +19,11 @@ abstract public class baseType
         if(x == null) return false;
         if (x instanceof nullType && (this instanceof arrayType || this instanceof userType)) return true;
         if (this instanceof nullType && (x instanceof arrayType || x instanceof userType)) return true;
+        if (this instanceof userType || x instanceof  userType)
+        {
+            if (this instanceof userType && x instanceof userType) return ((userType) x).getName() == ((userType) this).getName();
+            else return false;
+        }
         return this.getClass() == x.getClass();
     }
 
