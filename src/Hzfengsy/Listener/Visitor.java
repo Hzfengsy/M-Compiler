@@ -66,29 +66,29 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     //IF STATEMENT
     @Override public IRBaseNode visitIf_Stat(MParser.If_StatContext ctx)
     {
-//        localVar.add(new HashMap<>());
+        localVar.add(new HashMap<>());
         IRBaseNode boolcheck = visit(ctx.expr());
         if (boolcheck.getType() != classes.getClass("bool"))
             error("error during if stat");
         IRBaseNode ans = visit(ctx.stat());
-//        localVar.remove(localVar.size() - 1);
+        localVar.remove(localVar.size() - 1);
         return ans;
     }
 
     @Override public IRBaseNode visitIfElse_Stat(MParser.IfElse_StatContext ctx)
     {
-//        localVar.add(new HashMap<>());
+        localVar.add(new HashMap<>());
         IRBaseNode boolcheck = visit(ctx.expr());
         if (boolcheck.getType() != classes.getClass("bool"))
             error("error during if stat");
         IRBaseNode ans = visit(ctx.stat(0));
-//        localVar.remove(localVar.size() - 1);
+        localVar.remove(localVar.size() - 1);
         return ans;
     }
 
     @Override public IRBaseNode visitFor_Stat(MParser.For_StatContext ctx)
     {
-//        localVar.add(new HashMap<>());
+        localVar.add(new HashMap<>());
         if (ctx.second != null)
         {
             IRBaseNode boolcheck = visit(ctx.second);
@@ -99,13 +99,13 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         loopStack.push(ans);
         visit(ctx.stat());
         loopStack.pop();
-//        localVar.remove(localVar.size() - 1);
+        localVar.remove(localVar.size() - 1);
         return ans;
     }
 
     @Override public IRBaseNode visitWhile_Stat(MParser.While_StatContext ctx)
     {
-//        localVar.add(new HashMap<>());
+        localVar.add(new HashMap<>());
         IRBaseNode boolcheck = visit(ctx.expr());
         if (boolcheck.getType() != classes.getClass("bool"))
             error("error during for stat");
@@ -113,7 +113,7 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         loopStack.push(ans);
         visit(ctx.stat());
         loopStack.pop();
-//        localVar.remove(localVar.size() - 1);
+        localVar.remove(localVar.size() - 1);
         return ans;
     }
 
