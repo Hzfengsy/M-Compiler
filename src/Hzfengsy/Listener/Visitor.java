@@ -55,11 +55,13 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
 
     @Override public IRBaseNode visitClas(MParser.ClasContext ctx)
     {
+        localVar.add(new HashMap<>());
         baseType clas = classes.getClass(ctx.id().getText());
         IRBaseNode ans = new IRTypeNode(clas, true);
         classStack.push(ans);
         if (ctx.prog() != null) visit(ctx.prog());
         classStack.pop();
+        localVar.remove(localVar.size() - 1);
         return ans;
     }
 
@@ -254,8 +256,21 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         String varName = ctx.getText();
         boolean found = false;
         String rename = new String();
+        baseType var = null;
         for (int i = localVar.size() - 1; i >= 0; i--)
         {
+            if (i == 1 && !classStack.empty())
+            {
+                userType userClass = (userType) classStack.peek().getType();
+                try
+                {
+                    var = userClass.queryVar(varName);
+                    found = true;
+                    break;
+                }
+                catch (Exception e) {}
+                continue;
+            }
             Map<String, String> local = localVar.elementAt(i);
             if (local.containsKey(varName))
             {
@@ -268,7 +283,7 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
         {
             if (found)
             {
-                baseType var = variables.query(rename);
+                if (var == null) var = variables.query(rename);
                 return new IRTypeNode(var, true);
             }
         }
