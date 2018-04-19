@@ -74,7 +74,7 @@ class_name: BOOL
           | NAME
           ;
 
-class_stat: class_stat '[]'         # Array
+class_stat: class_stat '[' ']'         # Array
           | class_name              # SingleClass
           ;
 

@@ -7,8 +7,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.io.*;
 
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-
 
 public class Main {
 
@@ -50,10 +48,12 @@ public class Main {
             MParser parser = new MParser(tokens);
             parser.setErrorHandler(new BailErrorStrategy());
             ParseTree tree = parser.prog();
-            preVisitor preeval = new preVisitor(functions, classes);
-            preeval.visit(tree);
-            Visitor eval = new Visitor(functions, classes);
-            eval.visit(tree);
+            classVisitor class_visitor = new classVisitor(classes);
+            class_visitor.visit(tree);
+            funcVisitor func_visitor = new funcVisitor(functions, classes);
+            func_visitor.visit(tree);
+            mainVisitor main_visitor = new mainVisitor(functions, classes);
+            main_visitor.visit(tree);
         }
         catch (Exception e)
         {

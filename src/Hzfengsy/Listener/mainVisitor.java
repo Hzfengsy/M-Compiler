@@ -7,7 +7,7 @@ import Hzfengsy.utility.*;
 
 import java.util.*;
 
-public class Visitor extends MBaseVisitor<IRBaseNode>
+public class mainVisitor extends MBaseVisitor<IRBaseNode>
 {
 
     private Variable variables = new Variable();
@@ -18,7 +18,7 @@ public class Visitor extends MBaseVisitor<IRBaseNode>
     private Stack<IRBaseNode> functionStack = new Stack<>();
     private Stack<IRBaseNode> classStack = new Stack<>();
 
-    public Visitor(Function _functions, Classes _classes)
+    public mainVisitor(Function _functions, Classes _classes)
     {
         functions = _functions; classes = _classes;
     }

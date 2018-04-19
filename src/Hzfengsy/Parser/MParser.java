@@ -2364,7 +2364,7 @@ public class MParser extends Parser {
 			class_name();
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(247);
+			setState(248);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,20,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
@@ -2378,11 +2378,13 @@ public class MParser extends Parser {
 					setState(243);
 					if (!(precpred(_ctx, 2))) throw new FailedPredicateException(this, "precpred(_ctx, 2)");
 					setState(244);
-					match(T__28);
+					match(T__7);
+					setState(245);
+					match(T__8);
 					}
 					} 
 				}
-				setState(249);
+				setState(250);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,20,_ctx);
 			}
@@ -2427,32 +2429,32 @@ public class MParser extends Parser {
 		enterRule(_localctx, 22, RULE_dimension);
 		int _la;
 		try {
-			setState(256);
+			setState(257);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T__7:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(250);
+				setState(251);
 				match(T__7);
-				setState(252);
+				setState(253);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__2) | (1L << T__5) | (1L << T__6) | (1L << T__10) | (1L << T__11) | (1L << NULL) | (1L << TRUE) | (1L << FALSE) | (1L << NEW) | (1L << THIS) | (1L << NUM) | (1L << STR) | (1L << ADD) | (1L << SUB) | (1L << NAME))) != 0)) {
 					{
-					setState(251);
+					setState(252);
 					expr(0);
 					}
 				}
 
-				setState(254);
+				setState(255);
 				match(T__8);
 				}
 				break;
 			case T__28:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(255);
+				setState(256);
 				match(T__28);
 				}
 				break;
@@ -2507,21 +2509,21 @@ public class MParser extends Parser {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(258);
+			setState(259);
 			class_name();
-			setState(262);
+			setState(263);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,23,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					{
 					{
-					setState(259);
+					setState(260);
 					dimension();
 					}
 					} 
 				}
-				setState(264);
+				setState(265);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,23,_ctx);
 			}
@@ -2609,7 +2611,7 @@ public class MParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3:\u010c\4\2\t\2\4"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3:\u010d\4\2\t\2\4"+
 		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
 		"\13\4\f\t\f\4\r\t\r\4\16\t\16\3\2\3\2\3\2\6\2 \n\2\r\2\16\2!\3\3\3\3\3"+
 		"\3\3\3\5\3(\n\3\3\3\3\3\3\4\5\4-\n\4\3\4\3\4\3\4\3\4\3\4\3\4\7\4\65\n"+
@@ -2625,13 +2627,13 @@ public class MParser extends Parser {
 		"\5\7\u00cb\n\7\3\7\3\7\3\7\7\7\u00d0\n\7\f\7\16\7\u00d3\13\7\3\b\3\b\3"+
 		"\b\3\b\5\b\u00d9\n\b\3\b\3\b\3\b\7\b\u00de\n\b\f\b\16\b\u00e1\13\b\3\t"+
 		"\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\5\t\u00ed\n\t\3\n\3\n\3\13\3\13\3"+
-		"\f\3\f\3\f\3\f\3\f\7\f\u00f8\n\f\f\f\16\f\u00fb\13\f\3\r\3\r\5\r\u00ff"+
-		"\n\r\3\r\3\r\5\r\u0103\n\r\3\16\3\16\7\16\u0107\n\16\f\16\16\16\u010a"+
+		"\f\3\f\3\f\3\f\3\f\3\f\7\f\u00f9\n\f\f\f\16\f\u00fc\13\f\3\r\3\r\5\r\u0100"+
+		"\n\r\3\r\3\r\5\r\u0104\n\r\3\16\3\16\7\16\u0108\n\16\f\16\16\16\u010b"+
 		"\13\16\3\16\2\6\n\f\16\26\17\2\4\6\b\n\f\16\20\22\24\26\30\32\2\n\3\2"+
 		"\b\t\3\2\678\3\2\r\16\4\2\17\17\65\66\3\2\20\21\3\2\22\25\3\2\26\27\5"+
-		"\2 \"$$99\2\u0137\2\37\3\2\2\2\4#\3\2\2\2\6,\3\2\2\2\bt\3\2\2\2\n\u008f"+
+		"\2 \"$$99\2\u0138\2\37\3\2\2\2\4#\3\2\2\2\6,\3\2\2\2\bt\3\2\2\2\n\u008f"+
 		"\3\2\2\2\f\u00c8\3\2\2\2\16\u00d4\3\2\2\2\20\u00ec\3\2\2\2\22\u00ee\3"+
-		"\2\2\2\24\u00f0\3\2\2\2\26\u00f2\3\2\2\2\30\u0102\3\2\2\2\32\u0104\3\2"+
+		"\2\2\2\24\u00f0\3\2\2\2\26\u00f2\3\2\2\2\30\u0103\3\2\2\2\32\u0105\3\2"+
 		"\2\2\34 \5\20\t\2\35 \5\6\4\2\36 \5\4\3\2\37\34\3\2\2\2\37\35\3\2\2\2"+
 		"\37\36\3\2\2\2 !\3\2\2\2!\37\3\2\2\2!\"\3\2\2\2\"\3\3\2\2\2#$\7/\2\2$"+
 		"%\5\22\n\2%\'\7\3\2\2&(\5\2\2\2\'&\3\2\2\2\'(\3\2\2\2()\3\2\2\2)*\7\4"+
@@ -2692,16 +2694,16 @@ public class MParser extends Parser {
 		"\u00e9\5\26\f\2\u00e9\u00ea\5\22\n\2\u00ea\u00eb\7\7\2\2\u00eb\u00ed\3"+
 		"\2\2\2\u00ec\u00e2\3\2\2\2\u00ec\u00e8\3\2\2\2\u00ed\21\3\2\2\2\u00ee"+
 		"\u00ef\79\2\2\u00ef\23\3\2\2\2\u00f0\u00f1\t\t\2\2\u00f1\25\3\2\2\2\u00f2"+
-		"\u00f3\b\f\1\2\u00f3\u00f4\5\24\13\2\u00f4\u00f9\3\2\2\2\u00f5\u00f6\f"+
-		"\4\2\2\u00f6\u00f8\7\37\2\2\u00f7\u00f5\3\2\2\2\u00f8\u00fb\3\2\2\2\u00f9"+
-		"\u00f7\3\2\2\2\u00f9\u00fa\3\2\2\2\u00fa\27\3\2\2\2\u00fb\u00f9\3\2\2"+
-		"\2\u00fc\u00fe\7\n\2\2\u00fd\u00ff\5\n\6\2\u00fe\u00fd\3\2\2\2\u00fe\u00ff"+
-		"\3\2\2\2\u00ff\u0100\3\2\2\2\u0100\u0103\7\13\2\2\u0101\u0103\7\37\2\2"+
-		"\u0102\u00fc\3\2\2\2\u0102\u0101\3\2\2\2\u0103\31\3\2\2\2\u0104\u0108"+
-		"\5\24\13\2\u0105\u0107\5\30\r\2\u0106\u0105\3\2\2\2\u0107\u010a\3\2\2"+
-		"\2\u0108\u0106\3\2\2\2\u0108\u0109\3\2\2\2\u0109\33\3\2\2\2\u010a\u0108"+
-		"\3\2\2\2\32\37!\',\66LPT`kpt\u008f\u00c3\u00c5\u00ca\u00d1\u00d8\u00df"+
-		"\u00ec\u00f9\u00fe\u0102\u0108";
+		"\u00f3\b\f\1\2\u00f3\u00f4\5\24\13\2\u00f4\u00fa\3\2\2\2\u00f5\u00f6\f"+
+		"\4\2\2\u00f6\u00f7\7\n\2\2\u00f7\u00f9\7\13\2\2\u00f8\u00f5\3\2\2\2\u00f9"+
+		"\u00fc\3\2\2\2\u00fa\u00f8\3\2\2\2\u00fa\u00fb\3\2\2\2\u00fb\27\3\2\2"+
+		"\2\u00fc\u00fa\3\2\2\2\u00fd\u00ff\7\n\2\2\u00fe\u0100\5\n\6\2\u00ff\u00fe"+
+		"\3\2\2\2\u00ff\u0100\3\2\2\2\u0100\u0101\3\2\2\2\u0101\u0104\7\13\2\2"+
+		"\u0102\u0104\7\37\2\2\u0103\u00fd\3\2\2\2\u0103\u0102\3\2\2\2\u0104\31"+
+		"\3\2\2\2\u0105\u0109\5\24\13\2\u0106\u0108\5\30\r\2\u0107\u0106\3\2\2"+
+		"\2\u0108\u010b\3\2\2\2\u0109\u0107\3\2\2\2\u0109\u010a\3\2\2\2\u010a\33"+
+		"\3\2\2\2\u010b\u0109\3\2\2\2\32\37!\',\66LPT`kpt\u008f\u00c3\u00c5\u00ca"+
+		"\u00d1\u00d8\u00df\u00ec\u00fa\u00ff\u0103\u0109";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

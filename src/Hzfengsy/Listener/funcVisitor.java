@@ -15,14 +15,14 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.Vector;
 
-public class preVisitor extends MBaseVisitor<IRBaseNode>
+public class funcVisitor extends MBaseVisitor<IRBaseNode>
 {
 
     private Function functions;
     private Classes classes;
     private Stack<IRBaseNode> classStack = new Stack<>();
 
-    public preVisitor(Function _functions, Classes _classes)
+    public funcVisitor(Function _functions, Classes _classes)
     {
         functions = _functions; classes = _classes;
     }
@@ -99,7 +99,7 @@ public class preVisitor extends MBaseVisitor<IRBaseNode>
     @Override public IRBaseNode visitClas(MParser.ClasContext ctx)
     {
         baseType clas = null;
-        try { clas = classes.defineClass(ctx.id().getText()); }
+        try { clas = classes.getClass(ctx.id().getText()); }
         catch (Exception e) { error(e.getMessage()); }
         IRBaseNode ans = new IRTypeNode(clas, true);
         classStack.push(ans);
