@@ -49,33 +49,33 @@ public class preVisitor extends MBaseVisitor<IRBaseNode>
 
     private funcType func_getInt()
     {
-        return new funcType(classes.getClass("int"), new Vector<>());
+        return new funcType(classes.get("int"), new Vector<>());
     }
 
     private funcType func_print()
     {
         Vector<baseType> parameter = new Vector<>();
-        parameter.add(classes.getClass("string"));
-        return new funcType(classes.getClass("string"), parameter);
+        parameter.add(classes.get("string"));
+        return new funcType(classes.get("string"), parameter);
     }
 
     private funcType func_println()
     {
         Vector<baseType> parameter = new Vector<>();
-        parameter.add(classes.getClass("string"));
-        return new funcType(classes.getClass("void"), parameter);
+        parameter.add(classes.get("string"));
+        return new funcType(classes.get("void"), parameter);
     }
 
     private funcType func_getString()
     {
-        return new funcType(classes.getClass("string"), new Vector<>());
+        return new funcType(classes.get("string"), new Vector<>());
     }
 
     private funcType func_toString()
     {
         Vector<baseType> parameter = new Vector<>();
-        parameter.add(classes.getClass("int"));
-        return new funcType(classes.getClass("string"), parameter);
+        parameter.add(classes.get("int"));
+        return new funcType(classes.get("string"), parameter);
     }
 
     private void loadInsideFunction()
@@ -155,7 +155,9 @@ public class preVisitor extends MBaseVisitor<IRBaseNode>
     {
         if (ctx.getText().equals("")) return new IRTypeListNode(new Vector<>());
         String className = ctx.class_stat().getText();
-        baseType type = classes.getClass(className);
+        baseType type = null;
+        try { classes.getClass(className); }
+        catch (Exception e) { error(e.getMessage()); }
         Vector<baseType> list = new Vector<>();
         list.add(type);
         return new IRTypeListNode(list);
@@ -167,10 +169,11 @@ public class preVisitor extends MBaseVisitor<IRBaseNode>
         String className = ctx.class_stat().getText();
         if (className.equals("void")) error("cannot define void variable");
         if (!classStack.empty())
-        {
-            userType userClass = (userType)classStack.peek().getType();
-            userClass.insertMemberVar(varName, classes.getClass(className));
-        }
+            try
+            {
+                userType userClass = (userType)classStack.peek().getType();
+                userClass.insertMemberVar(varName, classes.getClass(className));
+            } catch (Exception e) { error(e.getMessage()); }
         return new IRBaseNode();
     }
 

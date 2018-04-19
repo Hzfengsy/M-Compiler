@@ -26,7 +26,14 @@ public class Classes
         return clas;
     }
 
-    public baseType getClass(String className)
+    public baseType get(String className)
+    {
+        try { return getClass(className); }
+        catch (Exception e) {}
+        return null;
+    }
+
+    public baseType getClass(String className) throws Exception
     {
         if (classList.containsKey(className)) return classList.get(className);
         if (className.length() > 2 && className.substring(className.length() - 2).equals("[]"))
@@ -36,7 +43,8 @@ public class Classes
             classList.put(className, Type);
             return Type;
         }
-        return classList.get(className);
+        throw new semanticException("cannot find a class called \"" + className + "\"" );
+//        return classList.get(className);
     }
 
     public boolean containClass(String className)

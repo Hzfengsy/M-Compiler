@@ -2,8 +2,7 @@ package Hzfengsy;
 import Hzfengsy.Listener.*;
 import Hzfengsy.Parser.MLexer;
 import Hzfengsy.Parser.MParser;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.io.*;
@@ -40,26 +39,27 @@ public class Main {
         return ans;
     }
 
-    public static void run(String expr) throws Exception
+    public static void run(String prog) throws Exception
     {
-//        try
-//        {
-            ANTLRInputStream in = new ANTLRInputStream(expr);
-            MLexer lexer = new MLexer(in);
+
+        try
+        {
+            CharStream input = CharStreams.fromString(prog);
+            MLexer lexer = new MLexer(input);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             MParser parser = new MParser(tokens);
+            parser.setErrorHandler(new BailErrorStrategy());
             ParseTree tree = parser.prog();
             preVisitor preeval = new preVisitor(functions, classes);
             preeval.visit(tree);
             Visitor eval = new Visitor(functions, classes);
             eval.visit(tree);
-//        }
-//        catch (IOException e)
-//        {
-//            System.err.println(e.getMessage());
-//            System.exit(1);
-//        }
-
+        }
+        catch (Exception e)
+        {
+            System.err.println("Parser error");
+            System.exit(1);
+        }
     }
 
     public static void main(String[] args) throws Exception
