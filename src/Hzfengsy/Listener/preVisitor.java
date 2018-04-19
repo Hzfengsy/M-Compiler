@@ -156,7 +156,7 @@ public class preVisitor extends MBaseVisitor<IRBaseNode>
         if (ctx.getText().equals("")) return new IRTypeListNode(new Vector<>());
         String className = ctx.class_stat().getText();
         baseType type = null;
-        try { classes.getClass(className); }
+        try { type = classes.getClass(className); }
         catch (Exception e) { error(e.getMessage()); }
         Vector<baseType> list = new Vector<>();
         list.add(type);
