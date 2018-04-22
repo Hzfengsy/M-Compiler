@@ -1,8 +1,7 @@
-package Hzfengsy.Listener;
+package Hzfengsy.Visitor;
 
 import Hzfengsy.Parser.MBaseVisitor;
 import Hzfengsy.Parser.MParser;
-import Hzfengsy.Type.arrayType;
 import Hzfengsy.Type.baseType;
 import Hzfengsy.Type.funcType;
 import Hzfengsy.Type.userType;
@@ -10,8 +9,6 @@ import Hzfengsy.utility.IRBaseNode;
 import Hzfengsy.utility.IRTypeListNode;
 import Hzfengsy.utility.IRTypeNode;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Stack;
 import java.util.Vector;
 

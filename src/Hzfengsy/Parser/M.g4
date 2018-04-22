@@ -1,5 +1,7 @@
 grammar M;
 
+main_prog : prog;
+
 prog: (define|func|clas)+;
 
 clas: CLASS id '{' prog? '}';

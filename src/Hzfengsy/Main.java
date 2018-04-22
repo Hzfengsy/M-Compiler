@@ -1,5 +1,5 @@
 package Hzfengsy;
-import Hzfengsy.Listener.*;
+import Hzfengsy.Visitor.*;
 import Hzfengsy.Parser.MLexer;
 import Hzfengsy.Parser.MParser;
 import org.antlr.v4.runtime.*;
@@ -47,7 +47,7 @@ public class Main {
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             MParser parser = new MParser(tokens);
             parser.setErrorHandler(new BailErrorStrategy());
-            ParseTree tree = parser.prog();
+            ParseTree tree = parser.main_prog();
             classVisitor class_visitor = new classVisitor(classes);
             class_visitor.visit(tree);
             funcVisitor func_visitor = new funcVisitor(functions, classes);

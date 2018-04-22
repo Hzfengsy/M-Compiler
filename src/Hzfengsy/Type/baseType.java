@@ -13,12 +13,13 @@ abstract public class baseType
 
     public baseType getBaseType() { assert false; return null; }
 
-    @Override public boolean equals(Object x)
+    public boolean assign_check(baseType x)
     {
         if(this == x) return true;
         if(x == null) return false;
+        if (this instanceof nullType) return false;
+        if (this instanceof voidType || x instanceof voidType) return false;
         if (x instanceof nullType && (this instanceof arrayType || this instanceof userType)) return true;
-        if (this instanceof nullType && (x instanceof arrayType || x instanceof userType)) return true;
         if (this instanceof userType || x instanceof  userType)
         {
             if (this instanceof userType && x instanceof userType) return ((userType) x).getName() == ((userType) this).getName();

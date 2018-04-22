@@ -16,6 +16,18 @@ public class MBaseListener implements MListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterMain_prog(MParser.Main_progContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitMain_prog(MParser.Main_progContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterProg(MParser.ProgContext ctx) { }
 	/**
 	 * {@inheritDoc}

@@ -1,7 +1,6 @@
-package Hzfengsy.Listener;
+package Hzfengsy.Visitor;
 
 import Hzfengsy.Exceptions.semanticException;
-import Hzfengsy.Type.baseType;
 import Hzfengsy.Type.funcType;
 
 import java.util.HashMap;

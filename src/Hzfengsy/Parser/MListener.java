@@ -8,6 +8,16 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  */
 public interface MListener extends ParseTreeListener {
 	/**
+	 * Enter a parse tree produced by {@link MParser#main_prog}.
+	 * @param ctx the parse tree
+	 */
+	void enterMain_prog(MParser.Main_progContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MParser#main_prog}.
+	 * @param ctx the parse tree
+	 */
+	void exitMain_prog(MParser.Main_progContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link MParser#prog}.
 	 * @param ctx the parse tree
 	 */
