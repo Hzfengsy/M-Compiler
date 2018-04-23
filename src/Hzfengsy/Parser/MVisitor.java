@@ -189,7 +189,7 @@ public interface MVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitAssignment(MParser.AssignmentContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code Function}
+	 * Visit a parse tree produced by the {@code Functions}
 	 * labeled alternative in {@link MParser#expr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

@@ -312,13 +312,13 @@ public interface MListener extends ParseTreeListener {
 	 */
 	void exitAssignment(MParser.AssignmentContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code Function}
+	 * Enter a parse tree produced by the {@code Functions}
 	 * labeled alternative in {@link MParser#expr}.
 	 * @param ctx the parse tree
 	 */
 	void enterFunction(MParser.FunctionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code Function}
+	 * Exit a parse tree produced by the {@code Functions}
 	 * labeled alternative in {@link MParser#expr}.
 	 * @param ctx the parse tree
 	 */

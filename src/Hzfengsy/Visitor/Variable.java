@@ -1,35 +1,31 @@
 package Hzfengsy.Visitor;
 
-import Hzfengsy.Type.baseType;
+import Hzfengsy.Type.BaseType;
 import Hzfengsy.Exceptions.*;
 
 import java.util.*;
 
-public class Variable {
+public class Variable
+{
 
-    private Map<String, baseType> varList = new HashMap<String, baseType>();
+    private Map<String, BaseType> varList = new HashMap<String, BaseType>();
 
-    public void insert (String varName, baseType varType) throws Exception
-    {
+    public void insert(String varName, BaseType varType) throws Exception {
         if (varList.containsKey(varName))
-            throw new semanticException("already has a variable named" + "\"" + varName + "\"");
+            throw new SemanticException("already has a variable named" + "\"" + varName + "\"");
         varList.put(varName, varType);
     }
 
-    public baseType query (String varName) throws Exception
-    {
+    public BaseType query(String varName) throws Exception {
         if (!varList.containsKey(varName))
-            throw new semanticException("cannot find a variable named" + "\"" + varName + "\"");
+            throw new SemanticException("cannot find a variable named" + "\"" + varName + "\"");
         return varList.get(varName);
     }
 
-    public String rename (String varName)
-    {
+    public String rename(String varName) {
         if (!varList.containsKey(varName)) return varName;
-        else for (int i = 0;; i++)
-        {
-            String newName = varName + String.valueOf(i);
-            if (!varList.containsKey(newName)) return newName;
+        else for (int i = 0; ; i++) {
+            String newName = varName + String.valueOf(i); if (!varList.containsKey(newName)) return newName;
         }
     }
 
