@@ -157,7 +157,7 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
             functionStack.pop();
             localVar.remove(localVar.size() - 1);
             return ans;
-        } catch (NullPointerException e) {} catch (Exception e) {}
+        } catch (NullPointerException e) {} catch (Exception e) {error(e.getMessage(), ctx);}
         return null;
     }
 
@@ -172,6 +172,10 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
     public IRBaseNode visitStatList(MParser.StatListContext ctx) {
         if (ctx.getText().equals("")) return new IRTypeListNode(new Vector<>());
         String varName = ctx.id().getText();
+        if (functions.contain(varName) || localVar.contains(varName)) {
+            error("redefine variable \'" + varName + "\'", ctx);
+            return null;
+        }
         String className = ctx.class_stat().getText();
         String mappingName = variables.rename(varName);
         BaseType type = null;
