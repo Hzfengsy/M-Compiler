@@ -29,7 +29,8 @@ expr: expr op=('++'|'--')                  # Postfix
     | expr '.' id '(' expr_list ')'        # Memberfunc
     | op=('++'|'--') expr                  # Prefix
     | op=('+'|'-') expr                    # Unary
-    | op=('!'|'~') expr                    # Not
+    | '~' expr                             # Not
+    | '!' expr                             # LNot
     | <assoc=right> 'new' class_new        # New
     | expr op=('*'|'/'|'%') expr           # MulDivMod
     | expr op=('+'|'-') expr               # AddSub

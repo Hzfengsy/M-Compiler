@@ -1,13 +1,13 @@
 package Hzfengsy;
 
-import Hzfengsy.Exceptions.ErrorReporter;
+import Hzfengsy.Exceptions.*;
+import Hzfengsy.Parser.*;
 import Hzfengsy.Visitor.*;
-import Hzfengsy.Parser.MLexer;
-import Hzfengsy.Parser.MParser;
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.*;
 
 import java.io.*;
+import java.util.*;
 
 
 public class Main
@@ -43,24 +43,31 @@ public class Main
     }
 
     public static void run(String prog) {
+        Vector<String> errors = new Vector<>();
         CharStream input = CharStreams.fromString(prog);
         MLexer lexer = new MLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         MParser parser = new MParser(tokens);
+        parser.removeErrorListeners();
+        parser.addErrorListener(new BaseErrorListener()
+        {
+            @Override
+            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+                errors.add("syntax error: " + line + ":" + charPositionInLine + ": " + msg);
+            }
+        });
         ParseTree tree = parser.main_prog();
+        if (!errors.isEmpty()) {
+            for (String message : errors) System.err.println(message);
+            System.exit(1);
+        }
         ClassVisitor class_visitor = new ClassVisitor(classes, reporter);
         FuncVisitor func_visitor = new FuncVisitor(functions, classes, reporter);
         MainVisitor main_visitor = new MainVisitor(functions, classes, reporter);
-        try {
-            parser.setErrorHandler(new BailErrorStrategy());
-            class_visitor.visit(tree);
-            func_visitor.visit(tree);
-            main_visitor.visit(tree);
-            reporter.check();
-        } catch (Exception e) {
-//            System.err.println("Parser error");
-            System.exit(1);
-        }
+        class_visitor.visit(tree);
+        func_visitor.visit(tree);
+        main_visitor.visit(tree);
+        reporter.check();
     }
 
     public static void main(String[] args) {

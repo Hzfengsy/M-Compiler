@@ -126,6 +126,13 @@ public interface MVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitOr(MParser.OrContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code LNot}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLNot(MParser.LNotContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code Parens}
 	 * labeled alternative in {@link MParser#expr}.
 	 * @param ctx the parse tree
@@ -189,7 +196,7 @@ public interface MVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitAssignment(MParser.AssignmentContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code Functions}
+	 * Visit a parse tree produced by the {@code Function}
 	 * labeled alternative in {@link MParser#expr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

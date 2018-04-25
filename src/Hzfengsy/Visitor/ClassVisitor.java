@@ -17,9 +17,9 @@ public class ClassVisitor extends MBaseVisitor<IRBaseNode>
     }
 
     private void error(String message, ParserRuleContext ctx) {
-        Integer start = ctx.getStart().getStartIndex();
-        Integer stop = ctx.getStop().getStopIndex();
-        reporter.reportError(message, null, null, ctx.getStart().getLine(), start, stop + 1);
+        Integer start = ctx.getStart().getCharPositionInLine();
+        Integer stop = ctx.getStop().getCharPositionInLine() + ctx.getStop().getText().length();
+        reporter.reportError(message, null, null, ctx.getStart().getLine(), start, stop);
     }
 
     @Override

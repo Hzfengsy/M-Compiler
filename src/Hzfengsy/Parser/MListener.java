@@ -204,6 +204,18 @@ public interface MListener extends ParseTreeListener {
 	 */
 	void exitOr(MParser.OrContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code LNot}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterLNot(MParser.LNotContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code LNot}
+	 * labeled alternative in {@link MParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitLNot(MParser.LNotContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code Parens}
 	 * labeled alternative in {@link MParser#expr}.
 	 * @param ctx the parse tree
@@ -312,13 +324,13 @@ public interface MListener extends ParseTreeListener {
 	 */
 	void exitAssignment(MParser.AssignmentContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code Functions}
+	 * Enter a parse tree produced by the {@code Function}
 	 * labeled alternative in {@link MParser#expr}.
 	 * @param ctx the parse tree
 	 */
 	void enterFunction(MParser.FunctionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code Functions}
+	 * Exit a parse tree produced by the {@code Function}
 	 * labeled alternative in {@link MParser#expr}.
 	 * @param ctx the parse tree
 	 */

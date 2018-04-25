@@ -30,9 +30,9 @@ public class FuncVisitor extends MBaseVisitor<IRBaseNode>
 
     private void error(String message, ParserRuleContext ctx) {
         BaseType inClass = classStack.empty() ? null : classStack.peek().getType();
-        Integer start = ctx.getStart().getStartIndex();
-        Integer stop = ctx.getStop().getStopIndex();
-        reporter.reportError(message, inClass, null, ctx.getStart().getLine(), start, stop + 1);
+        Integer start = ctx.getStart().getCharPositionInLine();
+        Integer stop = ctx.getStop().getCharPositionInLine() + ctx.getStop().getText().length();
+        reporter.reportError(message, inClass, null, ctx.getStart().getLine(), start, stop);
     }
 
     private boolean checkMainFunc() {
