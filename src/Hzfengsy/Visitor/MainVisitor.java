@@ -329,7 +329,7 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
         }
         Vector<BaseType> list = func.getParameterList();
         Vector<BaseType> param = visit(ctx.expr_list()).getTypeList();
-        if (!checkExprList(list, param)) error("error function call at " + ctx.id().getText(), ctx);
+        if (!checkExprList(list, param)) error("error function call at \'" + ctx.id().getText() + "\'", ctx);
         return new IRTypeNode(func.getReturnType(), false);
     }
 
@@ -355,7 +355,7 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
         } catch (Exception e) { error(e.getMessage(), ctx); }
         Vector<BaseType> list = func.getParameterList();
         Vector<BaseType> param = visit(ctx.expr_list()).getTypeList();
-        if (!checkExprList(list, param)) error("error function call at " + ctx.id().getText(), ctx);
+        if (!checkExprList(list, param)) error("error function call at \'" + ctx.id().getText() + "\'", ctx);
         return new IRTypeNode(func.getReturnType(), false);
     }
 

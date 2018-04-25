@@ -20,7 +20,7 @@ public class BaseType
     public boolean assignCheck(BaseType x) {
         if (this == x) return true;
         if (x == null) return false;
-        if (x instanceof BaseType || this instanceof BaseType) return false;
+//        if (x instanceof BaseType || this instanceof BaseType) return false;
         if (this instanceof NullType) return false;
         if (this instanceof VoidType || x instanceof VoidType) return false;
         if (x instanceof NullType && (this instanceof ArrayType || this instanceof UserType))
