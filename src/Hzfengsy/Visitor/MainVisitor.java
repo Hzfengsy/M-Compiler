@@ -145,6 +145,7 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
                 func = userClass.queryFunc(funcName);
             }
             IRBaseNode ans = new IRFuncNode(func);
+            visit(ctx.stat_list());
             functionStack.push(ans);
             for (MParser.StatContext x : ctx.stat()) visit(x);
             functionStack.pop();
@@ -299,7 +300,7 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
     public IRBaseNode visitSubscript(MParser.SubscriptContext ctx) {
         BaseType expr0 = visit(ctx.expr(0)).getType();
         BaseType expr1 = visit(ctx.expr(1)).getType();
-        Boolean ans0 = typeChecker.typeCheck(typeChecker.Array, expr0);
+        Boolean ans0 = expr0 instanceof ArrayType;
         if (!ans0) {
             typeError(expr0, new ArrayType(null), ctx);
             return new IRTypeNode(expr0, false);
@@ -546,7 +547,7 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
     public IRBaseNode visitAssignment(MParser.AssignmentContext ctx) {
         IRBaseNode left = visit(ctx.expr(0));
         IRBaseNode right = visit(ctx.expr(1));
-        if (!typeChecker.typeCheck(typeChecker.Assign, left.getType(), right.getType()));
+        if (!typeChecker.typeCheck(typeChecker.Assign, left.getType(), right.getType()))
             operationError("=", left.getType(), right.getType(), ctx);
         if (!left.isLeft()) error("left value error", ctx);
         return new IRTypeNode(left.getType(), false);

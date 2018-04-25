@@ -64,7 +64,7 @@ public class TypeChecker
         operators.put(Compare, IntStringMatch());
     }
 
-    public Boolean typeCheck(Kind kind, BaseType... types) {
+    public boolean typeCheck(Kind kind, BaseType... types) {
         if (kind == Equal) {
             return types.length == 2 && types[0].compareCheck(types[1]);
         } else if (kind == Assign)
