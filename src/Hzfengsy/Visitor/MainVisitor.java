@@ -44,6 +44,10 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
         error("could not do operation \'" + op + "\' between \'" + expr0 + "\' and \'" + expr1 + "\'", ctx);
     }
 
+    private void leftError(String expr, ParserRuleContext ctx) {
+        error("\'" + expr + "\' is not a left value", ctx);
+    }
+
     private boolean checkExprList(Vector<BaseType> a, Vector<BaseType> b) {
         if (a.size() != b.size()) return false;
         for (int i = 0; i < a.size(); i++) {
@@ -106,11 +110,13 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
     @Override
     public IRBaseNode visitFor_Stat(MParser.For_StatContext ctx) {
         localVar.add(new HashMap<>());
+        if (ctx.first != null) visit(ctx.first);
         if (ctx.second != null) {
             IRBaseNode boolCheck = visit(ctx.second);
             if (boolCheck.getType() != classes.get("bool"))
                 typeError(boolCheck.getType(), classes.get("bool"), ctx.second);
         }
+        if (ctx.third != null) visit(ctx.third);
         IRBaseNode ans = new IRBaseNode();
         loopStack.push(ans);
         visit(ctx.stat());
@@ -151,7 +157,7 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
             functionStack.pop();
             localVar.remove(localVar.size() - 1);
             return ans;
-        } catch (NullPointerException e) {} catch (Exception e) {error(e.getMessage(), ctx);}
+        } catch (NullPointerException e) {} catch (Exception e) {}
         return null;
     }
 
@@ -169,8 +175,6 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
         String className = ctx.class_stat().getText();
         String mappingName = variables.rename(varName);
         BaseType type = null;
-        if (localVar.elementAt(localVar.size() - 1).containsKey(varName) || functions.contain(varName))
-            error("variable \'" + varName + "\' has been defined", ctx);
         try {
             type = classes.getClass(className);
             variables.insert(mappingName, type);
@@ -178,7 +182,7 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
             Vector<BaseType> list = new Vector<>();
             list.add(type);
             return new IRTypeListNode(list);
-        } catch (NullPointerException e) {} catch (Exception e) { error(e.getMessage(), ctx); }
+        } catch (NullPointerException e) {} catch (Exception e) { }
         return null;
     }
 
@@ -329,16 +333,19 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
         }
         Vector<BaseType> list = func.getParameterList();
         Vector<BaseType> param = visit(ctx.expr_list()).getTypeList();
-        if (!checkExprList(list, param)) error("error function call at \'" + ctx.id().getText() + "\'", ctx);
+        if (!checkExprList(list, param))
+            error("error function call at \'" + ctx.id().getText() + "\'", ctx);
         return new IRTypeNode(func.getReturnType(), false);
     }
 
     @Override
     public IRBaseNode visitPostfix(MParser.PostfixContext ctx) {
-        BaseType expr = visit(ctx.expr()).getType();
+        IRBaseNode left = visit(ctx.expr());
+        BaseType expr = left.getType();
         Boolean ans = typeChecker.typeCheck(typeChecker.OneInt, expr);
         if (!ans) typeError(expr, classes.get("int"), ctx);
-        return new IRTypeNode(expr, true);
+        if (!left.isLeft()) leftError(ctx.expr().getText(), ctx);
+        return new IRTypeNode(expr, false);
     }
 
     @Override
@@ -355,15 +362,18 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
         } catch (Exception e) { error(e.getMessage(), ctx); }
         Vector<BaseType> list = func.getParameterList();
         Vector<BaseType> param = visit(ctx.expr_list()).getTypeList();
-        if (!checkExprList(list, param)) error("error function call at \'" + ctx.id().getText() + "\'", ctx);
+        if (!checkExprList(list, param))
+            error("error function call at \'" + ctx.id().getText() + "\'", ctx);
         return new IRTypeNode(func.getReturnType(), false);
     }
 
     @Override
     public IRBaseNode visitPrefix(MParser.PrefixContext ctx) {
-        BaseType expr = visit(ctx.expr()).getType();
+        IRBaseNode left = visit(ctx.expr());
+        BaseType expr = left.getType();
         Boolean ans = typeChecker.typeCheck(typeChecker.OneInt, expr);
         if (!ans) typeError(expr, classes.get("int"), ctx);
+        if (!left.isLeft()) leftError(ctx.expr().getText(), ctx);
         return new IRTypeNode(expr, false);
     }
 
@@ -414,7 +424,7 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
             ans = typeChecker.typeCheck(typeChecker.Plus, expr0, expr1);
         else ans = typeChecker.typeCheck(typeChecker.BinaryArithmetic, expr0, expr1);
         if (!ans) operationError(ctx.op.getText(), expr0, expr1, ctx);
-        return new IRTypeNode(expr0, true);
+        return new IRTypeNode(expr0, false);
     }
 
     @Override
@@ -549,7 +559,7 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
         IRBaseNode right = visit(ctx.expr(1));
         if (!typeChecker.typeCheck(typeChecker.Assign, left.getType(), right.getType()))
             operationError("=", left.getType(), right.getType(), ctx);
-        if (!left.isLeft()) error("left value error", ctx);
+        if (!left.isLeft()) leftError(ctx.expr(0).getText(), ctx);
         return new IRTypeNode(left.getType(), false);
     }
 

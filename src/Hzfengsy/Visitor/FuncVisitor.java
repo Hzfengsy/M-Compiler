@@ -1,18 +1,12 @@
 package Hzfengsy.Visitor;
 
-import Hzfengsy.Exceptions.ErrorReporter;
-import Hzfengsy.Parser.MBaseVisitor;
-import Hzfengsy.Parser.MParser;
-import Hzfengsy.Type.BaseType;
-import Hzfengsy.Type.FuncType;
-import Hzfengsy.Type.UserType;
-import Hzfengsy.Utility.IRBaseNode;
-import Hzfengsy.Utility.IRTypeListNode;
-import Hzfengsy.Utility.IRTypeNode;
+import Hzfengsy.Exceptions.*;
+import Hzfengsy.Parser.*;
+import Hzfengsy.Type.*;
+import Hzfengsy.Utility.*;
 import org.antlr.v4.runtime.*;
 
-import java.util.Stack;
-import java.util.Vector;
+import java.util.*;
 
 public class FuncVisitor extends MBaseVisitor<IRBaseNode>
 {
@@ -91,7 +85,9 @@ public class FuncVisitor extends MBaseVisitor<IRBaseNode>
     @Override
     public IRBaseNode visitClas(MParser.ClasContext ctx) {
         BaseType clas = null;
-        try { clas = classes.getClass(ctx.id().getText()); } catch (Exception e) { error(e.getMessage(), ctx); }
+        try { clas = classes.getClass(ctx.id().getText()); } catch (Exception e) {
+            error(e.getMessage(), ctx);
+        }
         IRBaseNode ans = new IRTypeNode(clas, true);
         classStack.push(ans);
         if (ctx.prog() != null) visit(ctx.prog());
@@ -112,7 +108,10 @@ public class FuncVisitor extends MBaseVisitor<IRBaseNode>
                 UserType userClass = (UserType) classStack.peek().getType();
                 String userClassName = userClass.getName();
                 if (userClassName.equals(funcName)) className = "void";
-                else error("error construction function.", ctx);
+                else {
+                    error("error construction function.", ctx);
+                    return null;
+                }
             }
         }
         else className = ctx.class_stat().getText();
@@ -142,7 +141,9 @@ public class FuncVisitor extends MBaseVisitor<IRBaseNode>
         if (ctx.getText().equals("")) return new IRTypeListNode(new Vector<>());
         String className = ctx.class_stat().getText();
         BaseType type = null;
-        try { type = classes.getClass(className); } catch (Exception e) { error(e.getMessage(), ctx); }
+        try { type = classes.getClass(className); } catch (Exception e) {
+            error(e.getMessage(), ctx);
+        }
         Vector<BaseType> list = new Vector<>();
         list.add(type);
         return new IRTypeListNode(list);
