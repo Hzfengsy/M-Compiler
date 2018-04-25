@@ -182,7 +182,7 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
             Vector<BaseType> list = new Vector<>();
             list.add(type);
             return new IRTypeListNode(list);
-        } catch (NullPointerException e) {} catch (Exception e) { }
+        } catch (NullPointerException e) {} catch (Exception e) { error(e.getMessage(), ctx);}
         return null;
     }
 

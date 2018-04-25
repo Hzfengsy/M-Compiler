@@ -15,6 +15,14 @@ public class SemanticError
         line = lineNum;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (!(obj instanceof SemanticError)) return false;
+        SemanticError other = (SemanticError) obj;
+        return left.equals(other.left) && right.equals(other.right) && line.equals(other.line) && message.equals(other.message);
+    }
+
     private String redText(String source) {
         return "\033[31m" + source + "\033[0m";
     }
