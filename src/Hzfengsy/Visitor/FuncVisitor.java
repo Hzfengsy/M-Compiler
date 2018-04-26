@@ -40,29 +40,29 @@ public class FuncVisitor extends MBaseVisitor<IRBaseNode>
     }
 
     private FuncType func_getInt() {
-        return new FuncType(classes.get("int"), new Vector<>(), "int getInt()", "getInt");
+        return new FuncType(classes.intType, new Vector<>(), "int getInt()", "getInt");
     }
 
     private FuncType func_print() {
         Vector<BaseType> parameter = new Vector<>();
-        parameter.add(classes.get("string"));
-        return new FuncType(classes.get("void"), parameter, "void print(string str)", "print");
+        parameter.add(classes.stringType);
+        return new FuncType(classes.voidType, parameter, "void print(string str)", "print");
     }
 
     private FuncType func_println() {
         Vector<BaseType> parameter = new Vector<>();
-        parameter.add(classes.get("string"));
-        return new FuncType(classes.get("void"), parameter, "void println(string str)", "println");
+        parameter.add(classes.stringType);
+        return new FuncType(classes.voidType, parameter, "void println(string str)", "println");
     }
 
     private FuncType func_getString() {
-        return new FuncType(classes.get("string"), new Vector<>(), "string getString()", "getString");
+        return new FuncType(classes.stringType, new Vector<>(), "string getString()", "getString");
     }
 
     private FuncType func_toString() {
         Vector<BaseType> parameter = new Vector<>();
-        parameter.add(classes.get("int"));
-        return new FuncType(classes.get("string"), parameter, "string toString(int i)", "toString");
+        parameter.add(classes.intType);
+        return new FuncType(classes.stringType, parameter, "string toString(int i)", "toString");
     }
 
     private void loadInsideFunction() {
@@ -73,12 +73,13 @@ public class FuncVisitor extends MBaseVisitor<IRBaseNode>
         functions.insert("toString", func_toString());
     }
 
+
+
     @Override
-    public IRBaseNode visitProg(MParser.ProgContext ctx) {
-        if (classStack.empty()) loadInsideFunction();
+    public IRBaseNode visitMain_prog(MParser.Main_progContext ctx) {
+        loadInsideFunction();
         visitChildren(ctx);
-        if (classStack.empty() && !checkMainFunc())
-            error("could not find a main function with \'int\' return value", ctx);
+        if (!checkMainFunc()) error("could not find a main function with \'int\' return value", ctx);
         return null;
     }
 

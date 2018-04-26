@@ -11,7 +11,8 @@ public class ArrayType extends BaseType
     private BaseType Base;
 
     public ArrayType(BaseType _Base) {
-        Base = _Base; memberFunc.put("size", func_size());
+        Base = _Base;
+        memberFunc.put("size", func_size());
     }
 
     public BaseType getBaseType() { return Base; }
@@ -20,4 +21,5 @@ public class ArrayType extends BaseType
     public String toString() {
         return Base + "[]";
     }
+
 }

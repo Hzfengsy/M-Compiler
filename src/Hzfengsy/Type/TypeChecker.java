@@ -24,8 +24,8 @@ public class TypeChecker
 
     private Vector<BaseType[]> IntStringMatch() {
         Vector<BaseType[]> ans = new Vector<>();
-        ans.add(new BaseType[] { classes.get("int"), classes.get("int") });
-        ans.add(new BaseType[] { classes.get("string"), classes.get("string") });
+        ans.add(new BaseType[] { classes.intType, classes.intType });
+        ans.add(new BaseType[] { classes.stringType, classes.stringType });
         return ans;
     }
 
@@ -55,11 +55,11 @@ public class TypeChecker
 
     public TypeChecker(Classes _classes) {
         classes = _classes;
-        operators.put(OneInt, SingleMatch(classes.get("int")));
+        operators.put(OneInt, SingleMatch(classes.intType));
         operators.put(Array, SingleMatch(new ArrayType(null)));
-        operators.put(LNot, SingleMatch(classes.get("bool")));
-        operators.put(BinaryArithmetic, SingleMatch(classes.get("int"), classes.get("int")));
-        operators.put(BinaryLogical, SingleMatch(classes.get("bool"), classes.get("bool")));
+        operators.put(LNot, SingleMatch(classes.boolType));
+        operators.put(BinaryArithmetic, SingleMatch(classes.intType, classes.intType));
+        operators.put(BinaryLogical, SingleMatch(classes.boolType, classes.boolType));
         operators.put(Plus, IntStringMatch());
         operators.put(Compare, IntStringMatch());
     }

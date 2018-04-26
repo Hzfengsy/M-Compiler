@@ -17,10 +17,9 @@ public class BaseType
         return null;
     }
 
-    public boolean assignCheck(BaseType x) {
+    public Boolean assignCheck(BaseType x) {
         if (this == x) return true;
         if (x == null) return false;
-//        if (x instanceof BaseType || this instanceof BaseType) return false;
         if (this instanceof NullType) return false;
         if (this instanceof VoidType || x instanceof VoidType) return false;
         if (x instanceof NullType && (this instanceof ArrayType || this instanceof UserType))
@@ -30,11 +29,12 @@ public class BaseType
                 return ((UserType) x).getName() == ((UserType) this).getName();
             else return false;
         }
+        if (this instanceof ArrayType && x instanceof ArrayType)
+            return this.getBaseType().assignCheck(x.getBaseType());
         return this.getClass() == x.getClass();
     }
 
-    public boolean compareCheck(BaseType x)
-    {
+    Boolean compareCheck(BaseType x) {
         return this.assignCheck(x) || x.assignCheck(this);
     }
 
