@@ -11,7 +11,12 @@ public class SemanticError
     private String message;
 
     public SemanticError(String _message, BaseType _class, FuncType _function, String _line, Integer lineNum, Integer _left, Integer _right) {
-        message = _message; inClass = _class; inFunction = _function; codeLine = _line; left = _left; right = _right;
+        message = _message;
+        inClass = _class;
+        inFunction = _function;
+        codeLine = _line;
+        left = _left;
+        right = _right;
         line = lineNum;
     }
 
@@ -28,7 +33,8 @@ public class SemanticError
     }
 
     public String toString() {
-        String ans = new String(); if (inClass != null && inClass instanceof UserType)
+        String ans = new String();
+        if (inClass != null && inClass instanceof UserType)
             ans += "In class \'" + ((UserType) inClass).getName() + "\'\n";
         if (inFunction != null) ans += "In function \'" + inFunction.getFuncLine() + "\'\n";
         ans += redText("error:" + line.toString() + ":" + left.toString() + ": ") + message + '\n';

@@ -80,8 +80,9 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
             classStack.pop();
             localVar.remove(localVar.size() - 1);
             return ans;
-        } catch (NullPointerException ignored) {} 
-        catch (Exception e) { error(e.getMessage(), ctx); }
+        } catch (NullPointerException ignored) {} catch (Exception e) {
+            error(e.getMessage(), ctx);
+        }
         return null;
     }
 
@@ -224,7 +225,9 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
             if (!classes.getClass(className).assignCheck(exprType))
                 typeError(exprType, classes.getClass(className), ctx);
             localVar.elementAt(localVar.size() - 1).put(varName, mappingName);
-        } catch (NullPointerException ignored) {} catch (Exception e) { error(e.getMessage(), ctx); }
+        } catch (NullPointerException ignored) {} catch (Exception e) {
+            error(e.getMessage(), ctx);
+        }
         return null;
     }
 

@@ -1,10 +1,8 @@
 package Hzfengsy.Visitor;
 
-import Hzfengsy.Exceptions.SemanticException;
-import Hzfengsy.Type.FuncType;
+import Hzfengsy.Type.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Functions
 {
@@ -12,11 +10,13 @@ public class Functions
     private Map<String, FuncType> funcList = new HashMap();
 
     public void insert(String funcName, FuncType type) {
-        assert (!funcList.containsKey(funcName)); funcList.put(funcName, type);
+        assert (!funcList.containsKey(funcName));
+        funcList.put(funcName, type);
     }
 
     public FuncType query(String funcName) throws Exception {
-        if (!funcList.containsKey(funcName)) throw new SemanticException("Undefined Functions \"" + funcName + "\"");
+        if (!funcList.containsKey(funcName))
+            throw new Exception("Undefined Functions \"" + funcName + "\"");
         return funcList.get(funcName);
     }
 

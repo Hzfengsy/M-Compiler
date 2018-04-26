@@ -1,8 +1,6 @@
 package Hzfengsy.Utility;
 
-import Hzfengsy.Type.BaseType;
-import Hzfengsy.Type.FuncType;
-import Hzfengsy.Type.VoidType;
+import Hzfengsy.Type.*;
 
 public class IRFuncNode extends IRBaseNode
 {

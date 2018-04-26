@@ -74,12 +74,12 @@ public class FuncVisitor extends MBaseVisitor<IRBaseNode>
     }
 
 
-
     @Override
     public IRBaseNode visitMain_prog(MParser.Main_progContext ctx) {
         loadInsideFunction();
         visitChildren(ctx);
-        if (!checkMainFunc()) error("could not find a main function with \'int\' return value", ctx);
+        if (!checkMainFunc())
+            error("could not find a main function with \'int\' return value", ctx);
         return null;
     }
 

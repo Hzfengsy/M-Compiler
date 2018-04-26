@@ -25,15 +25,11 @@ public class Classes
 
     BaseType defineClass(String className) throws Exception {
         if (classList.containsKey(className))
-            throw new SemanticException("already has a class named" + "\"" + className + "\"");
+            throw new Exception("already has a class named" + "\"" + className + "\"");
         BaseType clas = new UserType(className);
         classList.put(className, clas);
         return clas;
     }
-
-    //    public BaseType get(String className) {
-    //        try { return getClass(className); } catch (Exception e) {} return null;
-    //    }
 
     BaseType getClass(String className) throws Exception {
         if (classList.containsKey(className)) return classList.get(className);
@@ -43,8 +39,7 @@ public class Classes
             classList.put(className, Type);
             return Type;
         }
-        throw new SemanticException("could not find a class called \"" + className + "\"");
-        //        return classList.get(className);
+        throw new Exception("could not find a class called \"" + className + "\"");
     }
 
     Boolean containClass(String className) {

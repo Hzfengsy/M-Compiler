@@ -1,17 +1,15 @@
 package Hzfengsy.Exceptions;
 
-import Hzfengsy.Type.BaseType;
-import Hzfengsy.Type.FuncType;
+import Hzfengsy.Type.*;
 
-import java.util.Vector;
+import java.util.*;
 
 public class ErrorReporter
 {
     private Vector<SemanticError> errorList = new Vector<>();
     private Vector<String> lines = new Vector<>();
 
-    private Boolean errorExist(SemanticError e)
-    {
+    private Boolean errorExist(SemanticError e) {
         for (SemanticError x : errorList)
             if (x.equals(e)) return true;
         return false;
@@ -24,7 +22,9 @@ public class ErrorReporter
     }
 
     public void check() {
-        if (errorList.isEmpty()) return; for (SemanticError x : errorList) System.err.println(x); System.exit(1);
+        if (errorList.isEmpty()) return;
+        for (SemanticError x : errorList) System.err.println(x);
+        System.exit(1);
     }
 
     public void putLine(String line) {

@@ -6,13 +6,14 @@ import java.util.*;
 
 public class IRBaseNode
 {
-
     public BaseType getType() {
-        assert false; return null;
+        assert false;
+        return null;
     }
 
     public Vector<BaseType> getTypeList() {
-        assert false; return null;
+        assert false;
+        return null;
     }
 
     public FuncType getFunc() {return null;}

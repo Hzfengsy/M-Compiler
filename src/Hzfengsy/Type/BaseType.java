@@ -40,13 +40,13 @@ public class BaseType
 
     public FuncType queryFunc(String funcName) throws Exception {
         if (!memberFunc.containsKey(funcName))
-            throw new SemanticException("Undefined Member Functions \"" + funcName + "\"");
+            throw new Exception("Undefined Member Functions \"" + funcName + "\"");
         return memberFunc.get(funcName);
     }
 
     public BaseType queryVar(String varName) throws Exception {
         if (!memberVar.containsKey(varName))
-            throw new SemanticException("Undefined Member Variable \"" + varName + "\"");
+            throw new Exception("Undefined Member Variable \"" + varName + "\"");
         return memberVar.get(varName);
     }
 
