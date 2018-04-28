@@ -1,6 +1,7 @@
 package Hzfengsy.Type;
 
-import Hzfengsy.Visitor.*;
+import Hzfengsy.Type.VarType.*;
+import Hzfengsy.Semantic.*;
 
 import java.util.*;
 

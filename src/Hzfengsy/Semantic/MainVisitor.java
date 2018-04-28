@@ -1,14 +1,15 @@
-package Hzfengsy.Visitor;
+package Hzfengsy.Semantic;
 
 import Hzfengsy.Exceptions.*;
+import Hzfengsy.Semantic.SemanticNode.*;
 import Hzfengsy.Parser.*;
 import Hzfengsy.Type.*;
-import Hzfengsy.Utility.*;
+import Hzfengsy.Type.VarType.*;
 import org.antlr.v4.runtime.*;
 
 import java.util.*;
 
-public class MainVisitor extends MBaseVisitor<IRBaseNode>
+public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
 {
 
     private Variable variables = new Variable();
@@ -16,9 +17,9 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
     private Vector<Map<String, String>> localVar = new Vector<>();
     private Classes classes;
     private ErrorReporter reporter;
-    private Stack<IRBaseNode> loopStack = new Stack<>();
-    private Stack<IRBaseNode> functionStack = new Stack<>();
-    private Stack<IRBaseNode> classStack = new Stack<>();
+    private Stack<SemanticBaseNode> loopStack = new Stack<>();
+    private Stack<SemanticBaseNode> functionStack = new Stack<>();
+    private Stack<SemanticBaseNode> classStack = new Stack<>();
     private TypeChecker typeChecker;
 
     public MainVisitor(Functions _functions, Classes _classes, ErrorReporter _reporter) {
@@ -57,24 +58,23 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
     }
 
     @Override
-    public IRBaseNode visitProg(MParser.ProgContext ctx) {
+    public SemanticBaseNode visitProg(MParser.ProgContext ctx) {
         localVar.add(new HashMap<>());
         visitChildren(ctx);
         return null;
     }
 
     @Override
-    public IRBaseNode visitMain_prog(MParser.Main_progContext ctx) {
-        visitChildren(ctx);
-        return null;
+    public SemanticBaseNode visitMain_prog(MParser.Main_progContext ctx) {
+        return visit(ctx.prog());
     }
 
     @Override
-    public IRBaseNode visitClas(MParser.ClasContext ctx) {
+    public SemanticBaseNode visitClas(MParser.ClasContext ctx) {
         localVar.add(new HashMap<>());
         try {
             BaseType clas = classes.getClass(ctx.id().getText());
-            IRBaseNode ans = new IRTypeNode(clas, true);
+            SemanticBaseNode ans = new SemanticExprNode(clas, true);
             classStack.push(ans);
             if (ctx.prog() != null) visit(ctx.prog());
             classStack.pop();
@@ -88,38 +88,38 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
 
     //IF STATEMENT
     @Override
-    public IRBaseNode visitIf_Stat(MParser.If_StatContext ctx) {
+    public SemanticBaseNode visitIf_Stat(MParser.If_StatContext ctx) {
         localVar.add(new HashMap<>());
-        IRBaseNode boolCheck = visit(ctx.expr());
+        SemanticBaseNode boolCheck = visit(ctx.expr());
         if (boolCheck.getType() != classes.boolType)
             typeError(boolCheck.getType(), classes.boolType, ctx.expr());
-        IRBaseNode ans = visit(ctx.stat());
+        SemanticBaseNode ans = visit(ctx.stat());
         localVar.remove(localVar.size() - 1);
         return ans;
     }
 
     @Override
-    public IRBaseNode visitIfElse_Stat(MParser.IfElse_StatContext ctx) {
+    public SemanticBaseNode visitIfElse_Stat(MParser.IfElse_StatContext ctx) {
         localVar.add(new HashMap<>());
-        IRBaseNode boolCheck = visit(ctx.expr());
+        SemanticBaseNode boolCheck = visit(ctx.expr());
         if (boolCheck.getType() != classes.boolType)
             typeError(boolCheck.getType(), classes.boolType, ctx.expr());
-        IRBaseNode ans = visit(ctx.stat(0));
+        SemanticBaseNode ans = visit(ctx.stat(0));
         localVar.remove(localVar.size() - 1);
         return ans;
     }
 
     @Override
-    public IRBaseNode visitFor_Stat(MParser.For_StatContext ctx) {
+    public SemanticBaseNode visitFor_Stat(MParser.For_StatContext ctx) {
         localVar.add(new HashMap<>());
         if (ctx.first != null) visit(ctx.first);
         if (ctx.second != null) {
-            IRBaseNode boolCheck = visit(ctx.second);
+            SemanticBaseNode boolCheck = visit(ctx.second);
             if (boolCheck.getType() != classes.boolType)
                 typeError(boolCheck.getType(), classes.boolType, ctx.second);
         }
         if (ctx.third != null) visit(ctx.third);
-        IRBaseNode ans = new IRBaseNode();
+        SemanticBaseNode ans = new SemanticBaseNode();
         loopStack.push(ans);
         visit(ctx.stat());
         loopStack.pop();
@@ -128,12 +128,12 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
     }
 
     @Override
-    public IRBaseNode visitWhile_Stat(MParser.While_StatContext ctx) {
+    public SemanticBaseNode visitWhile_Stat(MParser.While_StatContext ctx) {
         localVar.add(new HashMap<>());
-        IRBaseNode boolCheck = visit(ctx.expr());
+        SemanticBaseNode boolCheck = visit(ctx.expr());
         if (boolCheck.getType() != classes.boolType)
             typeError(boolCheck.getType(), classes.boolType, ctx.expr());
-        IRBaseNode ans = new IRBaseNode();
+        SemanticBaseNode ans = new SemanticBaseNode();
         loopStack.push(ans);
         visit(ctx.stat());
         loopStack.pop();
@@ -142,7 +142,7 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
     }
 
     @Override
-    public IRBaseNode visitFunc(MParser.FuncContext ctx) {
+    public SemanticBaseNode visitFunc(MParser.FuncContext ctx) {
         localVar.add(new HashMap<>());
         String funcName = ctx.id().getText();
         try {
@@ -152,7 +152,7 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
                 UserType userClass = (UserType) classStack.peek().getType();
                 func = userClass.queryFunc(funcName);
             }
-            IRBaseNode ans = new IRFuncNode(func);
+            SemanticBaseNode ans = new SemanticFuncNode(func);
             visit(ctx.stat_list());
             functionStack.push(ans);
             for (MParser.StatContext x : ctx.stat()) visit(x);
@@ -164,15 +164,15 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
     }
 
     @Override
-    public IRBaseNode visitStatListCombine(MParser.StatListCombineContext ctx) {
+    public SemanticBaseNode visitStatListCombine(MParser.StatListCombineContext ctx) {
         Vector<BaseType> list = visit(ctx.stat_list(0)).getTypeList();
         list.addAll(visit(ctx.stat_list(1)).getTypeList());
-        return new IRTypeListNode(list);
+        return new SemanticTypeListNode(list);
     }
 
     @Override
-    public IRBaseNode visitStatList(MParser.StatListContext ctx) {
-        if (ctx.getText().equals("")) return new IRTypeListNode(new Vector<>());
+    public SemanticBaseNode visitStatList(MParser.StatListContext ctx) {
+        if (ctx.getText().equals("")) return new SemanticTypeListNode(new Vector<>());
         String varName = ctx.id().getText();
         if (functions.contain(varName) || localVar.elementAt(localVar.size() - 1).containsKey(varName)) {
             error("redefine variable \'" + varName + "\'", ctx);
@@ -186,13 +186,13 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
             localVar.elementAt(localVar.size() - 1).put(varName, mappingName);
             Vector<BaseType> list = new Vector<>();
             list.add(type);
-            return new IRTypeListNode(list);
+            return new SemanticTypeListNode(list);
         } catch (NullPointerException ignored) {} catch (Exception e) { error(e.getMessage(), ctx);}
         return null;
     }
 
     @Override
-    public IRBaseNode visitId_Define(MParser.Id_DefineContext ctx) {
+    public SemanticBaseNode visitId_Define(MParser.Id_DefineContext ctx) {
         String varName = ctx.id().getText();
         String className = ctx.class_stat().getText();
         if (className.equals("void")) error("cannot define void variable", ctx);
@@ -208,11 +208,11 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
         } catch (Exception e) { error(e.getMessage(), ctx); }
 
         localVar.elementAt(localVar.size() - 1).put(varName, mappingName);
-        return new IRBaseNode();
+        return new SemanticBaseNode();
     }
 
     @Override
-    public IRBaseNode visitAssign_Define(MParser.Assign_DefineContext ctx) {
+    public SemanticBaseNode visitAssign_Define(MParser.Assign_DefineContext ctx) {
         String varName = ctx.id().getText();
         String className = ctx.class_stat().getText();
         if (className.equals("void")) error("cannot define void variable", ctx);
@@ -232,19 +232,19 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
     }
 
     @Override
-    public IRBaseNode visitBreak_Stat(MParser.Break_StatContext ctx) {
+    public SemanticBaseNode visitBreak_Stat(MParser.Break_StatContext ctx) {
         if (loopStack.empty()) error("could not use \'break\' outside loops", ctx);
         return null;
     }
 
     @Override
-    public IRBaseNode visitContinue_Stat(MParser.Continue_StatContext ctx) {
+    public SemanticBaseNode visitContinue_Stat(MParser.Continue_StatContext ctx) {
         if (loopStack.empty()) error("could not use \'continue\' outside loops", ctx);
         return null;
     }
 
     @Override
-    public IRBaseNode visitReturn_Stat(MParser.Return_StatContext ctx) {
+    public SemanticBaseNode visitReturn_Stat(MParser.Return_StatContext ctx) {
         if (functionStack.empty()) error("could not use \'return\' outside functions", ctx);
         BaseType func = functionStack.peek().getType();
         if (func.equals(classes.voidType)) {
@@ -261,7 +261,7 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
     }
 
     @Override
-    public IRBaseNode visitSegment_Stat(MParser.Segment_StatContext ctx) {
+    public SemanticBaseNode visitSegment_Stat(MParser.Segment_StatContext ctx) {
         localVar.add(new HashMap<>());
         visitChildren(ctx);
         localVar.remove(localVar.size() - 1);
@@ -269,7 +269,7 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
     }
 
     @Override
-    public IRBaseNode visitRAWID(MParser.RAWIDContext ctx) {
+    public SemanticBaseNode visitRAWID(MParser.RAWIDContext ctx) {
         String varName = ctx.getText();
         Boolean found = false;
         String rename = "";
@@ -294,13 +294,13 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
         try {
             if (found) {
                 if (var == null) var = variables.query(rename);
-                return new IRTypeNode(var, true);
+                return new SemanticExprNode(var, true);
             }
         } catch (Exception e) { error(e.getMessage(), ctx); }
 
         if (functions.contain(varName)) {
             try {
-                return new IRTypeNode(functions.query(varName).getReturnType(), true);
+                return new SemanticExprNode(functions.query(varName).getReturnType(), true);
             } catch (Exception e) { error(e.getMessage(), ctx); }
         }
         error("variable \'" + varName + "\' has not been defined", ctx);
@@ -308,31 +308,31 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
     }
 
     @Override
-    public IRBaseNode visitSubscript(MParser.SubscriptContext ctx) {
+    public SemanticBaseNode visitSubscript(MParser.SubscriptContext ctx) {
         BaseType expr0 = visit(ctx.expr(0)).getType();
         BaseType expr1 = visit(ctx.expr(1)).getType();
         Boolean ans0 = expr0 instanceof ArrayType;
         if (!ans0) {
             typeError(expr0, new ArrayType(null), ctx);
-            return new IRTypeNode(expr0, false);
+            return new SemanticExprNode(expr0, false);
         }
         else if (!typeChecker.typeCheck(typeChecker.OneInt, expr1))
             typeError(expr1, classes.intType, ctx);
-        return new IRTypeNode(expr0.getBaseType(), true);
+        return new SemanticExprNode(expr0.getBaseType(), true);
     }
 
     @Override
-    public IRBaseNode visitMembervar(MParser.MembervarContext ctx) {
+    public SemanticBaseNode visitMembervar(MParser.MembervarContext ctx) {
         BaseType Class = visit(ctx.expr()).getType();
         BaseType var = null;
         try { var = Class.queryVar(ctx.id().getText()); } catch (Exception e) {
             error(e.getMessage(), ctx);
         }
-        return new IRTypeNode(var, true);
+        return new SemanticExprNode(var, true);
     }
 
     @Override
-    public IRBaseNode visitMemberfunc(MParser.MemberfuncContext ctx) {
+    public SemanticBaseNode visitMemberfunc(MParser.MemberfuncContext ctx) {
         BaseType Class = visit(ctx.expr()).getType();
         FuncType func = null;
         try { func = Class.queryFunc(ctx.id().getText()); } catch (Exception e) {
@@ -342,21 +342,21 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
         Vector<BaseType> param = visit(ctx.expr_list()).getTypeList();
         if (!checkExprList(list, param))
             error("error function call at \'" + ctx.id().getText() + "\'", ctx);
-        return new IRTypeNode(func.getReturnType(), false);
+        return new SemanticExprNode(func.getReturnType(), false);
     }
 
     @Override
-    public IRBaseNode visitPostfix(MParser.PostfixContext ctx) {
-        IRBaseNode left = visit(ctx.expr());
+    public SemanticBaseNode visitPostfix(MParser.PostfixContext ctx) {
+        SemanticBaseNode left = visit(ctx.expr());
         BaseType expr = left.getType();
         Boolean ans = typeChecker.typeCheck(typeChecker.OneInt, expr);
         if (!ans) typeError(expr, classes.intType, ctx);
         if (!left.isLeft()) leftError(ctx.expr().getText(), ctx);
-        return new IRTypeNode(expr, false);
+        return new SemanticExprNode(expr, false);
     }
 
     @Override
-    public IRBaseNode visitFunction(MParser.FunctionContext ctx) {
+    public SemanticBaseNode visitFunction(MParser.FunctionContext ctx) {
         FuncType func = null;
         try {
             if (classStack.empty()) func = functions.query(ctx.id().getText());
@@ -371,59 +371,59 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
         Vector<BaseType> param = visit(ctx.expr_list()).getTypeList();
         if (!checkExprList(list, param))
             error("error function call at \'" + ctx.id().getText() + "\'", ctx);
-        return new IRTypeNode(func.getReturnType(), false);
+        return new SemanticExprNode(func.getReturnType(), false);
     }
 
     @Override
-    public IRBaseNode visitPrefix(MParser.PrefixContext ctx) {
-        IRBaseNode left = visit(ctx.expr());
+    public SemanticBaseNode visitPrefix(MParser.PrefixContext ctx) {
+        SemanticBaseNode left = visit(ctx.expr());
         BaseType expr = left.getType();
         Boolean ans = typeChecker.typeCheck(typeChecker.OneInt, expr);
         if (!ans) typeError(expr, classes.intType, ctx);
         if (!left.isLeft()) leftError(ctx.expr().getText(), ctx);
-        return new IRTypeNode(expr, false);
+        return new SemanticExprNode(expr, false);
     }
 
     @Override
-    public IRBaseNode visitUnary(MParser.UnaryContext ctx) {
+    public SemanticBaseNode visitUnary(MParser.UnaryContext ctx) {
         BaseType expr = visit(ctx.expr()).getType();
         Boolean ans = typeChecker.typeCheck(typeChecker.OneInt, expr);
         if (!ans) typeError(expr, classes.intType, ctx);
-        return new IRTypeNode(expr, false);
+        return new SemanticExprNode(expr, false);
     }
 
     @Override
-    public IRBaseNode visitNot(MParser.NotContext ctx) {
+    public SemanticBaseNode visitNot(MParser.NotContext ctx) {
         BaseType expr = visit(ctx.expr()).getType();
         Boolean ans = typeChecker.typeCheck(typeChecker.OneInt, expr);
         if (!ans) typeError(expr, classes.intType, ctx);
-        return new IRTypeNode(expr, false);
+        return new SemanticExprNode(expr, false);
     }
 
     @Override
-    public IRBaseNode visitLNot(MParser.LNotContext ctx) {
+    public SemanticBaseNode visitLNot(MParser.LNotContext ctx) {
         BaseType expr = visit(ctx.expr()).getType();
         Boolean ans = typeChecker.typeCheck(typeChecker.LNot, expr);
         if (!ans) typeError(expr, classes.boolType, ctx);
-        return new IRTypeNode(expr, false);
+        return new SemanticExprNode(expr, false);
     }
 
     @Override
-    public IRBaseNode visitNew(MParser.NewContext ctx) {
+    public SemanticBaseNode visitNew(MParser.NewContext ctx) {
         return visit(ctx.class_new());
     }
 
     @Override
-    public IRBaseNode visitMulDivMod(MParser.MulDivModContext ctx) {
+    public SemanticBaseNode visitMulDivMod(MParser.MulDivModContext ctx) {
         BaseType expr0 = visit(ctx.expr(0)).getType();
         BaseType expr1 = visit(ctx.expr(1)).getType();
         Boolean ans = typeChecker.typeCheck(typeChecker.BinaryArithmetic, expr0, expr1);
         if (!ans) operationError(ctx.op.getText(), expr0, expr1, ctx);
-        return new IRTypeNode(expr0, false);
+        return new SemanticExprNode(expr0, false);
     }
 
     @Override
-    public IRBaseNode visitAddSub(MParser.AddSubContext ctx) {
+    public SemanticBaseNode visitAddSub(MParser.AddSubContext ctx) {
         BaseType expr0 = visit(ctx.expr(0)).getType();
         BaseType expr1 = visit(ctx.expr(1)).getType();
         Boolean ans;
@@ -431,122 +431,122 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
             ans = typeChecker.typeCheck(typeChecker.Plus, expr0, expr1);
         else ans = typeChecker.typeCheck(typeChecker.BinaryArithmetic, expr0, expr1);
         if (!ans) operationError(ctx.op.getText(), expr0, expr1, ctx);
-        return new IRTypeNode(expr0, false);
+        return new SemanticExprNode(expr0, false);
     }
 
     @Override
-    public IRBaseNode visitBitwise(MParser.BitwiseContext ctx) {
+    public SemanticBaseNode visitBitwise(MParser.BitwiseContext ctx) {
         BaseType expr0 = visit(ctx.expr(0)).getType();
         BaseType expr1 = visit(ctx.expr(1)).getType();
         Boolean ans = typeChecker.typeCheck(typeChecker.BinaryArithmetic, expr0, expr1);
         if (!ans) operationError(ctx.op.getText(), expr0, expr1, ctx);
-        return new IRTypeNode(expr0, false);
+        return new SemanticExprNode(expr0, false);
     }
 
     @Override
-    public IRBaseNode visitCompare(MParser.CompareContext ctx) {
+    public SemanticBaseNode visitCompare(MParser.CompareContext ctx) {
         BaseType expr0 = visit(ctx.expr(0)).getType();
         BaseType expr1 = visit(ctx.expr(1)).getType();
         Boolean ans = typeChecker.typeCheck(typeChecker.Compare, expr0, expr1);
         if (!ans) operationError(ctx.op.getText(), expr0, expr1, ctx);
-        return new IRTypeNode(classes.boolType, false);
+        return new SemanticExprNode(classes.boolType, false);
     }
 
     @Override
-    public IRBaseNode visitEqual(MParser.EqualContext ctx) {
+    public SemanticBaseNode visitEqual(MParser.EqualContext ctx) {
         BaseType expr0 = visit(ctx.expr(0)).getType();
         BaseType expr1 = visit(ctx.expr(1)).getType();
         Boolean ans = typeChecker.typeCheck(typeChecker.Equal, expr0, expr1);
         if (!ans) operationError(ctx.op.getText(), expr0, expr1, ctx);
-        return new IRTypeNode(classes.boolType, false);
+        return new SemanticExprNode(classes.boolType, false);
     }
 
     @Override
-    public IRBaseNode visitAnd(MParser.AndContext ctx) {
+    public SemanticBaseNode visitAnd(MParser.AndContext ctx) {
         BaseType expr0 = visit(ctx.expr(0)).getType();
         BaseType expr1 = visit(ctx.expr(1)).getType();
         Boolean ans = typeChecker.typeCheck(typeChecker.BinaryArithmetic, expr0, expr1);
         if (!ans) operationError("&", expr0, expr1, ctx);
-        return new IRTypeNode(expr0, false);
+        return new SemanticExprNode(expr0, false);
     }
 
     @Override
-    public IRBaseNode visitXor(MParser.XorContext ctx) {
+    public SemanticBaseNode visitXor(MParser.XorContext ctx) {
         BaseType expr0 = visit(ctx.expr(0)).getType();
         BaseType expr1 = visit(ctx.expr(1)).getType();
         Boolean ans = typeChecker.typeCheck(typeChecker.BinaryArithmetic, expr0, expr1);
         if (!ans) operationError("^", expr0, expr1, ctx);
-        return new IRTypeNode(expr0, false);
+        return new SemanticExprNode(expr0, false);
     }
 
     @Override
-    public IRBaseNode visitOr(MParser.OrContext ctx) {
+    public SemanticBaseNode visitOr(MParser.OrContext ctx) {
         BaseType expr0 = visit(ctx.expr(0)).getType();
         BaseType expr1 = visit(ctx.expr(1)).getType();
         Boolean ans = typeChecker.typeCheck(typeChecker.BinaryArithmetic, expr0, expr1);
         if (!ans) operationError("|", expr0, expr1, ctx);
-        return new IRTypeNode(expr0, false);
+        return new SemanticExprNode(expr0, false);
     }
 
     @Override
-    public IRBaseNode visitLAnd(MParser.LAndContext ctx) {
+    public SemanticBaseNode visitLAnd(MParser.LAndContext ctx) {
         BaseType expr0 = visit(ctx.expr(0)).getType();
         BaseType expr1 = visit(ctx.expr(1)).getType();
         Boolean ans = typeChecker.typeCheck(typeChecker.BinaryLogical, expr0, expr1);
         if (!ans) operationError("&&", expr0, expr1, ctx);
-        return new IRTypeNode(expr0, false);
+        return new SemanticExprNode(expr0, false);
     }
 
     @Override
-    public IRBaseNode visitLOr(MParser.LOrContext ctx) {
+    public SemanticBaseNode visitLOr(MParser.LOrContext ctx) {
         BaseType expr0 = visit(ctx.expr(0)).getType();
         BaseType expr1 = visit(ctx.expr(1)).getType();
         Boolean ans = typeChecker.typeCheck(typeChecker.BinaryLogical, expr0, expr1);
         if (!ans) operationError("||", expr0, expr1, ctx);
-        return new IRTypeNode(expr0, false);
+        return new SemanticExprNode(expr0, false);
     }
 
     @Override
-    public IRBaseNode visitTrue(MParser.TrueContext ctx) {
-        return new IRTypeNode(classes.boolType, false);
+    public SemanticBaseNode visitTrue(MParser.TrueContext ctx) {
+        return new SemanticExprNode(classes.boolType, false);
     }
 
     @Override
-    public IRBaseNode visitFalse(MParser.FalseContext ctx) {
-        return new IRTypeNode(classes.boolType, false);
+    public SemanticBaseNode visitFalse(MParser.FalseContext ctx) {
+        return new SemanticExprNode(classes.boolType, false);
     }
 
     @Override
-    public IRBaseNode visitNumber(MParser.NumberContext ctx) {
-        return new IRTypeNode(classes.intType, false);
+    public SemanticBaseNode visitNumber(MParser.NumberContext ctx) {
+        return new SemanticExprNode(classes.intType, false);
     }
 
     @Override
-    public IRBaseNode visitStr(MParser.StrContext ctx) {
-        return new IRTypeNode(classes.stringType, false);
+    public SemanticBaseNode visitStr(MParser.StrContext ctx) {
+        return new SemanticExprNode(classes.stringType, false);
     }
 
     @Override
-    public IRBaseNode visitParens(MParser.ParensContext ctx) {
+    public SemanticBaseNode visitParens(MParser.ParensContext ctx) {
         return visit(ctx.expr());
     }
 
     @Override
-    public IRBaseNode visitExprListCombine(MParser.ExprListCombineContext ctx) {
+    public SemanticBaseNode visitExprListCombine(MParser.ExprListCombineContext ctx) {
         Vector<BaseType> list = visit(ctx.expr_list(0)).getTypeList();
         list.addAll(visit(ctx.expr_list(1)).getTypeList());
-        return new IRTypeListNode(list);
+        return new SemanticTypeListNode(list);
     }
 
     @Override
-    public IRBaseNode visitExprList(MParser.ExprListContext ctx) {
+    public SemanticBaseNode visitExprList(MParser.ExprListContext ctx) {
         Vector<BaseType> list = new Vector<>();
         if (!ctx.getText().equals("")) list.add(visit(ctx.expr()).getType());
-        return new IRTypeListNode(list);
+        return new SemanticTypeListNode(list);
     }
 
     @Override
-    public IRBaseNode visitClass_new(MParser.Class_newContext ctx) {
+    public SemanticBaseNode visitClass_new(MParser.Class_newContext ctx) {
         String classname = ctx.class_name().getText();
         Boolean check = false;
         for (MParser.DimensionContext x : ctx.dimension()) {
@@ -554,29 +554,29 @@ public class MainVisitor extends MBaseVisitor<IRBaseNode>
             else if (check) error("Type error occupied during expr \"" + ctx.getText() + "\"", ctx);
             classname = new StringBuilder(classname).append("[]").toString();
         }
-        try { return new IRTypeNode(classes.getClass(classname), true); } catch (Exception e) {
+        try { return new SemanticExprNode(classes.getClass(classname), true); } catch (Exception e) {
             error(e.getMessage(), ctx);
         }
         return null;
     }
 
     @Override
-    public IRBaseNode visitAssignment(MParser.AssignmentContext ctx) {
-        IRBaseNode left = visit(ctx.expr(0));
-        IRBaseNode right = visit(ctx.expr(1));
+    public SemanticBaseNode visitAssignment(MParser.AssignmentContext ctx) {
+        SemanticBaseNode left = visit(ctx.expr(0));
+        SemanticBaseNode right = visit(ctx.expr(1));
         if (!typeChecker.typeCheck(typeChecker.Assign, left.getType(), right.getType()))
             operationError("=", left.getType(), right.getType(), ctx);
         if (!left.isLeft()) leftError(ctx.expr(0).getText(), ctx);
-        return new IRTypeNode(left.getType(), false);
+        return new SemanticExprNode(left.getType(), false);
     }
 
     @Override
-    public IRBaseNode visitNull(MParser.NullContext ctx) {
-        return new IRTypeNode(classes.nullType, false);
+    public SemanticBaseNode visitNull(MParser.NullContext ctx) {
+        return new SemanticExprNode(classes.nullType, false);
     }
 
     @Override
-    public IRBaseNode visitThis(MParser.ThisContext ctx) {
-        return new IRTypeNode(classStack.peek().getType(), false);
+    public SemanticBaseNode visitThis(MParser.ThisContext ctx) {
+        return new SemanticExprNode(classStack.peek().getType(), false);
     }
 }

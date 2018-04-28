@@ -1,4 +1,4 @@
-package Hzfengsy.Visitor;
+package Hzfengsy.Semantic;
 
 import Hzfengsy.Type.*;
 

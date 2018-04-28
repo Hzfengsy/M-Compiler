@@ -1,6 +1,6 @@
-package Hzfengsy.Utility;
+package Hzfengsy.IR.IRNode;
 
-import Hzfengsy.Type.*;
+import Hzfengsy.Type.VarType.*;
 
 import java.util.*;
 

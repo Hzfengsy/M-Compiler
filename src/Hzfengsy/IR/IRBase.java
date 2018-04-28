@@ -1,10 +1,11 @@
-package Hzfengsy.Utility;
+package Hzfengsy.IR;
 
 import Hzfengsy.Type.*;
+import Hzfengsy.Type.VarType.*;
 
 import java.util.*;
 
-public class IRBaseNode
+public class IRBase
 {
     public BaseType getType() {
         assert false;
@@ -12,11 +13,10 @@ public class IRBaseNode
     }
 
     public Vector<BaseType> getTypeList() {
-        assert false;
         return null;
     }
 
-    public FuncType getFunc() {return null;}
+    public FuncType getFunc() { return null;}
 
     public boolean isLeft() {
         return false;

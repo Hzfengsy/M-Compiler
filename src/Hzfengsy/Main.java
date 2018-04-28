@@ -2,7 +2,7 @@ package Hzfengsy;
 
 import Hzfengsy.Exceptions.*;
 import Hzfengsy.Parser.*;
-import Hzfengsy.Visitor.*;
+import Hzfengsy.Semantic.*;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 

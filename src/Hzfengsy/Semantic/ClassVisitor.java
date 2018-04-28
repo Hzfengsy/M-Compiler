@@ -1,11 +1,11 @@
-package Hzfengsy.Visitor;
+package Hzfengsy.Semantic;
 
 import Hzfengsy.Exceptions.*;
+import Hzfengsy.Semantic.SemanticNode.*;
 import Hzfengsy.Parser.*;
-import Hzfengsy.Utility.*;
 import org.antlr.v4.runtime.*;
 
-public class ClassVisitor extends MBaseVisitor<IRBaseNode>
+public class ClassVisitor extends MBaseVisitor<SemanticBaseNode>
 {
 
     private Classes classes;
@@ -23,7 +23,7 @@ public class ClassVisitor extends MBaseVisitor<IRBaseNode>
     }
 
     @Override
-    public IRBaseNode visitClas(MParser.ClasContext ctx) {
+    public SemanticBaseNode visitClas(MParser.ClasContext ctx) {
         try { classes.defineClass(ctx.id().getText()); } catch (Exception e) {
             error(e.getMessage(), ctx);
         }
@@ -31,7 +31,7 @@ public class ClassVisitor extends MBaseVisitor<IRBaseNode>
     }
 
     @Override
-    public IRBaseNode visitFunc(MParser.FuncContext ctx) {
+    public SemanticBaseNode visitFunc(MParser.FuncContext ctx) {
         return null;
     }
 }

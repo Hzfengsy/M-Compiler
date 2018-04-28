@@ -1,6 +1,7 @@
 package Hzfengsy.Exceptions;
 
 import Hzfengsy.Type.*;
+import Hzfengsy.Type.VarType.*;
 
 import java.util.*;
 

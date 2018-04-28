@@ -1,20 +1,21 @@
-package Hzfengsy.Visitor;
+package Hzfengsy.Semantic;
 
 import Hzfengsy.Exceptions.*;
+import Hzfengsy.Semantic.SemanticNode.*;
 import Hzfengsy.Parser.*;
 import Hzfengsy.Type.*;
-import Hzfengsy.Utility.*;
+import Hzfengsy.Type.VarType.*;
 import org.antlr.v4.runtime.*;
 
 import java.util.*;
 
-public class FuncVisitor extends MBaseVisitor<IRBaseNode>
+public class FuncVisitor extends MBaseVisitor<SemanticBaseNode>
 {
 
     private Functions functions;
     private Classes classes;
     private ErrorReporter reporter;
-    private Stack<IRBaseNode> classStack = new Stack<>();
+    private Stack<SemanticBaseNode> classStack = new Stack<>();
 
     public FuncVisitor(Functions _functions, Classes _classes, ErrorReporter _reporter) {
         functions = _functions;
@@ -75,7 +76,7 @@ public class FuncVisitor extends MBaseVisitor<IRBaseNode>
 
 
     @Override
-    public IRBaseNode visitMain_prog(MParser.Main_progContext ctx) {
+    public SemanticBaseNode visitMain_prog(MParser.Main_progContext ctx) {
         loadInsideFunction();
         visitChildren(ctx);
         if (!checkMainFunc())
@@ -84,12 +85,12 @@ public class FuncVisitor extends MBaseVisitor<IRBaseNode>
     }
 
     @Override
-    public IRBaseNode visitClas(MParser.ClasContext ctx) {
+    public SemanticBaseNode visitClas(MParser.ClasContext ctx) {
         BaseType clas = null;
         try { clas = classes.getClass(ctx.id().getText()); } catch (Exception e) {
             error(e.getMessage(), ctx);
         }
-        IRBaseNode ans = new IRTypeNode(clas, true);
+        SemanticBaseNode ans = new SemanticExprNode(clas, true);
         classStack.push(ans);
         if (ctx.prog() != null) visit(ctx.prog());
         classStack.pop();
@@ -99,7 +100,7 @@ public class FuncVisitor extends MBaseVisitor<IRBaseNode>
     //IF STATEMENT
 
     @Override
-    public IRBaseNode visitFunc(MParser.FuncContext ctx) {
+    public SemanticBaseNode visitFunc(MParser.FuncContext ctx) {
         String funcName = ctx.id().getText();
         String className = null;
         String funcLine = (ctx.class_stat() == null ? "" : ctx.class_stat().getText()) + ' ' + funcName + '(' + ctx.stat_list().getText() + ')';
@@ -131,15 +132,15 @@ public class FuncVisitor extends MBaseVisitor<IRBaseNode>
     }
 
     @Override
-    public IRBaseNode visitStatListCombine(MParser.StatListCombineContext ctx) {
+    public SemanticBaseNode visitStatListCombine(MParser.StatListCombineContext ctx) {
         Vector<BaseType> list = visit(ctx.stat_list(0)).getTypeList();
         list.addAll(visit(ctx.stat_list(1)).getTypeList());
-        return new IRTypeListNode(list);
+        return new SemanticTypeListNode(list);
     }
 
     @Override
-    public IRBaseNode visitStatList(MParser.StatListContext ctx) {
-        if (ctx.getText().equals("")) return new IRTypeListNode(new Vector<>());
+    public SemanticBaseNode visitStatList(MParser.StatListContext ctx) {
+        if (ctx.getText().equals("")) return new SemanticTypeListNode(new Vector<>());
         String className = ctx.class_stat().getText();
         BaseType type = null;
         try { type = classes.getClass(className); } catch (Exception e) {
@@ -147,11 +148,11 @@ public class FuncVisitor extends MBaseVisitor<IRBaseNode>
         }
         Vector<BaseType> list = new Vector<>();
         list.add(type);
-        return new IRTypeListNode(list);
+        return new SemanticTypeListNode(list);
     }
 
     @Override
-    public IRBaseNode visitId_Define(MParser.Id_DefineContext ctx) {
+    public SemanticBaseNode visitId_Define(MParser.Id_DefineContext ctx) {
         String varName = ctx.id().getText();
         String className = ctx.class_stat().getText();
         if (className.equals("void")) error("cannot define void variable", ctx);
@@ -159,7 +160,7 @@ public class FuncVisitor extends MBaseVisitor<IRBaseNode>
             UserType userClass = (UserType) classStack.peek().getType();
             userClass.insertMemberVar(varName, classes.getClass(className));
         } catch (Exception e) { error(e.getMessage(), ctx); }
-        return new IRBaseNode();
+        return new SemanticBaseNode();
     }
 
 }

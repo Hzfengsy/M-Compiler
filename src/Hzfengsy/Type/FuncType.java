@@ -1,5 +1,7 @@
 package Hzfengsy.Type;
 
+import Hzfengsy.Type.VarType.*;
+
 import java.util.Vector;
 
 public class FuncType
