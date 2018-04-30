@@ -8,13 +8,8 @@ import org.antlr.v4.runtime.*;
 public class ClassVisitor extends MBaseVisitor<SemanticBaseNode>
 {
 
-    private Classes classes;
-    private ErrorReporter reporter;
-
-    public ClassVisitor(Classes _classes, ErrorReporter _repoter) {
-        classes = _classes;
-        reporter = _repoter;
-    }
+    private Classes classes = Classes.getInstance();
+    private ErrorReporter reporter = ErrorReporter.getInstance();
 
     private void error(String message, ParserRuleContext ctx) {
         Integer start = ctx.getStart().getCharPositionInLine();

@@ -12,11 +12,6 @@ import java.util.*;
 
 public class Main
 {
-
-    private static Functions functions = new Functions();
-    private static Classes classes = new Classes();
-    private static ErrorReporter reporter = new ErrorReporter();
-
     private static String readTestFile(String filePath) {
         String ans = new String();
         File file = new File(filePath);
@@ -25,7 +20,7 @@ public class Main
             reader = new BufferedReader(new FileReader(file));
             String tempString = null;
             while ((tempString = reader.readLine()) != null) {
-                reporter.putLine(tempString);
+                ErrorReporter.getInstance().putLine(tempString);
                 ans += tempString + '\n';
             }
             reader.close();
@@ -61,13 +56,13 @@ public class Main
             for (String message : errors) System.err.println(message);
             System.exit(1);
         }
-        ClassVisitor class_visitor = new ClassVisitor(classes, reporter);
-        FuncVisitor func_visitor = new FuncVisitor(functions, classes, reporter);
-        MainVisitor main_visitor = new MainVisitor(functions, classes, reporter);
+        ClassVisitor class_visitor = new ClassVisitor();
+        FuncVisitor func_visitor = new FuncVisitor();
+        MainVisitor main_visitor = new MainVisitor();
         class_visitor.visit(tree);
         func_visitor.visit(tree);
         main_visitor.visit(tree);
-        reporter.check();
+        ErrorReporter.getInstance().check();
     }
 
     public static void main(String[] args) {

@@ -1,4 +1,4 @@
-package Hzfengsy.Type.VarType;
+package Hzfengsy.Semantic.Type.VarType;
 
 public class IntType extends BaseType
 {

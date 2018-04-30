@@ -1,11 +1,12 @@
 package Hzfengsy.Semantic;
 
-import Hzfengsy.Type.VarType.*;
+import Hzfengsy.Semantic.Type.VarType.*;
 
 import java.util.*;
 
 public class Classes
 {
+    private static Classes classes = new Classes();
     private Map<String, BaseType> classList = new HashMap<>();
     public final BaseType intType = new IntType();
     public final BaseType stringType = new StringType();
@@ -13,8 +14,12 @@ public class Classes
     public final BaseType voidType = new VoidType();
     public final BaseType nullType = new NullType();
 
+    public static Classes getInstance(){
+        return classes;
+    }
 
-    public Classes() {
+
+    private Classes() {
         classList.put("int", intType);
         classList.put("string", stringType);
         classList.put("bool", boolType);

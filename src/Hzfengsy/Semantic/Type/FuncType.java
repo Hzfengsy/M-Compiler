@@ -1,6 +1,6 @@
-package Hzfengsy.Type;
+package Hzfengsy.Semantic.Type;
 
-import Hzfengsy.Type.VarType.*;
+import Hzfengsy.Semantic.Type.VarType.*;
 
 import java.util.Vector;
 

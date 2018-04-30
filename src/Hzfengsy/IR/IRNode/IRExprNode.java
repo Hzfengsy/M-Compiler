@@ -2,7 +2,7 @@ package Hzfengsy.IR.IRNode;
 
 import Hzfengsy.IR.*;
 import Hzfengsy.IR.IRInstruction.*;
-import Hzfengsy.Type.VarType.*;
+import Hzfengsy.Semantic.Type.VarType.*;
 
 public class IRExprNode extends IRBaseNode
 {

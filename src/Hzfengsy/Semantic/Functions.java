@@ -1,13 +1,18 @@
 package Hzfengsy.Semantic;
 
-import Hzfengsy.Type.*;
+import Hzfengsy.Semantic.Type.*;
 
 import java.util.*;
 
 public class Functions
 {
+    private static Functions functions = new Functions();
 
-    private Map<String, FuncType> funcList = new HashMap();
+    public static Functions getInstance() {
+        return functions;
+    }
+
+    private Map<String, FuncType> funcList = new HashMap<>();
 
     public void insert(String funcName, FuncType type) {
         assert (!funcList.containsKey(funcName));

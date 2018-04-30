@@ -1,7 +1,7 @@
 package Hzfengsy.Semantic.SemanticNode;
 
-import Hzfengsy.Type.*;
-import Hzfengsy.Type.VarType.*;
+import Hzfengsy.Semantic.Type.*;
+import Hzfengsy.Semantic.Type.VarType.*;
 
 public class SemanticFuncNode extends SemanticBaseNode
 {

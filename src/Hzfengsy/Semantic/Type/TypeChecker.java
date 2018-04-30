@@ -1,6 +1,6 @@
-package Hzfengsy.Type;
+package Hzfengsy.Semantic.Type;
 
-import Hzfengsy.Type.VarType.*;
+import Hzfengsy.Semantic.Type.VarType.*;
 import Hzfengsy.Semantic.*;
 
 import java.util.*;
@@ -14,8 +14,14 @@ public class TypeChecker
         Kind(String _kind) { kind = _kind; }
     }
 
+    private static TypeChecker typeChecker = new TypeChecker();
+
+    public static TypeChecker getInstance() {
+        return typeChecker;
+    }
+
     private Map<Kind, Vector<BaseType[]>> operators = new HashMap<>();
-    private Classes classes;
+    private Classes classes = Classes.getInstance();
 
     private Vector<BaseType[]> SingleMatch(BaseType... baseType) {
         Vector<BaseType[]> ans = new Vector<>();
@@ -54,8 +60,7 @@ public class TypeChecker
     public Kind Equal = new Kind("Equal");
     public Kind Assign = new Kind("Assign");
 
-    public TypeChecker(Classes _classes) {
-        classes = _classes;
+    public TypeChecker() {
         operators.put(OneInt, SingleMatch(classes.intType));
         operators.put(Array, SingleMatch(new ArrayType(null)));
         operators.put(LNot, SingleMatch(classes.boolType));

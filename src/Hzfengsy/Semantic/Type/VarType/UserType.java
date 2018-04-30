@@ -1,6 +1,6 @@
-package Hzfengsy.Type.VarType;
+package Hzfengsy.Semantic.Type.VarType;
 
-import Hzfengsy.Type.*;
+import Hzfengsy.Semantic.Type.*;
 
 public class UserType extends BaseType
 {

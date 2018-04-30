@@ -2,8 +2,8 @@ package Hzfengsy.IR.IRNode;
 
 import Hzfengsy.IR.*;
 import Hzfengsy.IR.IRInstruction.*;
-import Hzfengsy.Type.*;
-import Hzfengsy.Type.VarType.*;
+import Hzfengsy.Semantic.Type.*;
+import Hzfengsy.Semantic.Type.VarType.*;
 
 import java.util.*;
 

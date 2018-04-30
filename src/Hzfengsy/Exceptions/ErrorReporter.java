@@ -1,14 +1,22 @@
 package Hzfengsy.Exceptions;
 
-import Hzfengsy.Type.*;
-import Hzfengsy.Type.VarType.*;
+import Hzfengsy.Semantic.Type.*;
+import Hzfengsy.Semantic.Type.VarType.*;
 
 import java.util.*;
 
 public class ErrorReporter
 {
+    private static ErrorReporter myReporter = new ErrorReporter();
+
+    public static ErrorReporter getInstance() {
+        return myReporter;
+    }
+
     private Vector<SemanticError> errorList = new Vector<>();
     private Vector<String> lines = new Vector<>();
+
+    private ErrorReporter() {}
 
     private Boolean errorExist(SemanticError e) {
         for (SemanticError x : errorList)

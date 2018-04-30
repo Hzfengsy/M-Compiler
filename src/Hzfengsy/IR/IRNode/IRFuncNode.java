@@ -1,19 +1,34 @@
 package Hzfengsy.IR.IRNode;
 
 import Hzfengsy.IR.*;
-import Hzfengsy.Type.*;
-import Hzfengsy.Type.VarType.*;
+import Hzfengsy.IR.IRType.*;
 
 public class IRFuncNode extends IRBaseNode
 {
-    public IRVariables IRVars = new IRVariables();
-    public IRFuncNode(FuncType _type) { func = _type; }
+    String funcName;
+    IRBaseType returnType;
+    IRBaseType[] args;
+    public IRVariables vars = new IRVariables();
 
-    private FuncType func;
+    public IRFuncNode(String funcName, IRBaseType... args) {
+        this.funcName = funcName;
+        this.args = args;
+    }
 
-    public FuncType getFunc() { return func; }
+    public String getFuncName() {
+        return "@" + funcName;
+    }
 
-    public BaseType getType() {
-        return getFunc().getReturnType();
+    private String argsToString() {
+        String ans = new String();
+        for (IRBaseType arg : this.args)
+            ans += args.toString();
+        return ans;
+    }
+
+
+    @Override
+    public String toString() {
+        return "define " + returnType + getFuncName() + "(" + argsToString() + ") {\n" + ((IRBaseNode) this).toString() + "\n}";
     }
 }

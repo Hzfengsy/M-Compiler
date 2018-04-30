@@ -3,8 +3,8 @@ package Hzfengsy.Semantic;
 import Hzfengsy.Exceptions.*;
 import Hzfengsy.Semantic.SemanticNode.*;
 import Hzfengsy.Parser.*;
-import Hzfengsy.Type.*;
-import Hzfengsy.Type.VarType.*;
+import Hzfengsy.Semantic.Type.*;
+import Hzfengsy.Semantic.Type.VarType.*;
 import org.antlr.v4.runtime.*;
 
 import java.util.*;
@@ -12,16 +12,11 @@ import java.util.*;
 public class FuncVisitor extends MBaseVisitor<SemanticBaseNode>
 {
 
-    private Functions functions;
-    private Classes classes;
-    private ErrorReporter reporter;
+    private Functions functions = Functions.getInstance();
+    private Classes classes = Classes.getInstance();
+    private ErrorReporter reporter = ErrorReporter.getInstance();
     private Stack<SemanticBaseNode> classStack = new Stack<>();
 
-    public FuncVisitor(Functions _functions, Classes _classes, ErrorReporter _reporter) {
-        functions = _functions;
-        classes = _classes;
-        reporter = _reporter;
-    }
 
     private void error(String message, ParserRuleContext ctx) {
         BaseType inClass = classStack.empty() ? null : classStack.peek().getType();

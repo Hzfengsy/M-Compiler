@@ -1,6 +1,6 @@
 package Hzfengsy.Semantic.SemanticNode;
 
-import Hzfengsy.Type.VarType.*;
+import Hzfengsy.Semantic.Type.VarType.*;
 
 import java.util.*;
 

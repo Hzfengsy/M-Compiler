@@ -1,7 +1,7 @@
 package Hzfengsy.Exceptions;
 
-import Hzfengsy.Type.*;
-import Hzfengsy.Type.VarType.*;
+import Hzfengsy.Semantic.Type.*;
+import Hzfengsy.Semantic.Type.VarType.*;
 
 public class SemanticError
 {
