@@ -25,6 +25,13 @@ public class Functions
         return funcList.get(funcName);
     }
 
+    public FuncType safeQuery(String funcName) {
+        try {
+            return query(funcName);
+        } catch (Exception ignore) {}
+        return null;
+    }
+
     public Boolean contain(String funcName) {
         return funcList.containsKey(funcName);
     }

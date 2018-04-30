@@ -5,14 +5,19 @@ import Hzfengsy.IR.IRType.*;
 
 public class IRFuncNode extends IRBaseNode
 {
-    String funcName;
-    IRBaseType returnType;
-    IRBaseType[] args;
-    public IRVariables vars = new IRVariables();
+    private String funcName;
+    private IRBaseType returnType;
+    private IRBaseType[] args;
+    private IRVariables vars = new IRVariables();
 
-    public IRFuncNode(String funcName, IRBaseType... args) {
+    public IRFuncNode(IRBaseType returnType, String funcName, IRBaseType... args) {
+        this.returnType = returnType;
         this.funcName = funcName;
         this.args = args;
+    }
+
+    public IRVariables getVars() {
+        return vars;
     }
 
     public String getFuncName() {

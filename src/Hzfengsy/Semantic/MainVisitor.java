@@ -86,9 +86,9 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
         SemanticBaseNode boolCheck = visit(ctx.expr());
         if (boolCheck.getType() != classes.boolType)
             typeError(boolCheck.getType(), classes.boolType, ctx.expr());
-        SemanticBaseNode ans = visit(ctx.stat());
+        visit(ctx.stat());
         localVar.remove(localVar.size() - 1);
-        return ans;
+        return null;
     }
 
     @Override
@@ -97,9 +97,10 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
         SemanticBaseNode boolCheck = visit(ctx.expr());
         if (boolCheck.getType() != classes.boolType)
             typeError(boolCheck.getType(), classes.boolType, ctx.expr());
-        SemanticBaseNode ans = visit(ctx.stat(0));
+        visit(ctx.stat(0));
+        visit(ctx.stat(1));
         localVar.remove(localVar.size() - 1);
-        return ans;
+        return null;
     }
 
     @Override

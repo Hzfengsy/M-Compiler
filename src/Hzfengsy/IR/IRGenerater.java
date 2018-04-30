@@ -1,24 +1,54 @@
 package Hzfengsy.IR;
 
+import Hzfengsy.IR.IRInstruction.*;
 import Hzfengsy.IR.IRNode.*;
 import Hzfengsy.IR.IRType.*;
 import Hzfengsy.Parser.*;
 import Hzfengsy.Semantic.*;
+import Hzfengsy.Semantic.Type.*;
+import Hzfengsy.Semantic.Type.VarType.*;
+
+import java.util.*;
+
 
 public class IRGenerater extends MBaseVisitor<IRBaseNode>
 {
-    private TypeMap typeMap = new TypeMap();
+    private TypeMap typeMap = TypeMap.getInstance();
     private Classes classes = Classes.getInstance();
+    private Functions functions = Functions.getInstance();
+    private Stack<IRFuncNode> funcStack = new Stack<>();
+
+    private IRBaseType[] getIRParameter(FuncType func) {
+        Vector<BaseType> parameterList = func.getParameterList();
+        IRBaseType[] ans = new IRBaseType[parameterList.size()];
+        for (int i = 0; i < parameterList.size(); i++)
+            ans[i] = typeMap.exchange(parameterList.elementAt(i));
+        return ans;
+    }
+
     @Override
     public IRBaseNode visitClas(MParser.ClasContext ctx) {
         return null;
     }
 
-    public IRBaseNode visitFunc(MParser.FuncContext ctx)
-    {
+    @Override
+    public IRBaseNode visitFunc(MParser.FuncContext ctx) {
+        //TODO:DEFINE VARS
         String funcName = ctx.id().getText();
+        FuncType funcType = functions.safeQuery(funcName);
+        IRBaseType[] parameter = getIRParameter(funcType);
+        IRFuncNode func = new IRFuncNode(typeMap.exchange(funcType.getReturnType()), funcName, parameter);
+        funcStack.push(func);
+        for (MParser.StatContext x : ctx.stat()) visit(x);
+        return func;
+    }
 
-        IRBaseNode func = new IRFuncNode(funcName, new IRi32Type());
+    @Override
+    public IRBaseNode visitIdentity(MParser.IdentityContext ctx) {
+        IRBaseType type = new IRi32Type();
+        IRVar result = funcStack.peek().getVars().insertTempVar();
+//        IRLoadInstruction inst = new IRLoadInstruction(result, type,  ,4);
+//        return IR
         return null;
     }
 }

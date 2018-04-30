@@ -20,6 +20,6 @@ public class IRVar extends IRExpr
 
     @Override
     public String toString() {
-        return type + " " + (globle ? "@" : "%") + " " + name;
+        return  (globle ? "@" : "%") + name;
     }
 }
