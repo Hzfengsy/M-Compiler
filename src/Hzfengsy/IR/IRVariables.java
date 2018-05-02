@@ -4,21 +4,32 @@ import java.util.*;
 
 public class IRVariables
 {
+    private Vector<IRVar> varList = new Vector<>();
     private Map<String, IRVar> variables = new HashMap<>();
-    private Vector<IRVar> tempVars = new Vector<>();
-    Integer index = 0;
+    private Integer index = 0;
 
     public IRVar insertVar(String name) {
         IRVar ans = new IRVar(index++, false);
+        varList.add(ans);
+
         variables.put(name, ans);
         return ans;
     }
 
     public IRVar insertTempVar() {
         IRVar ans = new IRVar(index++, false);
-        tempVars.add(ans);
+        varList.add(ans);
         return ans;
+    }
 
+    public IRVar query(Integer index) { return varList.elementAt(index); }
+
+    public IRVar query(String varName){
+        return variables.get(varName);
+    }
+
+    public void setIndex(Integer index) {
+        this.index = index;
     }
 }
 

@@ -18,6 +18,10 @@ public class IRVar extends IRExpr
         this.globle = globle;
     }
 
+    public IRBaseType getType() {
+        return type;
+    }
+
     @Override
     public String toString() {
         return  (globle ? "@" : "%") + name;

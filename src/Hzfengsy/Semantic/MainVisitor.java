@@ -11,7 +11,7 @@ import java.util.*;
 
 public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
 {
-
+    private RenameMap renameMap = RenameMap.getInstance();
     private Variable variables = new Variable();
     private Functions functions = Functions.getInstance();
     private Vector<Map<String, String>> localVar = new Vector<>();
@@ -176,6 +176,8 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
         String mappingName = variables.rename(varName);
         try {
             BaseType type = classes.getClass(className);
+            if (!functionStack.empty())
+                functionStack.peek().getFunc().insertVar(mappingName, type);
             variables.insert(mappingName, type);
             localVar.elementAt(localVar.size() - 1).put(varName, mappingName);
             Vector<BaseType> list = new Vector<>();
@@ -193,7 +195,10 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
         if (localVar.elementAt(localVar.size() - 1).containsKey(varName) || functions.contain(varName))
             error("variable " + varName + " redefined", ctx);
         String mappingName = variables.rename(varName);
+        renameMap.put(ctx, mappingName);
         try {
+            if (!functionStack.empty())
+                functionStack.peek().getFunc().insertVar(mappingName, classes.getClass(className));
             variables.insert(mappingName, classes.getClass(className));
             if (!classStack.empty()) {
                 UserType userClass = (UserType) classStack.peek().getType();
@@ -214,7 +219,10 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
         if (localVar.elementAt(localVar.size() - 1).containsKey(varName) || functions.contain(varName))
             error("variable \'" + varName + "\' has been defined", ctx);
         String mappingName = variables.rename(varName);
+        renameMap.put(ctx, mappingName);
         try {
+            if (!functionStack.empty())
+                functionStack.peek().getFunc().insertVar(mappingName, classes.getClass(className));
             variables.insert(mappingName, classes.getClass(className));
             if (!classes.getClass(className).assignCheck(exprType))
                 typeError(exprType, classes.getClass(className), ctx);
@@ -263,13 +271,13 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
     }
 
     @Override
-    public SemanticBaseNode visitRAWID(MParser.RAWIDContext ctx) {
+    public SemanticBaseNode visitIdentity(MParser.IdentityContext ctx) {
         String varName = ctx.getText();
         Boolean found = false;
         String rename = "";
         BaseType var = null;
         for (Integer i = localVar.size() - 1; i >= 0; i--) {
-            if (i == 1 && !classStack.empty()) {
+            if (i == classStack.size() && !classStack.empty()) {
                 UserType userClass = (UserType) classStack.peek().getType();
                 try {
                     var = userClass.queryVar(varName);
@@ -287,16 +295,11 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
         }
         try {
             if (found) {
+                renameMap.put(ctx, rename);
                 if (var == null) var = variables.query(rename);
                 return new SemanticExprNode(var, true);
             }
         } catch (Exception e) { error(e.getMessage(), ctx); }
-
-        if (functions.contain(varName)) {
-            try {
-                return new SemanticExprNode(functions.query(varName).getReturnType(), true);
-            } catch (Exception e) { error(e.getMessage(), ctx); }
-        }
         error("variable \'" + varName + "\' has not been defined", ctx);
         return null;
     }

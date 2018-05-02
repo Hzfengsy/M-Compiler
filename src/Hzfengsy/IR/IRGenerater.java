@@ -7,6 +7,7 @@ import Hzfengsy.Parser.*;
 import Hzfengsy.Semantic.*;
 import Hzfengsy.Semantic.Type.*;
 import Hzfengsy.Semantic.Type.VarType.*;
+import javafx.util.*;
 
 import java.util.*;
 
@@ -33,11 +34,13 @@ public class IRGenerater extends MBaseVisitor<IRBaseNode>
 
     @Override
     public IRBaseNode visitFunc(MParser.FuncContext ctx) {
-        //TODO:DEFINE VARS
         String funcName = ctx.id().getText();
         FuncType funcType = functions.safeQuery(funcName);
         IRBaseType[] parameter = getIRParameter(funcType);
         IRFuncNode func = new IRFuncNode(typeMap.exchange(funcType.getReturnType()), funcName, parameter);
+        for (Pair<String, BaseType> x : funcType.getVars()) {
+            func.defineVar(x.getValue(), x.getKey());
+        }
         funcStack.push(func);
         for (MParser.StatContext x : ctx.stat()) visit(x);
         return func;
@@ -46,7 +49,7 @@ public class IRGenerater extends MBaseVisitor<IRBaseNode>
     @Override
     public IRBaseNode visitIdentity(MParser.IdentityContext ctx) {
         IRBaseType type = new IRi32Type();
-        IRVar result = funcStack.peek().getVars().insertTempVar();
+        IRVar result = funcStack.peek().tempVar(type);
 //        IRLoadInstruction inst = new IRLoadInstruction(result, type,  ,4);
 //        return IR
         return null;

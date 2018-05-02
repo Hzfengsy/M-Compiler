@@ -20,15 +20,16 @@ public class FuncVisitor extends MBaseVisitor<SemanticBaseNode>
 
     private void error(String message, ParserRuleContext ctx) {
         BaseType inClass = classStack.empty() ? null : classStack.peek().getType();
-        Integer start = ctx.getStart().getCharPositionInLine();
-        Integer stop = ctx.getStop().getCharPositionInLine() + ctx.getStop().getText().length();
-        reporter.reportError(message, inClass, null, ctx.getStart().getLine(), start, stop);
+        Integer start = ctx != null ? ctx.getStart().getCharPositionInLine() : 0;
+        Integer stop = ctx != null ? ctx.getStop().getCharPositionInLine() + ctx.getStop().getText().length() : 0;
+        reporter.reportError(message, inClass, null, ctx != null ? ctx.getStart().getLine() : 1, start, stop);
     }
 
     private boolean checkMainFunc() {
         try {
             FuncType funcMain = functions.query("main");
             if (funcMain.getReturnType() != classes.getClass("int")) return false;
+            if (!funcMain.getParameterList().isEmpty()) return false;
         } catch (Exception e) {
             return false;
         }
@@ -75,7 +76,7 @@ public class FuncVisitor extends MBaseVisitor<SemanticBaseNode>
         loadInsideFunction();
         visitChildren(ctx);
         if (!checkMainFunc())
-            error("could not find a main function with \'int\' return value", ctx);
+            error("could not find a valid \'main\' function", null);
         return null;
     }
 

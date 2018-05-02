@@ -6,21 +6,21 @@ import Hzfengsy.IR.IRType.*;
 public class IRLoadInstruction extends IRBaseInstruction
 {
     private IRVar result;
-    private IRExpr addr;
-    private IRBaseType type, addrType;
+    private IRVar address;
+    private IRBaseType type, addressType;
     private Integer align;
 
-    public IRLoadInstruction(IRVar result, IRBaseType type, IRExpr addr, Integer align)
+    public IRLoadInstruction(IRVar result, IRBaseType type, IRVar address, Integer align)
     {
         this.result = result;
-        this.type = type; this.addr = addr;
-        this.align = align;
+        this.type = type; this.address = address;
+        this.align = align; this.addressType = address.getType();
     }
 
     public IRVar getResult() { return result; }
 
     @Override
     public String toString() {
-        return result + " = load " + type + ", " + addrType + " " + addr + ", align" + align;
+        return result + " = load " + type + ", " + addressType + " " + address + ", align " + align;
     }
 }
