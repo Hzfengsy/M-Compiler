@@ -31,7 +31,7 @@ expr: expr op=('++'|'--')                  # Postfix
     | op=('+'|'-') expr                    # Unary
     | '~' expr                             # Not
     | '!' expr                             # LNot
-    | <assoc=right> 'new' class_new        # New
+    | <assoc=right> NEW class_new          # New
     | expr op=('*'|'/'|'%') expr           # MulDivMod
     | expr op=('+'|'-') expr               # AddSub
     | expr op=('<<'|'>>') expr             # Bitwise
@@ -75,14 +75,13 @@ class_name: BOOL
           | NAME
           ;
 
-class_stat: class_stat (('[' ']') | '[]')  # Array
+class_stat: class_stat '[' ']'             # Array
           | class_name                     # SingleClass
           ;
 
-dimension : '[' expr? ']'
-          | '[]';
+dimension : '[' expr? ']';
 
-class_new : class_name (('('')')? | dimension+)
+class_new : class_name (dimension* | ('('')')? )
           ;
 
 //Reserved Keywords
