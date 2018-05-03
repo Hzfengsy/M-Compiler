@@ -65,9 +65,7 @@ define: class_stat id '=' expr ';'         # Assign_Define
       | class_stat id ';'                  # Id_Define
       ;
 
-id: NAME                            # RAWID
-//  | expr '[' expr ']'                 # Subscript
-//  | id '.' id                       # Member
+id: NAME                                   # RAWID
   ;
 
 class_name: BOOL
@@ -77,14 +75,15 @@ class_name: BOOL
           | NAME
           ;
 
-class_stat: class_stat (('[' ']') | '[]')         # Array
-          | class_name              # SingleClass
+class_stat: class_stat (('[' ']') | '[]')  # Array
+          | class_name                     # SingleClass
           ;
 
 dimension : '[' expr? ']'
           | '[]';
 
-class_new : class_name dimension* ;
+class_new : class_name (('('')')? | dimension+)
+          ;
 
 //Reserved Keywords
 BOOL  : 'bool';

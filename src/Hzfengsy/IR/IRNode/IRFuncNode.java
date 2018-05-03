@@ -36,7 +36,8 @@ public class IRFuncNode extends IRBaseNode
     public void storeArgs() {
         Integer index = args.length + 1;
         for (int i = 0; i < args.length; i++) {
-//            instructions.add(new IRStoreInstruction());
+            IRBaseInstruction inst = new IRStoreInstruction(args[i], variables.query(i), new IRPointerType(args[i]), variables.query(i + index), 4);
+            instructions.add(inst);
         }
     }
 

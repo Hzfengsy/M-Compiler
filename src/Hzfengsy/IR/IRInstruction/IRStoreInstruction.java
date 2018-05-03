@@ -3,7 +3,7 @@ package Hzfengsy.IR.IRInstruction;
 import Hzfengsy.IR.*;
 import Hzfengsy.IR.IRType.*;
 
-public class IRStoreInstruction
+public class IRStoreInstruction extends IRBaseInstruction
 {
     private IRVar address;
     private IRExpr data;

@@ -1,8 +1,8 @@
 package Hzfengsy.Semantic;
 
 import Hzfengsy.Exceptions.*;
-import Hzfengsy.Semantic.SemanticNode.*;
 import Hzfengsy.Parser.*;
+import Hzfengsy.Semantic.SemanticNode.*;
 import Hzfengsy.Semantic.Type.*;
 import Hzfengsy.Semantic.Type.VarType.*;
 import org.antlr.v4.runtime.*;
@@ -28,6 +28,11 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
         Integer stop = ctx.getStop().getCharPositionInLine() + ctx.getStop().getText().length();
         FuncType inFunction = functionStack.empty() ? null : functionStack.peek().getFunc();
         reporter.reportError(message, inClass, inFunction, ctx.getStart().getLine(), start, stop);
+    }
+
+    private Boolean definable(BaseType type) {
+        if (type instanceof ArrayType) return definable(type.getBaseType());
+        else return !(type instanceof VoidType);
     }
 
     private void typeError(BaseType expr, BaseType require, ParserRuleContext ctx) {
@@ -147,8 +152,8 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
                 func = userClass.queryFunc(funcName);
             }
             SemanticBaseNode ans = new SemanticFuncNode(func);
-            visit(ctx.stat_list());
             functionStack.push(ans);
+            if (ctx.stat_list() != null) visit(ctx.stat_list());
             for (MParser.StatContext x : ctx.stat()) visit(x);
             functionStack.pop();
             localVar.remove(localVar.size() - 1);
@@ -168,7 +173,8 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
     public SemanticBaseNode visitStatList(MParser.StatListContext ctx) {
         if (ctx.getText().equals("")) return new SemanticTypeListNode(new Vector<>());
         String varName = ctx.id().getText();
-        if (functions.contain(varName) || localVar.elementAt(localVar.size() - 1).containsKey(varName)) {
+        if (functionStack.peek().getFunc().getFuncName().equals(varName)
+            || localVar.elementAt(localVar.size() - 1).containsKey(varName)) {
             error("redefine variable \'" + varName + "\'", ctx);
             return null;
         }
@@ -191,7 +197,11 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
     public SemanticBaseNode visitId_Define(MParser.Id_DefineContext ctx) {
         String varName = ctx.id().getText();
         String className = ctx.class_stat().getText();
-        if (className.equals("void")) error("cannot define void variable", ctx);
+        try {
+            BaseType type = classes.getClass(className);
+            if (!definable(type)) error("cannot define a \'" + className + "\' variable", ctx);
+        } catch (Exception e) {error(e.getMessage(), ctx);}
+
         if (localVar.elementAt(localVar.size() - 1).containsKey(varName) || functions.contain(varName))
             error("variable " + varName + " redefined", ctx);
         String mappingName = variables.rename(varName);
@@ -214,7 +224,10 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
     public SemanticBaseNode visitAssign_Define(MParser.Assign_DefineContext ctx) {
         String varName = ctx.id().getText();
         String className = ctx.class_stat().getText();
-        if (className.equals("void")) error("cannot define void variable", ctx);
+        try {
+            BaseType type = classes.getClass(className);
+            if (!definable(type)) error("cannot define a \'" + className + "\' variable", ctx);
+        } catch (Exception e) {error(e.getMessage(), ctx);}
         BaseType exprType = visit(ctx.expr()).getType();
         if (localVar.elementAt(localVar.size() - 1).containsKey(varName) || functions.contain(varName))
             error("variable \'" + varName + "\' has been defined", ctx);
@@ -551,7 +564,11 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
             else if (check) error("Type error occupied during expr \"" + ctx.getText() + "\"", ctx);
             classname = new StringBuilder(classname).append("[]").toString();
         }
-        try { return new SemanticExprNode(classes.getClass(classname), true); } catch (Exception e) {
+        try {
+            BaseType type = classes.getClass(classname);
+            if (!definable(type)) error("can not new a \'" + classname + "\' variable", ctx);
+            return new SemanticExprNode(type, true);
+        } catch (Exception e) {
             error(e.getMessage(), ctx);
         }
         return null;
