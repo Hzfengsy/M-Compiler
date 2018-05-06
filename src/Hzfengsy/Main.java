@@ -85,6 +85,6 @@ public class Main
         if (args.length == 1) program = readTestFile(args[0]);
         else program = readTestFile("program.txt");
         semantic(program);
-        IRGenerate();
+//        IRGenerate();
     }
 }
