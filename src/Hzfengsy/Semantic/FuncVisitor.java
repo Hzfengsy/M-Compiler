@@ -1,8 +1,8 @@
 package Hzfengsy.Semantic;
 
 import Hzfengsy.Exceptions.*;
-import Hzfengsy.Semantic.SemanticNode.*;
 import Hzfengsy.Parser.*;
+import Hzfengsy.Semantic.SemanticNode.*;
 import Hzfengsy.Semantic.Type.*;
 import Hzfengsy.Semantic.Type.VarType.*;
 import org.antlr.v4.runtime.*;
@@ -99,10 +99,6 @@ public class FuncVisitor extends MBaseVisitor<SemanticBaseNode>
     public SemanticBaseNode visitFunc(MParser.FuncContext ctx) {
         String funcName = ctx.id().getText();
         String className = null;
-        if (classes.containClass(funcName)) {
-            error("have a class called \'" + funcName + "\' that is same with the function name", ctx);
-            return null;
-        }
         String funcLine = (ctx.class_stat() == null ? "" : ctx.class_stat().getText()) + ' ' + funcName + '(' + ctx.stat_list().getText() + ')';
         if (ctx.class_stat() == null) {
             if (classStack.empty()) error("error construction function.", ctx);
@@ -116,7 +112,13 @@ public class FuncVisitor extends MBaseVisitor<SemanticBaseNode>
                 }
             }
         }
-        else className = ctx.class_stat().getText();
+        else {
+            if (classes.containClass(funcName)) {
+                error("have a class called \'" + funcName + "\' that is same with the function name", ctx);
+                return null;
+            }
+            className = ctx.class_stat().getText();
+        }
         Vector<BaseType> list = visit(ctx.stat_list()).getTypeList();
         try {
             BaseType returnType = classes.getClass(className);
