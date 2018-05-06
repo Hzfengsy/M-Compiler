@@ -8,11 +8,13 @@ import Hzfengsy.Semantic.*;
 import Hzfengsy.Semantic.Type.*;
 import Hzfengsy.Semantic.Type.VarType.*;
 import javafx.util.*;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.*;
 
 import java.util.*;
 
 
-public class IRGenerater extends MBaseVisitor<IRBaseNode>
+public class IRGenerator extends MBaseVisitor<IRBaseNode>
 {
     private TypeMap typeMap = TypeMap.getInstance();
     private Classes classes = Classes.getInstance();
@@ -24,6 +26,21 @@ public class IRGenerater extends MBaseVisitor<IRBaseNode>
         IRBaseType[] ans = new IRBaseType[parameterList.size()];
         for (int i = 0; i < parameterList.size(); i++)
             ans[i] = typeMap.exchange(parameterList.elementAt(i));
+        return ans;
+    }
+
+    @Override
+    public IRBaseNode visitMain_prog(MParser.Main_progContext ctx) {
+        System.out.println(visit(ctx.prog()).toString());
+        return null;
+    }
+
+    @Override
+    public IRBaseNode visitProg(MParser.ProgContext ctx) {
+        IRBaseNode ans = new IRBaseNode();
+        for (ParseTree x : ctx.func()) {
+            ans.appendNextNode(visit(x));
+        }
         return ans;
     }
 
@@ -41,6 +58,7 @@ public class IRGenerater extends MBaseVisitor<IRBaseNode>
         for (Pair<String, BaseType> x : funcType.getVars()) {
             func.defineVar(x.getValue(), x.getKey());
         }
+        func.storeArgs();
         funcStack.push(func);
         for (MParser.StatContext x : ctx.stat()) visit(x);
         return func;
@@ -48,8 +66,7 @@ public class IRGenerater extends MBaseVisitor<IRBaseNode>
 
     @Override
     public IRBaseNode visitIdentity(MParser.IdentityContext ctx) {
-        IRBaseType type = new IRi32Type();
-        IRVar result = funcStack.peek().tempVar(type);
+        IRVar result = funcStack.peek().tempVar(classes.intType);
 //        IRLoadInstruction inst = new IRLoadInstruction(result, type,  ,4);
 //        return IR
         return null;

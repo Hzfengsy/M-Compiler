@@ -30,10 +30,11 @@ public class ErrorReporter
         if (!errorExist(error)) errorList.add(error);
     }
 
-    public void check() {
-        if (errorList.isEmpty()) return;
+    public Boolean check() {
+        if (errorList.isEmpty()) return true;
         for (SemanticError x : errorList) System.err.println(x);
         System.exit(1);
+        return false;
     }
 
     public void putLine(String line) {

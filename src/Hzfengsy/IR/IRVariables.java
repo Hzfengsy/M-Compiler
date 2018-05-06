@@ -11,7 +11,6 @@ public class IRVariables
     public IRVar insertVar(String name) {
         IRVar ans = new IRVar(index++, false);
         varList.add(ans);
-
         variables.put(name, ans);
         return ans;
     }
@@ -29,6 +28,7 @@ public class IRVariables
     }
 
     public void setIndex(Integer index) {
+        for (int i = this.index; i < index; i++) varList.add(null);
         this.index = index;
     }
 }

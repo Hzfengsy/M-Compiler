@@ -5,9 +5,6 @@ import Hzfengsy.IR.IRType.*;
 import Hzfengsy.IR.*;
 import Hzfengsy.Semantic.Type.VarType.*;
 
-import java.net.*;
-import java.util.*;
-
 public class IRFuncNode extends IRBaseNode
 {
     private String funcName;
@@ -19,6 +16,9 @@ public class IRFuncNode extends IRBaseNode
         this.returnType = returnType;
         this.funcName = funcName;
         this.args = args;
+        for (IRBaseType x : args) {
+            tempVar(x);
+        }
         variables.setIndex(args.length + 1);
     }
 
@@ -28,8 +28,11 @@ public class IRFuncNode extends IRBaseNode
 
     private String argsToString() {
         String ans = new String();
-        for (IRBaseType arg : this.args)
-            ans += args.toString();
+        Boolean first = true;
+        for (IRBaseType arg : this.args) {
+            ans += (first ? "" : ", ") + arg.toString();
+            first = false;
+        }
         return ans;
     }
 
@@ -44,7 +47,7 @@ public class IRFuncNode extends IRBaseNode
 
     @Override
     public String toString() {
-        return "define " + returnType + getFuncName() + "(" + argsToString() + ") {\n" + ((IRBaseNode) this).toString() + "\n}";
+        return "define " + returnType + " " + getFuncName() + "(" + argsToString() + ") {\n" + instsToString() + "}\n\n";
     }
 
     public IRVar defineVar(BaseType type, String varName) {
@@ -55,7 +58,12 @@ public class IRFuncNode extends IRBaseNode
         return result;
     }
 
-    public IRVar tempVar(IRBaseType type) {
+    private IRVar tempVar(IRBaseType type) {
+        return variables.insertTempVar();
+    }
+
+    public IRVar tempVar(BaseType type) {
+        IRBaseType IRType = TypeMap.getInstance().exchange(type);
         return variables.insertTempVar();
     }
 }

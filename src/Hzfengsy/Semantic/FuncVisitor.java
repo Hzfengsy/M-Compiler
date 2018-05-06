@@ -99,6 +99,10 @@ public class FuncVisitor extends MBaseVisitor<SemanticBaseNode>
     public SemanticBaseNode visitFunc(MParser.FuncContext ctx) {
         String funcName = ctx.id().getText();
         String className = null;
+        if (classes.containClass(funcName)) {
+            error("have a class called \'" + funcName + "\' that is same with the function name", ctx);
+            return null;
+        }
         String funcLine = (ctx.class_stat() == null ? "" : ctx.class_stat().getText()) + ' ' + funcName + '(' + ctx.stat_list().getText() + ')';
         if (ctx.class_stat() == null) {
             if (classStack.empty()) error("error construction function.", ctx);

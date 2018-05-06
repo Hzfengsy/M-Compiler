@@ -7,4 +7,9 @@ public class IRPointerType extends IRBaseType
     public IRPointerType(IRBaseType baseType) {
         this.baseType = baseType;
     }
+
+    @Override
+    public String toString() {
+        return "*" + baseType;
+    }
 }
