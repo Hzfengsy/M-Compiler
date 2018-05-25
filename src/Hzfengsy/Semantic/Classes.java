@@ -27,7 +27,7 @@ public class Classes
         classList.put("null", nullType);
     }
 
-    BaseType defineClass(String className) throws Exception {
+    public BaseType defineClass(String className) throws Exception {
         if (classList.containsKey(className))
             throw new Exception("already has a class named" + "\"" + className + "\"");
         BaseType clas = new UserType(className);
@@ -35,7 +35,7 @@ public class Classes
         return clas;
     }
 
-    BaseType getClass(String className) throws Exception {
+    public BaseType getClass(String className) throws Exception {
         if (classList.containsKey(className)) return classList.get(className);
         if (className.length() > 2 && className.substring(className.length() - 2).equals("[]")) {
             BaseType Base = getClass(className.substring(0, className.length() - 2));
@@ -46,7 +46,18 @@ public class Classes
         throw new Exception("could not find a class called \"" + className + "\"");
     }
 
-    Boolean containClass(String className) {
+    public BaseType safeGetClass(String className) {
+        try {
+            return getClass(className);
+        } catch (Exception ignore) {}
+        return null;
+    }
+
+    public Boolean containClass(String className) {
         return classList.containsKey(className);
+    }
+
+    public Collection<BaseType> values() {
+        return  classList.values();
     }
 }

@@ -1,35 +1,42 @@
 package Hzfengsy.IR;
 
+import Hzfengsy.IR.IRExpr.*;
+
 import java.util.*;
 
 public class IRVariables
 {
-    private Vector<IRVar> varList = new Vector<>();
     private Map<String, IRVar> variables = new HashMap<>();
+    private Set<IRVar> globe = new HashSet<>();
     private Integer index = 0;
+    private static IRVariables irVariables = new IRVariables();
 
-    public IRVar insertVar(String name) {
-        IRVar ans = new IRVar(index++, false);
-        varList.add(ans);
+    private IRVariables() {}
+
+    public static IRVariables getInstance() {
+        return irVariables;
+    }
+
+    public IRVar insertVar(String name, Boolean globe) {
+        IRVar ans = new IRVar(name, globe);
         variables.put(name, ans);
+        if (globe) this.globe.add(ans);
         return ans;
     }
 
     public IRVar insertTempVar() {
-        IRVar ans = new IRVar(index++, false);
-        varList.add(ans);
+        String Index = (index++).toString();
+        IRVar ans = new IRVar(Index, false);
+        variables.put(Index, ans);
         return ans;
     }
 
-    public IRVar query(Integer index) { return varList.elementAt(index); }
-
-    public IRVar query(String varName){
+    public IRVar query(String varName) {
         return variables.get(varName);
     }
 
-    public void setIndex(Integer index) {
-        for (int i = this.index; i < index; i++) varList.add(null);
-        this.index = index;
+    public Collection<IRVar> getGlobe() {
+        return globe;
     }
 }
 

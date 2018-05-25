@@ -1,7 +1,9 @@
 package Hzfengsy;
 
+import Hzfengsy.CodeGenerator.*;
 import Hzfengsy.Exceptions.*;
 import Hzfengsy.IR.*;
+import Hzfengsy.IR.IRNode.*;
 import Hzfengsy.Parser.*;
 import Hzfengsy.Semantic.*;
 import org.antlr.v4.runtime.*;
@@ -75,9 +77,26 @@ public class Main
         return ErrorReporter.getInstance().check();
     }
 
-    public static void IRGenerate() {
+    private static IRProgNode IRGenerate() {
         IRGenerator generator = new IRGenerator();
-        generator.visit(tree);
+        return (IRProgNode) generator.visit(tree);
+    }
+
+    private static String codeGenrate(IRProgNode progNode) {
+        BaseGenerator generator = new BaseGenerator(progNode);
+        return generator.genrate();
+    }
+
+    private static void writeFile(String text, String fileName) {
+        FileWriter writer;
+        try {
+            writer = new FileWriter(fileName);
+            writer.write(text);
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
@@ -85,6 +104,7 @@ public class Main
         if (args.length == 1) program = readTestFile(args[0]);
         else program = readTestFile("program.txt");
         semantic(program);
-//        IRGenerate();
+        IRProgNode IRProg = IRGenerate();
+        writeFile(codeGenrate(IRProg), "code.asm");
     }
 }

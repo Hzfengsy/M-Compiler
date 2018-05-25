@@ -1,21 +1,29 @@
 package Hzfengsy.IR.IRInstruction;
 
-import Hzfengsy.IR.*;
-import Hzfengsy.IR.IRType.*;
+import Hzfengsy.IR.IRExpr.*;
 
 public class IRAllocaInstruction extends IRBaseInstruction
 {
-    private IRVar result;
-    private IRBaseType type;
+    private IRExpr result;
     private Integer align;
-    public IRAllocaInstruction(IRVar result, IRBaseType type, Integer align) {
+    public IRAllocaInstruction(IRExpr result, Integer align) {
         this.result = result;
-        this.type = type;
         this.align = align;
     }
 
     @Override
+    public void setResult(IRExpr result) {
+        this.result = result;
+    }
+
+
+    @Override
+    public IRExpr getResult() {
+        return result;
+    }
+
+    @Override
     public String toString() {
-        return result + " = alloca " + type + ", align " + align;
+        return result + " = alloca align " + align;
     }
 }

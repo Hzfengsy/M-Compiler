@@ -5,6 +5,8 @@ import Hzfengsy.Semantic.Type.*;
 public class UserType extends BaseType
 {
     private String className;
+    private int index = 0;
+    public boolean construction = false;
 
     public UserType(String Name) { className = Name; }
 
@@ -18,6 +20,7 @@ public class UserType extends BaseType
 
     public void insertMemberVar(String varName, BaseType var) {
         memberVar.put(varName, var);
+        varIndex.put(varName, index++);
     }
 
     @Override

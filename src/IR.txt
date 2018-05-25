@@ -1,0 +1,36 @@
+define @f(%a, %b) {
+
+#f:
+    %0 = LT %a, %b
+    jmp %0, #0
+    jmp 1, #1
+
+#0:
+    ret %a
+    jmp 1, #1
+
+#1:
+    ret %b
+
+#end_f:
+}
+
+define @main() {
+
+#main:
+    @x = MOV 0
+    %1 = ADD 10, 1
+    %2 = LSHIFT %1, 2
+    %3 = call @malloc(%2)
+    %array = ADD %3, 8
+    %n = MOV 10
+    %sum = call @f(1, 1)
+    %6 = ADD 1, %n
+    %7 = call @f(1, 2)
+    %8 = ADD %6, %7
+    %i = ADD %8, @x
+    %10 = ADD %n, %sum
+    ret %10
+
+#end_main:
+}

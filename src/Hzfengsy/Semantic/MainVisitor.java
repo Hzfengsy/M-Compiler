@@ -21,6 +21,7 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
     private Stack<SemanticBaseNode> functionStack = new Stack<>();
     private Stack<SemanticBaseNode> classStack = new Stack<>();
     private TypeChecker typeChecker = TypeChecker.getInstance();
+    private TypeRecorder typeRecorder = TypeRecorder.getInstance();
 
     private void error(String message, ParserRuleContext ctx) {
         BaseType inClass = classStack.empty() ? null : classStack.peek().getType();
@@ -153,7 +154,9 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
             }
             SemanticBaseNode ans = new SemanticFuncNode(func);
             functionStack.push(ans);
-            if (ctx.stat_list() != null) visit(ctx.stat_list());
+            if (ctx.stat_list() != null) {
+                func.setParameterName(((SemanticTypeListNode) visit(ctx.stat_list())).getName());
+            }
             for (MParser.StatContext x : ctx.stat()) visit(x);
             functionStack.pop();
             localVar.remove(localVar.size() - 1);
@@ -164,14 +167,18 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
 
     @Override
     public SemanticBaseNode visitStatListCombine(MParser.StatListCombineContext ctx) {
-        Vector<BaseType> list = visit(ctx.stat_list(0)).getTypeList();
-        list.addAll(visit(ctx.stat_list(1)).getTypeList());
-        return new SemanticTypeListNode(list);
+        SemanticTypeListNode stat_0 = (SemanticTypeListNode) visit(ctx.stat_list(0));
+        SemanticTypeListNode stat_1 = (SemanticTypeListNode) visit(ctx.stat_list(1));
+        Vector<BaseType> list = stat_0.getTypeList();
+        list.addAll(stat_1.getTypeList());
+        Vector<String> name = stat_0.getName();
+        name.addAll(stat_1.getName());
+        return new SemanticTypeListNode(list, name);
     }
 
     @Override
     public SemanticBaseNode visitStatList(MParser.StatListContext ctx) {
-        if (ctx.getText().equals("")) return new SemanticTypeListNode(new Vector<>());
+        if (ctx.getText().equals("")) return new SemanticTypeListNode(new Vector<>(), new Vector<>());
         String varName = ctx.id().getText();
         if (functionStack.peek().getFunc().getFuncName().equals(varName)
             || localVar.elementAt(localVar.size() - 1).containsKey(varName)) {
@@ -188,7 +195,9 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
             localVar.elementAt(localVar.size() - 1).put(varName, mappingName);
             Vector<BaseType> list = new Vector<>();
             list.add(type);
-            return new SemanticTypeListNode(list);
+            Vector<String> name = new Vector<>();
+            name.add(mappingName);
+            return new SemanticTypeListNode(list, name);
         } catch (NullPointerException ignored) {} catch (Exception e) { error(e.getMessage(), ctx);}
         return null;
     }
@@ -210,10 +219,6 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
             if (!functionStack.empty())
                 functionStack.peek().getFunc().insertVar(mappingName, classes.getClass(className));
             variables.insert(mappingName, classes.getClass(className));
-            if (!classStack.empty()) {
-                UserType userClass = (UserType) classStack.peek().getType();
-                userClass.insertMemberVar(varName, classes.getClass(className));
-            }
         } catch (Exception e) { error(e.getMessage(), ctx); }
 
         localVar.elementAt(localVar.size() - 1).put(varName, mappingName);
@@ -290,16 +295,17 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
         String rename = "";
         BaseType var = null;
         for (Integer i = localVar.size() - 1; i >= 0; i--) {
-            if (i == classStack.size() && !classStack.empty()) {
+            Map<String, String> local = localVar.elementAt(i);
+            if (i == classStack.size() + 1 && !classStack.empty()) {
                 UserType userClass = (UserType) classStack.peek().getType();
                 try {
+                    ASTSet.getInstance().putMemberVar(ctx);
                     var = userClass.queryVar(varName);
                     found = true;
                     break;
                 } catch (Exception ignored) {}
                 continue;
             }
-            Map<String, String> local = localVar.elementAt(i);
             if (local.containsKey(varName)) {
                 found = true;
                 rename = local.get(varName);
@@ -334,6 +340,7 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
     @Override
     public SemanticBaseNode visitMembervar(MParser.MembervarContext ctx) {
         BaseType Class = visit(ctx.expr()).getType();
+        typeRecorder.put(ctx, Class);
         BaseType var = null;
         try { var = Class.queryVar(ctx.id().getText()); } catch (Exception e) {
             error(e.getMessage(), ctx);
@@ -344,6 +351,7 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
     @Override
     public SemanticBaseNode visitMemberfunc(MParser.MemberfuncContext ctx) {
         BaseType Class = visit(ctx.expr()).getType();
+        typeRecorder.put(ctx, Class);
         FuncType func = null;
         try { func = Class.queryFunc(ctx.id().getText()); } catch (Exception e) {
             error(e.getMessage(), ctx);
@@ -362,6 +370,7 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
         Boolean ans = typeChecker.typeCheck(typeChecker.OneInt, expr);
         if (!ans) typeError(expr, classes.intType, ctx);
         if (!left.isLeft()) leftError(ctx.expr().getText(), ctx);
+        ASTSet.getInstance().putLeftValue(ctx.expr());
         return new SemanticExprNode(expr, false);
     }
 
@@ -391,6 +400,7 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
         Boolean ans = typeChecker.typeCheck(typeChecker.OneInt, expr);
         if (!ans) typeError(expr, classes.intType, ctx);
         if (!left.isLeft()) leftError(ctx.expr().getText(), ctx);
+        ASTSet.getInstance().putLeftValue(ctx.expr());
         return new SemanticExprNode(expr, false);
     }
 
@@ -581,6 +591,7 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
         if (!typeChecker.typeCheck(typeChecker.Assign, left.getType(), right.getType()))
             operationError("=", left.getType(), right.getType(), ctx);
         if (!left.isLeft()) leftError(ctx.expr(0).getText(), ctx);
+        ASTSet.getInstance().putLeftValue(ctx.expr(0));
         return new SemanticExprNode(left.getType(), false);
     }
 

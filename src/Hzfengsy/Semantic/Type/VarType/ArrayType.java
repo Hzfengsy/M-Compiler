@@ -7,7 +7,7 @@ import java.util.*;
 public class ArrayType extends BaseType
 {
     private FuncType func_size() {
-        return new FuncType(new IntType(), new Vector<>(), "int size()", "size");
+        return new FuncType(new IntType(), new Vector<>(), new Vector<>(), "int size()", "size");
     }
 
     private BaseType Base;

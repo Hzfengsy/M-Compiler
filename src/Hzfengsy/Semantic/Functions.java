@@ -3,6 +3,7 @@ package Hzfengsy.Semantic;
 import Hzfengsy.Semantic.Type.*;
 
 import java.util.*;
+import java.util.function.*;
 
 public class Functions
 {
@@ -36,5 +37,8 @@ public class Functions
         return funcList.containsKey(funcName);
     }
 
+    public Set<Map.Entry<String, FuncType>> values() {
+        return funcList.entrySet();
+    }
 
 }

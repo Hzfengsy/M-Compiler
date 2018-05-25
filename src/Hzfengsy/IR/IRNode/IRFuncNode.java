@@ -1,69 +1,82 @@
 package Hzfengsy.IR.IRNode;
 
-import Hzfengsy.IR.IRInstruction.*;
-import Hzfengsy.IR.IRType.*;
+import Hzfengsy.CodeGenerator.*;
 import Hzfengsy.IR.*;
-import Hzfengsy.Semantic.Type.VarType.*;
+import Hzfengsy.IR.IRExpr.*;
 
-public class IRFuncNode extends IRBaseNode
+import java.util.*;
+
+public class IRFuncNode extends IRBase
 {
     private String funcName;
-    private IRBaseType returnType;
-    private IRBaseType[] args;
-    private IRVariables variables = new IRVariables();
+    private IRVar[] args;
+    private Vector<IRBaseBlock> containNodes = new Vector<>();
+    private StackAlloc alloc = new StackAlloc();
+    private boolean extend = false;
 
-    public IRFuncNode(IRBaseType returnType, String funcName, IRBaseType... args) {
-        this.returnType = returnType;
+    public IRFuncNode(String funcName, IRVar... args) {
         this.funcName = funcName;
         this.args = args;
-        for (IRBaseType x : args) {
-            tempVar(x);
-        }
-        variables.setIndex(args.length + 1);
+    }
+
+    public IRFuncNode(String funcName, boolean extend, IRVar... args) {
+        this.funcName = funcName;
+        this.args = args;
+        this.extend = extend;
     }
 
     public String getFuncName() {
         return "@" + funcName;
     }
 
+    public String getName() {
+        return funcName;
+    }
+
     private String argsToString() {
         String ans = new String();
         Boolean first = true;
-        for (IRBaseType arg : this.args) {
+        for (IRVar arg : this.args) {
             ans += (first ? "" : ", ") + arg.toString();
             first = false;
         }
         return ans;
     }
 
-    public void storeArgs() {
-        Integer index = args.length + 1;
-        for (int i = 0; i < args.length; i++) {
-            IRBaseInstruction inst = new IRStoreInstruction(args[i], variables.query(i), new IRPointerType(args[i]), variables.query(i + index), 4);
-            instructions.add(inst);
-        }
+    private String instToString() {
+        StringBuilder ans = new StringBuilder();
+        for (IRBaseBlock node : containNodes)
+            ans.append(node.toString());
+        return ans.toString();
     }
 
+    public void appendNode(IRBaseBlock nextNode) {
+        this.containNodes.add(nextNode);
+    }
 
     @Override
     public String toString() {
-        return "define " + returnType + " " + getFuncName() + "(" + argsToString() + ") {\n" + instsToString() + "}\n\n";
+        if (extend) return "";
+        return "define " + getFuncName() + "(" + argsToString() + ") {\n" + instToString() + "}\n\n";
     }
 
-    public IRVar defineVar(BaseType type, String varName) {
-        IRBaseType IRType = TypeMap.getInstance().exchange(type);
-        IRVar result = variables.insertVar(varName);
-        Integer align = 4;
-        instructions.add(new IRAllocaInstruction(result, IRType, align));
-        return result;
+    public IRVar getThis() {
+        return args[0];
     }
 
-    private IRVar tempVar(IRBaseType type) {
-        return variables.insertTempVar();
+    public List<IRBaseBlock> getContainNodes() {
+        return containNodes;
     }
 
-    public IRVar tempVar(BaseType type) {
-        IRBaseType IRType = TypeMap.getInstance().exchange(type);
-        return variables.insertTempVar();
+    public void allocVar(IRVar var) {
+        alloc.SetVar(var);
+    }
+
+    public StackAlloc getAlloc() {
+        return alloc;
+    }
+
+    public IRVar[] getArgs() {
+        return args;
     }
 }

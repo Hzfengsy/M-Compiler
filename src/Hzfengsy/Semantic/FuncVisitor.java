@@ -1,6 +1,7 @@
 package Hzfengsy.Semantic;
 
 import Hzfengsy.Exceptions.*;
+import Hzfengsy.IR.IRType.*;
 import Hzfengsy.Parser.*;
 import Hzfengsy.Semantic.SemanticNode.*;
 import Hzfengsy.Semantic.Type.*;
@@ -37,29 +38,36 @@ public class FuncVisitor extends MBaseVisitor<SemanticBaseNode>
     }
 
     private FuncType func_getInt() {
-        return new FuncType(classes.intType, new Vector<>(), "int getInt()", "getInt");
+        return new FuncType(classes.intType, new Vector<>(), new Vector<>(), "int getInt()", "getInt");
     }
 
     private FuncType func_print() {
         Vector<BaseType> parameter = new Vector<>();
         parameter.add(classes.stringType);
-        return new FuncType(classes.voidType, parameter, "void print(string str)", "print");
+        Vector<String> args = new Vector<>();
+        args.add("str");
+        return new FuncType(classes.voidType, parameter, args, "void print(string str)", "print");
     }
 
     private FuncType func_println() {
         Vector<BaseType> parameter = new Vector<>();
         parameter.add(classes.stringType);
-        return new FuncType(classes.voidType, parameter, "void println(string str)", "println");
+        Vector<String> args = new Vector<>();
+        args.add("str");
+        return new FuncType(classes.voidType, parameter, args, "void println(string str)", "println");
     }
 
     private FuncType func_getString() {
-        return new FuncType(classes.stringType, new Vector<>(), "string getString()", "getString");
+
+        return new FuncType(classes.stringType, new Vector<>(), new Vector<>(), "string getString()", "getString");
     }
 
     private FuncType func_toString() {
         Vector<BaseType> parameter = new Vector<>();
         parameter.add(classes.intType);
-        return new FuncType(classes.stringType, parameter, "string toString(int i)", "toString");
+        Vector<String> args = new Vector<>();
+        args.add("i");
+        return new FuncType(classes.stringType, parameter, args, "string toString(int i)", "toString");
     }
 
     private void loadInsideFunction() {
@@ -105,7 +113,10 @@ public class FuncVisitor extends MBaseVisitor<SemanticBaseNode>
             else {
                 UserType userClass = (UserType) classStack.peek().getType();
                 String userClassName = userClass.getName();
-                if (userClassName.equals(funcName)) className = "void";
+                if (userClassName.equals(funcName)) {
+                    className = "void";
+                    userClass.construction = true;
+                }
                 else {
                     error("error construction function.", ctx);
                     return null;
@@ -119,10 +130,12 @@ public class FuncVisitor extends MBaseVisitor<SemanticBaseNode>
             }
             className = ctx.class_stat().getText();
         }
-        Vector<BaseType> list = visit(ctx.stat_list()).getTypeList();
+        SemanticTypeListNode stat = (SemanticTypeListNode) visit(ctx.stat_list());
+        Vector<BaseType> list = stat.getTypeList();
+        Vector<String> args = stat.getName();
         try {
             BaseType returnType = classes.getClass(className);
-            FuncType type = new FuncType(returnType, list, funcLine, funcName);
+            FuncType type = new FuncType(returnType, list, args, funcLine, funcName);
             if (classStack.empty()) functions.insert(funcName, type);
             else {
                 UserType userClass = (UserType) classStack.peek().getType();

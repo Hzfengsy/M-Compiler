@@ -6,10 +6,64 @@ public class IROperations
     {
         ADD, SUB, MUL, DIV, MOD,
         LSHIFT, RSHIFT, LT, GT, LE, GE, EQ, NE,
-        AND, XOR, OR
+        AND, XOR, OR;
+
+        public String toNASM() {
+            switch (this) {
+                case ADD:
+                    return "add";
+                case SUB:
+                    return "sub";
+                case MUL:
+                    return "imul";
+                case DIV:
+                    return "div";
+                case MOD:
+                    return "mod";
+                case LSHIFT:
+                    return "shl";
+                case RSHIFT:
+                    return "shr";
+                case LT:
+                    return "setl";
+                case GT:
+                    return "setg";
+                case LE:
+                    return "setle";
+                case GE:
+                    return "setge";
+                case EQ:
+                    return "sete";
+                case NE:
+                    return "setne";
+                case AND:
+                    return "and";
+                case OR:
+                    return "or";
+                case XOR:
+                    return "xor";
+                default:
+                    return null;
+            }
+        }
     }
 
-    public enum memOp {
-        LOAD, STORE
+    public enum unaryOp
+    {
+        MOV, NEG, NOT, LNOT;
+
+        public String toNASM() {
+            switch (this) {
+                case MOV:
+                    return "mov";
+                case NEG:
+                    return "neg";
+                case NOT:
+                    return "not";
+                case LNOT:
+                    return "lnot";
+            }
+            return null;
+        }
     }
 }

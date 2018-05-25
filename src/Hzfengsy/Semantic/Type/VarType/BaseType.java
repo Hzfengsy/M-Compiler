@@ -11,9 +11,9 @@ public class BaseType
 
     Map<String, FuncType> memberFunc = new HashMap<>();
     Map<String, BaseType> memberVar = new HashMap<>();
+    Map<String, Integer> varIndex = new HashMap<>();
 
     public BaseType getBaseType() {
-        assert false;
         return null;
     }
 
@@ -44,6 +44,11 @@ public class BaseType
         return memberFunc.get(funcName);
     }
 
+    public FuncType safeQueryFunc(String funcName) {
+        try { return queryFunc(funcName); } catch (Exception ignore) {}
+        return null;
+    }
+
     public BaseType queryVar(String varName) throws Exception {
         if (!memberVar.containsKey(varName))
             throw new Exception("Undefined Member Variable \"" + varName + "\"");
@@ -54,4 +59,15 @@ public class BaseType
         return memberFunc.containsKey(Name) || memberVar.containsKey(Name);
     }
 
+    public Integer varIndex(String varName) {
+        return varIndex.get(varName);
+    }
+
+    public Integer memSize() {
+        return memberVar.size() * 8;
+    }
+
+    public Set<Map.Entry<String, FuncType>> funcstions() {
+        return memberFunc.entrySet();
+    }
 }
