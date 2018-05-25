@@ -105,6 +105,9 @@ public class Main
         else program = readTestFile("program.txt");
         semantic(program);
         IRProgNode IRProg = IRGenerate();
-        writeFile(codeGenrate(IRProg), "code.asm");
+        String code = codeGenrate(IRProg);
+        if (args.length == 1) writeFile(code, "code.asm");
+        else System.out.println(code);
+
     }
 }

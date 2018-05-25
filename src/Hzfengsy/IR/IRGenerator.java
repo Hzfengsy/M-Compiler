@@ -81,7 +81,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     @Override
     public IRBase visitMain_prog(MParser.Main_progContext ctx) {
         IRBase ans = visit(ctx.prog());
-        System.out.println(ans.toString());
+        System.err.println(ans.toString());
         return ans;
     }
 
