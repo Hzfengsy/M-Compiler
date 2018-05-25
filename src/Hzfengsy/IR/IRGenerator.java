@@ -593,7 +593,14 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         else left_expr = (IRExpr) left;
         if (right instanceof IRBaseBlock) {
             ans.join((IRBaseBlock) right);
-            ans.setLastInstResult(left_expr);
+            if (((IRBaseBlock) right).AssignValid())
+                ans.setLastInstResult(left_expr);
+            else {
+                right_expr = ((IRBaseBlock) right).getResult();
+                IROperations.unaryOp op = IROperations.unaryOp.MOV;
+                IRBaseInstruction inst = new IRUnaryExprInstruction(left_expr, op, right_expr);
+                ans.join(inst);
+            }
         }
         else {
             right_expr = (IRExpr) right;
@@ -749,7 +756,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         }
         body_1.join(new IRjumpInstruction(new IRConst(1), tail));
 
-        IRBase body_stat_2 = visit(ctx.stat(0));
+        IRBase body_stat_2 = visit(ctx.stat(1));
         if (body_stat_2 instanceof IRBaseBlock)
             body_2.join((IRBaseBlock) body_stat_2);
         else {
@@ -810,8 +817,10 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             result = variables.insertTempVar();
             funcStack.peek().allocVar(result);
         }
+        IRBaseBlock block = new IRBaseBlock(args);
         IRBaseInstruction inst = new IRCallInstruction(result, func, args.getArgs());
-        return new IRBaseBlock(inst);
+        block.join(inst);
+        return block;
     }
 
     @Override
@@ -919,7 +928,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
                 IRVar size = variables.insertTempVar();
                 funcStack.peek().allocVar(size);
 
-                IRBaseInstruction sizeChange = new IRBinaryExprInstruction(size, IROperations.binaryOp.LSHIFT, plus, new IRConst(2));
+                IRBaseInstruction sizeChange = new IRBinaryExprInstruction(size, IROperations.binaryOp.LSHIFT, plus, new IRConst(3));
                 baseBlock.join(sizeChange);
                 exprs.add(new Pair<>(expr, size));
             }

@@ -83,6 +83,10 @@ public class IRBaseBlock extends IRBase
         this.result = result;
     }
 
+    public boolean AssignValid() {
+        return result == instructions.get(instructions.size() - 1).getResult();
+    }
+
     public void setLastInstResult(IRExpr result) {
         instructions.get(instructions.size() - 1).setResult(result);
         setResult(result);

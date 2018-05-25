@@ -27,6 +27,12 @@ public class IRArgs extends IRBaseBlock
         this.args.addAll(args.args);
     }
 
+    public void join(IRBaseBlock block) {
+        if (args == null) return;
+        instructions.addAll(block.instructions);
+        this.args.add(block.getResult());
+    }
+
     public void addArg(IRExpr arg) {
         this.args.add(arg);
     }

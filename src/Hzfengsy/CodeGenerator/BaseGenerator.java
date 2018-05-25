@@ -204,8 +204,7 @@ public class BaseGenerator
 
     private void retOperator(IRRetInstruction inst) {
         if (inst.getVal() != null)
-            load(inst.getVal(), Register.r10);
-        ans.append("\tmov\trax, r10\n");
+            load(inst.getVal(), Register.rax);
         ans.append("\tjmp\t" + endLable.getName() + "\n");
     }
 
