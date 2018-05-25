@@ -1,7 +1,6 @@
 package Hzfengsy.Semantic;
 
 import Hzfengsy.Exceptions.*;
-import Hzfengsy.IR.IRType.*;
 import Hzfengsy.Parser.*;
 import Hzfengsy.Semantic.SemanticNode.*;
 import Hzfengsy.Semantic.Type.*;
