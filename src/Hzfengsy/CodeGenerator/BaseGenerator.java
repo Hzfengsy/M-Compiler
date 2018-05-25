@@ -52,7 +52,7 @@ public class BaseGenerator
         ans.append("\tmov\t" + var2Mem(var) + ", " + reg + "\n");
     }
 
-    public String memAddr(IRMem irMem) {
+    private String memAddr(IRMem irMem) {
         IRExpr base = irMem.getAddr();
         IRExpr offset = irMem.getOffset();
         String baseAddr = base.toString();
@@ -65,7 +65,7 @@ public class BaseGenerator
             load(offset, Register.r15);
             offsetAddr = Register.r15.toString();
         }
-        return "[" + baseAddr + "+" + offsetAddr + "]";
+        return "qword [" + baseAddr + "+" + offsetAddr + "]";
     }
 
     private void enterFunc() {
@@ -156,17 +156,31 @@ public class BaseGenerator
     }
 
     private void moveOperator(IRExpr dest, IRExpr rhs) {
-
-        if (rhs instanceof IRVar) {
-            load(rhs, Register.rcx);
-            store((IRVar) dest, Register.rcx);
+        if (dest instanceof IRVar) {
+            if (rhs instanceof IRVar) {
+                load(rhs, Register.rcx);
+                store((IRVar) dest, Register.rcx);
+            }
+            else if (rhs instanceof IRMem) {
+                ans.append("\tmov\trcx, " + memAddr((IRMem) rhs) + "\n");
+                store((IRVar) dest, Register.rcx);
+            }
+            else if (rhs instanceof IRConst) {
+                ans.append("\tmov\t" + var2Mem((IRVar) dest) + ", " + rhs + "\n");
+            }
         }
-        else if (rhs instanceof IRMem) {
-            ans.append("\tmov\trcx, " + memAddr((IRMem) rhs) + "\n");
-            store((IRVar) dest, Register.rcx);
-        }
-        else if (rhs instanceof IRConst) {
-            ans.append("\tmov\t" + var2Mem((IRVar) dest) + ", " + rhs + "\n");
+        else {
+            if (rhs instanceof IRVar) {
+                load(rhs, Register.rcx);
+                ans.append("\tmov\t" + memAddr((IRMem) dest) + ", rcx\n");
+            }
+            else if (rhs instanceof IRMem) {
+                ans.append("\tmov\trcx, " + memAddr((IRMem) rhs) + "\n");
+                ans.append("\tmov\t" + memAddr((IRMem) dest) + ", rcx\n");
+            }
+            else if (rhs instanceof IRConst) {
+                ans.append("\tmov\t" + memAddr((IRMem) dest) + ", " + rhs + "\n");
+            }
         }
 
     }

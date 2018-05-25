@@ -841,11 +841,16 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             block.join((IRBaseBlock) index);
             index_result = ((IRBaseBlock) id).getResult();
         }
-        IRVar result = variables.insertTempVar();
-        funcStack.peek().allocVar(result);
 
-        IRBaseInstruction inst = new IRUnaryExprInstruction(result, IROperations.unaryOp.MOV, new IRMem(id_result, index_result));
-        block.join(inst);
+        if (!ASTSet.getInstance().getLeftValue(ctx)) {
+            IRVar result = variables.insertTempVar();
+            funcStack.peek().allocVar(result);
+            IRBaseInstruction inst = new IRUnaryExprInstruction(result, IROperations.unaryOp.MOV, new IRMem(id_result, index_result));
+            block.join(inst);
+        }
+        else {
+            block.setResult(new IRMem(id_result, index_result));
+        }
         return block;
     }
 
@@ -952,10 +957,11 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         String varName = ctx.id().getText();
         BaseType Class = typeRecorder.get(ctx);
         Integer index = Class.varIndex(varName);
-        IRVar result = variables.insertTempVar();
-        funcStack.peek().allocVar(result);
+
 
         if (!ASTSet.getInstance().getLeftValue(ctx)) {
+            IRVar result = variables.insertTempVar();
+            funcStack.peek().allocVar(result);
             IRBaseInstruction inst = new IRUnaryExprInstruction(result, IROperations.unaryOp.MOV, new IRMem(expr_result, new IRConst(index)));
             block.join(inst);
         }
