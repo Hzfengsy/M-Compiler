@@ -716,7 +716,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             IRExpr result;
             if (second instanceof IRExpr)
                 result = (IRExpr) second;
-            else if (second instanceof IRNode) {
+            else if (second instanceof IRBaseBlock) {
                 bodyBlock.join((IRBaseBlock) second);
                 result = ((IRBaseBlock) second).getResult();
             }
