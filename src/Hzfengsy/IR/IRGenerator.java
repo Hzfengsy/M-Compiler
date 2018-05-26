@@ -8,6 +8,7 @@ import Hzfengsy.Semantic.*;
 import Hzfengsy.Semantic.Type.*;
 import Hzfengsy.Semantic.Type.VarType.*;
 import javafx.util.*;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
 import java.util.*;
@@ -638,6 +639,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         IRBaseBlock bodyBlock = new IRBaseBlock();
         bodyBlock.setLabel(labels.insertTemp());
         func.appendNode(bodyBlock);
+        head.join(new IRjumpInstruction(new IRConst(1), bodyBlock));
         IRBaseBlock stepBlock = null;
         if (step != null) {
             stepBlock = new IRBaseBlock();
