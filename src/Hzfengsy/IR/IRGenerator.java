@@ -185,10 +185,10 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             return ans;
         }
         else {
-            IRBaseBlock ans = ((IRNode) expr).getHead();
-            IRBaseInstruction inst = new IRUnaryExprInstruction(result, op, ans.getResult());
-            ans.join(inst);
-            return new IRNode(ans, ((IRNode) expr).getTail());
+            IRBaseBlock tail = ((IRNode) expr).getTail();
+            IRBaseInstruction inst = new IRUnaryExprInstruction(result, op, tail.getResult());
+            tail.join(inst);
+            return expr;
         }
     }
 
@@ -653,20 +653,24 @@ public class IRGenerator extends MBaseVisitor<IRBase>
                 IRBaseInstruction inst = new IRUnaryExprInstruction(left_expr, op, right_expr);
                 ans.join(inst);
             }
+            return ans;
         }
         else if (right instanceof IRExpr) {
             right_expr = (IRExpr) right;
             IROperations.unaryOp op = IROperations.unaryOp.MOV;
             IRBaseInstruction inst = new IRUnaryExprInstruction(left_expr, op, right_expr);
             ans.join(inst);
+            return ans;
         }
         else {
-            right_expr = (IRExpr) right;
+            IRBaseBlock tail = ((IRNode) right).getTail();
+            right_expr = tail.getResult();
             IROperations.unaryOp op = IROperations.unaryOp.MOV;
             IRBaseInstruction inst = new IRUnaryExprInstruction(left_expr, op, right_expr);
-            ans.join(inst);
+            tail.join(inst);
+            return right;
         }
-        return ans;
+
     }
 
     @Override
