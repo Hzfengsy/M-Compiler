@@ -178,7 +178,8 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
 
     @Override
     public SemanticBaseNode visitStatList(MParser.StatListContext ctx) {
-        if (ctx.getText().equals("")) return new SemanticTypeListNode(new Vector<>(), new Vector<>());
+        if (ctx.getText().equals(""))
+            return new SemanticTypeListNode(new Vector<>(), new Vector<>());
         String varName = ctx.id().getText();
         if (functionStack.peek().getFunc().getFuncName().equals(varName)
             || localVar.elementAt(localVar.size() - 1).containsKey(varName)) {
@@ -571,7 +572,12 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
         Boolean check = false;
         for (MParser.DimensionContext x : ctx.dimension()) {
             if (x.getText().equals("[]")) check = true;
-            else if (check) error("Type error occupied during expr \"" + ctx.getText() + "\"", ctx);
+            else {
+                if (check) error("Type error occupied during expr \"" + ctx.getText() + "\"", ctx);
+                BaseType type = visit(x.expr()).getType();
+                Boolean ans = typeChecker.typeCheck(typeChecker.OneInt, type);
+                if (!ans) error("dimension is not a int", ctx);
+            }
             classname = new StringBuilder(classname).append("[]").toString();
         }
         try {

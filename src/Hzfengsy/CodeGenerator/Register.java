@@ -17,7 +17,7 @@ public class Register
     public static Register r12 = new Register("r12", 12);
     public static Register r13 = new Register("r13", 13);
     public static Register r14 = new Register("r14", 14);
-    public static Register r15 = new Register("r15s", 15);
+    public static Register r15 = new Register("r15", 15);
 
     private String name;
     private Integer index;

@@ -90,7 +90,9 @@ public class BaseGenerator
             load(rhs, Register.r11);
             ans.append("\t" + op.toNASM() + "\trcx, r11\n");
         }
-        store((IRVar) dest, Register.rcx);
+        if (dest instanceof IRVar)
+            store((IRVar) dest, Register.rcx);
+        else ans.append("\tmov\t" + memAddr((IRMem)dest) + ", rcx\n");
     }
 
     private void cmpOperator(IRExpr dest, IRExpr lhs, IROperations.binaryOp op, IRExpr rhs) {
@@ -199,6 +201,7 @@ public class BaseGenerator
                 break;
             case LNOT:
                 addLikeOperator(inst.getResult(), inst.getRight(), IROperations.binaryOp.XOR, new IRConst(1));
+                break;
             default:
                 unaryOpeartor(inst.getResult(), op, inst.getRight());
 

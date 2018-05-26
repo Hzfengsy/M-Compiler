@@ -1,5 +1,7 @@
 package Hzfengsy.IR.IRExpr;
 
+import java.util.regex.*;
+
 public class IRVar extends IRExpr
 {
     private String name;
@@ -34,5 +36,10 @@ public class IRVar extends IRExpr
     @Override
     public int hashCode() {
         return toString().hashCode();
+    }
+
+    public boolean isTemp() {
+        Pattern pattern = Pattern.compile("[0-9]*");
+        return pattern.matcher(name).matches();
     }
 }
