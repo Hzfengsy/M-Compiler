@@ -1,0 +1,41 @@
+define @main() {
+
+#main:
+%la = MOV 5
+%lb = MOV 10
+%0 = ADD %lb, 1
+%1 = LSHIFT %0, 3
+%2 = call @malloc(%1)
+%b = ADD %2, 8
+%4 = ADD 2, 1
+%5 = LSHIFT %4, 3
+%6 = call @malloc(%5)
+%c = ADD %6, 8
+%8 = ADD %la, 1
+%9 = LSHIFT %8, 3
+%10 = call @malloc(%9)
+%a = ADD %10, 8
+[%c + 0 * 8] = MOV %a
+[%c + 1 * 8] = MOV %b
+%sum = MOV 0
+%i = MOV 0
+jmp 1, #0
+
+#0:
+%12 = LT %i, %la
+%16 = LNOT %12
+jmp %16, #2
+%13 = MOV [%c + 0 * 8]
+%14 = MOV [%13 + %i * 8]
+%sum = ADD %sum, %14
+jmp 1, #1
+
+#1:
+%i = ADD %i, 1
+jmp 1, #0
+
+#2:
+ret %sum
+
+#end_main:
+}

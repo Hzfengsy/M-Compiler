@@ -101,12 +101,12 @@ public class Main
 
     public static void main(String[] args) {
         String program;
-        if (args.length == 1) program = readTestFile(args[0]);
+        if (args.length > 0) program = readTestFile(args[0]);
         else program = readTestFile("program.txt");
         semantic(program);
         IRProgNode IRProg = IRGenerate();
         String code = codeGenrate(IRProg);
-        if (args.length == 1) writeFile(code, "code.asm");
+        if (args.length > 0) writeFile(code, "code.asm");
         else System.out.println(code);
 
     }

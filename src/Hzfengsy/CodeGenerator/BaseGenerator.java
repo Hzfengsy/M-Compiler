@@ -65,7 +65,7 @@ public class BaseGenerator
             load(offset, Register.r15);
             offsetAddr = Register.r15.toString();
         }
-        return "qword [" + baseAddr + "+" + offsetAddr + "]";
+        return "qword [" + baseAddr + "+" + offsetAddr + " * 8]";
     }
 
     private void enterFunc() {
