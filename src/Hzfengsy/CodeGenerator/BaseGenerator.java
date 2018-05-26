@@ -22,7 +22,7 @@ public class BaseGenerator
 
     private void storeArgs(IRFuncNode func) {
         IRVar[] args = func.getArgs();
-        for (int i = 0 ; i <args.length; i++){
+        for (int i = 0; i < args.length; i++) {
             store(args[i], Register.getParm(i));
         }
     }
@@ -42,15 +42,24 @@ public class BaseGenerator
         if (var instanceof IRConst) {
             ans.append("\tmov\t" + reg + ", " + var + "\n");
         }
-        else {
+        else if (var instanceof IRVar) {
             ans.append("\tmov\t" + reg + ", " + var2Mem((IRVar) var) + "\n");
+        }
+        else {
+            ans.append("\tmov\t" + reg + ", " + memAddr((IRMem) var) + "\n");
         }
     }
 
+    private void store(IRExpr var, Register reg) {
+        if (var instanceof IRVar) {
+            ans.append("\tmov\t" + var2Mem((IRVar) var) + ", " + reg + "\n");
+        }
+        else {
+            ans.append("\tmov\t" + memAddr((IRMem) var) + ", " + reg + "\n");
+        }
 
-    private void store(IRVar var, Register reg) {
-        ans.append("\tmov\t" + var2Mem(var) + ", " + reg + "\n");
     }
+
 
     private String memAddr(IRMem irMem) {
         IRExpr base = irMem.getAddr();
@@ -91,28 +100,25 @@ public class BaseGenerator
             ans.append("\t" + op.toNASM() + "\trcx, r11\n");
         }
         if (dest instanceof IRVar)
-            store((IRVar) dest, Register.rcx);
-        else ans.append("\tmov\t" + memAddr((IRMem)dest) + ", rcx\n");
+            store( dest, Register.rcx);
+        else ans.append("\tmov\t" + memAddr((IRMem) dest) + ", rcx\n");
     }
 
     private void cmpOperator(IRExpr dest, IRExpr lhs, IROperations.binaryOp op, IRExpr rhs) {
-        load(lhs, Register.r10);
+        load(lhs, Register.rcx);
         load(rhs, Register.r11);
-        ans.append("\tmov\trcx, r10\n");
         ans.append("\tcmp\trcx, r11\n");
         ans.append("\t" + op.toNASM() + "\tcl\n\tmovzx\trcx, cl\n");
-        store((IRVar) dest, Register.rcx);
+        store( dest, Register.rcx);
     }
 
     private void divLikeOperator(IRExpr dest, IRExpr lhs, IROperations.binaryOp op, IRExpr rhs) {
-        load(lhs, Register.r10);
-        load(rhs, Register.r11);
-        ans.append("\tmov\trax, r10\n");
-        ans.append("\tmov\trcx, r11\n");
+        load(lhs, Register.rax);
+        load(rhs, Register.rcx);
+        ans.append("\txor\trdx, rdx\n");
         ans.append("\tcqo\n\tidiv\trcx\n");
-        ans.append("\t" + op.toNASM() + "\tr12, r11\n");
         Register src = op.equals("div") ? Register.rax : Register.rdx;
-        store((IRVar) dest, src);
+        store( dest, src);
     }
 
     private void shiftOperator(IRExpr dest, IRExpr lhs, IROperations.binaryOp op, IRExpr rhs) {
@@ -121,7 +127,7 @@ public class BaseGenerator
         ans.append("\tmov\trax, r10\n");
         ans.append("\tmov\trcx, r11\n");
         ans.append("\t" + op.toNASM() + "\trax, cl\n");
-        store((IRVar) dest, Register.rax);
+        store( dest, Register.rax);
     }
 
     private void binaryOpeation(IRBinaryExprInstruction inst) {
@@ -161,11 +167,11 @@ public class BaseGenerator
         if (dest instanceof IRVar) {
             if (rhs instanceof IRVar) {
                 load(rhs, Register.rcx);
-                store((IRVar) dest, Register.rcx);
+                store( dest, Register.rcx);
             }
             else if (rhs instanceof IRMem) {
                 ans.append("\tmov\trcx, " + memAddr((IRMem) rhs) + "\n");
-                store((IRVar) dest, Register.rcx);
+                store( dest, Register.rcx);
             }
             else if (rhs instanceof IRConst) {
                 ans.append("\tmov\t" + var2Mem((IRVar) dest) + ", " + rhs + "\n");
@@ -190,7 +196,7 @@ public class BaseGenerator
     private void unaryOpeartor(IRExpr dest, IROperations.unaryOp op, IRExpr rhs) {
         load(rhs, Register.r10);
         ans.append("\t" + op.toNASM() + "\t" + Register.r10 + "\n");
-        store((IRVar) dest, Register.r10);
+        store( dest, Register.r10);
     }
 
     private void unaryOpeation(IRUnaryExprInstruction inst) {
@@ -234,7 +240,7 @@ public class BaseGenerator
         }
         ans.append("\tcall " + inst.getFunc().getName() + "\n");
         if (inst.getResult() != null) {
-            store((IRVar) inst.getResult(), Register.rax);
+            store( inst.getResult(), Register.rax);
         }
 
     }
