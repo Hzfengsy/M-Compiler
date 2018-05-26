@@ -669,9 +669,10 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             IRBaseInstruction jump = new IRjumpInstruction(tempResult, tail);
             bodyBlock.join(jump);
         }
-        if (body instanceof IRBaseBlock)
+        if (body instanceof IRBaseBlock) {
             bodyBlock.join((IRBaseBlock) body);
-        else if (((IRNode) body).getHead() == ((IRNode) body).getTail()) {            bodyBlock.join(((IRNode) body).getHead());
+        }
+        else if (((IRNode) body).getHead() == ((IRNode) body).getTail()) {
             bodyBlock.join(((IRNode) body).getHead());
         }
         else {
