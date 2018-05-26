@@ -66,4 +66,35 @@ public class IROperations
             return null;
         }
     }
+
+    public enum jmpOp
+    {
+        JMP,
+        JG, JGE, JL, JLE, JE, JNE,
+        JZ, JNZ;
+
+        public String toNASM() {
+            switch (this) {
+                case JMP:
+                    return "jmp";
+                case JG:
+                    return "jg";
+                case JGE:
+                    return "jge";
+                case JL:
+                    return "jl";
+                case JLE:
+                    return "jle";
+                case JE:
+                    return "je";
+                case JNZ:
+                    return "jnz";
+                case JZ:
+                    return "jz";
+                case JNE:
+                    return "jne";
+            }
+            return null;
+        }
+    }
 }

@@ -8,15 +8,26 @@ public class IRjumpInstruction extends IRBaseInstruction
 {
     private IRExpr expr;
     private IRBaseBlock block;
+    private IROperations.jmpOp op;
 
-    public IRjumpInstruction(IRExpr expr, IRBaseBlock block) {
+    public IRjumpInstruction(IRExpr expr, IROperations.jmpOp op, IRBaseBlock block) {
         this.expr = expr;
         this.block = block;
+        this.op = op;
+    }
+
+    public IRjumpInstruction(IRBaseBlock block) {
+        this.expr = null;
+        this.block = block;
+        this.op = IROperations.jmpOp.JMP;
     }
 
     @Override
     public String toString() {
-        return "jmp " + expr + ", " + block.getLabel();
+        if (op == IROperations.jmpOp.JMP)
+            return op + " " + block.getLabel();
+        else
+            return op + " " + expr + ", " + block.getLabel();
     }
 
     @Override
@@ -34,5 +45,9 @@ public class IRjumpInstruction extends IRBaseInstruction
 
     public IRLable getLable() {
         return block.getLabel();
+    }
+
+    public IROperations.jmpOp getOp() {
+        return op;
     }
 }

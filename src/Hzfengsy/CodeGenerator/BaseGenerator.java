@@ -215,13 +215,13 @@ public class BaseGenerator
     }
 
     private void jumpOperator(IRjumpInstruction inst) {
-        if (inst.getExpr() instanceof IRConst) {
+        if (inst.getExpr() == null) {
             ans.append("\tjmp\t" + inst.getLable().getName() + "\n");
         }
         else {
             load(inst.getExpr(), Register.rcx);
             ans.append("\tcmp\trcx, 0\n");
-            ans.append("\tjnz\t" + inst.getLable().getName() + "\n");
+            ans.append("\t" + inst.getOp().toNASM() + "\t" + inst.getLable().getName() + "\n");
         }
     }
 
