@@ -879,6 +879,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         IRBaseBlock baseBlock = new IRBaseBlock(inst);
         IRVar temp = variables.insertTempVar();
         funcStack.peek().allocVar(temp);
+        baseBlock.join(new IRUnaryExprInstruction(new IRMem(result, new IRConst(0)), IROperations.unaryOp.MOV, expr.getKey()));
         baseBlock.join(new IRBinaryExprInstruction(temp, IROperations.binaryOp.ADD, result, new IRConst(8)));
         if (deep.equals(exprs.size() - 1))
             return new IRNode(baseBlock, baseBlock);
@@ -996,6 +997,9 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             expr_result = ((IRBaseBlock) expr).getResult();
         }
         BaseType Class = typeRecorder.get(ctx);
+        if (Class instanceof ArrayType) {
+            if (funcName.equals("size")) return new IRMem(expr_result, new IRConst(-1));
+        }
         String className = ((UserType) Class).getName();
         IRFuncNode func = funcNodeMap.get(className + "." + funcName);
         IRArgs args = new IRArgs();
