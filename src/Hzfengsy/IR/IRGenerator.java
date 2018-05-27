@@ -29,6 +29,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     private IRBaseBlock globeVariable = new IRBaseBlock();
 
     private Set<String> buildin = new HashSet<>();
+    private StringData stringData = StringData.getInstance();
 
     private void initBuildIn() {
         buildin.add("malloc");
@@ -1111,6 +1112,19 @@ public class IRGenerator extends MBaseVisitor<IRBase>
 
         IRBaseInstruction inst = new IRCallInstruction(result, func, args.getArgs());
         return new IRBaseBlock(inst);
+    }
+
+    @Override
+    public IRBase visitStr(MParser.StrContext ctx) {
+        String x = ctx.getText();
+        x = x.substring(1, x.length() - 1);
+        IRExpr get = stringData.getLabel(x);
+        if (get == null) {
+            IRVar var = variables.insertTempString();
+            stringData.insert(var, x);
+            return var;
+        }
+        else return get;
     }
 
 }

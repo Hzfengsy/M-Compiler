@@ -17,9 +17,17 @@ public class BaseGenerator
     private StackAlloc allocor;
     private StringBuilder ans = new StringBuilder();
     private IRLable endLable;
+    private StringData stringData = StringData.getInstance();
 
     public BaseGenerator(IRProgNode program) {
         this.program = program;
+    }
+
+    private void dataSection() {
+        for (Map.Entry<String,IRExpr> entry : stringData.getEntry()) {
+            ans.append(((IRVar)entry.getValue()).getName() + ":\n");
+            ans.append("\tdb \"" + entry.getKey() + "\", 0\n");
+        }
     }
 
     private String readFile(String filePath) {
@@ -55,7 +63,10 @@ public class BaseGenerator
     }
 
     private String var2Mem(IRVar var) {
-        if (var.isGlobe()) {
+        if (stringData.containLabel(var)) {
+            return var.getName();
+        }
+        else if (var.isGlobe()) {
             return "qword [" + var.getName() + "]";
         }
         else {
@@ -127,7 +138,7 @@ public class BaseGenerator
             ans.append("\t" + op.toNASM() + "\trcx, r11\n");
         }
         if (dest instanceof IRVar)
-            store( dest, Register.rcx);
+            store(dest, Register.rcx);
         else ans.append("\tmov\t" + memAddr((IRMem) dest) + ", rcx\n");
     }
 
@@ -136,7 +147,7 @@ public class BaseGenerator
         load(rhs, Register.r11);
         ans.append("\tcmp\trcx, r11\n");
         ans.append("\t" + op.toNASM() + "\tcl\n\tmovzx\trcx, cl\n");
-        store( dest, Register.rcx);
+        store(dest, Register.rcx);
     }
 
     private void divLikeOperator(IRExpr dest, IRExpr lhs, IROperations.binaryOp op, IRExpr rhs) {
@@ -145,7 +156,7 @@ public class BaseGenerator
         ans.append("\txor\trdx, rdx\n");
         ans.append("\tcqo\n\tidiv\trcx\n");
         Register src = op.toNASM().equals("div") ? Register.rax : Register.rdx;
-        store( dest, src);
+        store(dest, src);
     }
 
     private void shiftOperator(IRExpr dest, IRExpr lhs, IROperations.binaryOp op, IRExpr rhs) {
@@ -154,7 +165,7 @@ public class BaseGenerator
         ans.append("\tmov\trax, r10\n");
         ans.append("\tmov\trcx, r11\n");
         ans.append("\t" + op.toNASM() + "\trax, cl\n");
-        store( dest, Register.rax);
+        store(dest, Register.rax);
     }
 
     private void binaryOpeation(IRBinaryExprInstruction inst) {
@@ -194,11 +205,11 @@ public class BaseGenerator
         if (dest instanceof IRVar) {
             if (rhs instanceof IRVar) {
                 load(rhs, Register.rcx);
-                store( dest, Register.rcx);
+                store(dest, Register.rcx);
             }
             else if (rhs instanceof IRMem) {
                 ans.append("\tmov\trcx, " + memAddr((IRMem) rhs) + "\n");
-                store( dest, Register.rcx);
+                store(dest, Register.rcx);
             }
             else if (rhs instanceof IRConst) {
                 ans.append("\tmov\t" + var2Mem((IRVar) dest) + ", " + rhs + "\n");
@@ -223,7 +234,7 @@ public class BaseGenerator
     private void unaryOpeartor(IRExpr dest, IROperations.unaryOp op, IRExpr rhs) {
         load(rhs, Register.r10);
         ans.append("\t" + op.toNASM() + "\t" + Register.r10 + "\n");
-        store( dest, Register.r10);
+        store(dest, Register.r10);
     }
 
     private void unaryOpeation(IRUnaryExprInstruction inst) {
@@ -267,7 +278,7 @@ public class BaseGenerator
         }
         ans.append("\tcall " + inst.getFunc().getName() + "\n");
         if (inst.getResult() != null) {
-            store( inst.getResult(), Register.rax);
+            store(inst.getResult(), Register.rax);
         }
 
     }
@@ -317,8 +328,9 @@ public class BaseGenerator
         }
         ans.append("\n" +
                    "\n" +
-                   "SECTION .data   \n" +
-                   "\n" +
+                   "SECTION .data   \n");
+        dataSection();
+        ans.append("\n" +
                    "\n" +
                    "SECTION .bss    \n");
         Collection<IRVar> globe = IRVariables.getInstance().getGlobe();

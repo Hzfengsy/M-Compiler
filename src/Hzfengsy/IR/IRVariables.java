@@ -9,6 +9,7 @@ public class IRVariables
     private Map<String, IRVar> variables = new HashMap<>();
     private Set<IRVar> globe = new HashSet<>();
     private Integer index = 0;
+    private Integer stringIndex = 0;
     private static IRVariables irVariables = new IRVariables();
 
     private IRVariables() {}
@@ -26,6 +27,13 @@ public class IRVariables
 
     public IRVar insertTempVar() {
         String Index = (index++).toString();
+        IRVar ans = new IRVar(Index, false);
+        variables.put(Index, ans);
+        return ans;
+    }
+
+    public IRVar insertTempString() {
+        String Index = "__String_" + (stringIndex++).toString();
         IRVar ans = new IRVar(Index, false);
         variables.put(Index, ans);
         return ans;
