@@ -709,6 +709,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         }
         IRFuncNode func = funcStack.peek();
         IRBaseBlock bodyBlock = new IRBaseBlock();
+        IRBaseBlock nowBody = bodyBlock;
         bodyBlock.setLabel(labels.insertTemp());
         func.appendNode(bodyBlock);
         head.join(new IRjumpInstruction(bodyBlock));
@@ -744,19 +745,19 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             bodyBlock.join(jump);
         }
         if (body instanceof IRBaseBlock) {
-            bodyBlock.join((IRBaseBlock) body);
+            nowBody.join((IRBaseBlock) body);
         }
         else if (((IRNode) body).getHead() == ((IRNode) body).getTail()) {
-            bodyBlock.join(((IRNode) body).getHead());
+            nowBody.join(((IRNode) body).getHead());
         }
         else {
             bodyBlock.join(((IRNode) body).getHead());
-            bodyBlock = ((IRNode) body).getTail();
+            nowBody = ((IRNode) body).getTail();
         }
         if (step != null) {
-            bodyBlock.join(new IRjumpInstruction(stepBlock));
+            nowBody.join(new IRjumpInstruction(stepBlock));
         }
-        else bodyBlock.join(new IRjumpInstruction(bodyBlock));
+        else nowBody.join(new IRjumpInstruction(bodyBlock));
         func.appendNode(tail);
         loopBreak.pop();
         loopContinue.pop();

@@ -144,7 +144,7 @@ public class BaseGenerator
         load(rhs, Register.rcx);
         ans.append("\txor\trdx, rdx\n");
         ans.append("\tcqo\n\tidiv\trcx\n");
-        Register src = op.equals("div") ? Register.rax : Register.rdx;
+        Register src = op.toNASM().equals("div") ? Register.rax : Register.rdx;
         store( dest, src);
     }
 
