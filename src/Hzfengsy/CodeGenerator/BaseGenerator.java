@@ -1,11 +1,13 @@
 package Hzfengsy.CodeGenerator;
 
 
+import Hzfengsy.Exceptions.*;
 import Hzfengsy.IR.IRExpr.*;
 import Hzfengsy.IR.IRInstruction.*;
 import Hzfengsy.IR.*;
 import Hzfengsy.IR.IRNode.*;
 
+import java.io.*;
 import java.util.*;
 
 
@@ -18,6 +20,31 @@ public class BaseGenerator
 
     public BaseGenerator(IRProgNode program) {
         this.program = program;
+    }
+
+    private String readFile(String filePath) {
+        String ans = new String();
+        File file = new File(filePath);
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            String tempString = null;
+            while ((tempString = reader.readLine()) != null) {
+                ErrorReporter.getInstance().putLine(tempString);
+                ans += tempString + '\n';
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e1) {
+                }
+            }
+        }
+        return ans;
     }
 
     private void storeArgs(IRFuncNode func) {
@@ -251,10 +278,14 @@ public class BaseGenerator
                    "global main\n" +
                    "\n" +
                    "extern malloc\n" +
+                   "extern puts\n" +
+                   "extern printf\n" +
+                   "extern sprintf\n" +
                    "\n" +
                    "\n" +
                    "SECTION .text   \n" +
                    "\n");
+        ans.append(readFile("buildin.asm"));
         for (IRFuncNode funcNode : program.getFuncs()) {
             if (funcNode.getContainNodes().size() == 0) continue;
             allocor = funcNode.getAlloc();
@@ -294,6 +325,9 @@ public class BaseGenerator
         for (IRVar var : globe) {
             ans.append(var.getName() + ":\tresq\t1\n");
         }
+
+        ans.append("\n\nSECTION .rodata    \n");
+        ans.append(readFile("rodata.asm"));
         return ans.toString();
     }
 }

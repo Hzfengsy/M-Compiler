@@ -30,7 +30,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
 
     private Set<String> buildin = new HashSet<>();
 
-    public IRGenerator() {
+    private void initBuildIn() {
         buildin.add("malloc");
         buildin.add("getInt");
         buildin.add("print");
@@ -39,6 +39,16 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         buildin.add("getString");
         IRFuncNode malloc = new IRFuncNode("malloc", true, new IRVar("size", false));
         funcNodeMap.put("malloc", malloc);
+        IRFuncNode print = new IRFuncNode("print", true, new IRVar("str", false));
+        funcNodeMap.put("print", print);
+        IRFuncNode println = new IRFuncNode("println", true, new IRVar("str", false));
+        funcNodeMap.put("println", println);
+        IRFuncNode toString = new IRFuncNode("toString", true, new IRVar("i", false));
+        funcNodeMap.put("toString", toString);
+    }
+
+    public IRGenerator() {
+        initBuildIn();
         for (Map.Entry<String, FuncType> entry : functions.values()) {
             String funcName = entry.getKey();
             if (buildin.contains(funcName)) continue;
