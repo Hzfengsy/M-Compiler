@@ -341,7 +341,7 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
     @Override
     public SemanticBaseNode visitMembervar(MParser.MembervarContext ctx) {
         BaseType Class = visit(ctx.expr()).getType();
-        typeRecorder.put(ctx, Class);
+        typeRecorder.put(ctx.expr(), Class);
         BaseType var = null;
         try { var = Class.queryVar(ctx.id().getText()); } catch (Exception e) {
             error(e.getMessage(), ctx);
@@ -352,7 +352,7 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
     @Override
     public SemanticBaseNode visitMemberfunc(MParser.MemberfuncContext ctx) {
         BaseType Class = visit(ctx.expr()).getType();
-        typeRecorder.put(ctx, Class);
+        typeRecorder.put(ctx.expr(), Class);
         FuncType func = null;
         try { func = Class.queryFunc(ctx.id().getText()); } catch (Exception e) {
             error(e.getMessage(), ctx);
@@ -470,6 +470,8 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
     public SemanticBaseNode visitCompare(MParser.CompareContext ctx) {
         BaseType expr0 = visit(ctx.expr(0)).getType();
         BaseType expr1 = visit(ctx.expr(1)).getType();
+        typeRecorder.put(ctx.expr(0), expr0);
+        typeRecorder.put(ctx.expr(1), expr1);
         Boolean ans = typeChecker.typeCheck(typeChecker.Compare, expr0, expr1);
         if (!ans) operationError(ctx.op.getText(), expr0, expr1, ctx);
         return new SemanticExprNode(classes.boolType, false);

@@ -299,6 +299,7 @@ public class BaseGenerator
                    "extern strcat\n" +
                    "extern getline\n" +
                    "extern stdin\n" +
+                   "extern strcmp\n" +
                    "extern __stack_chk_fail\n" +
                    "\n" +
                    "\n" +
