@@ -292,6 +292,13 @@ public class BaseGenerator
                    "extern puts\n" +
                    "extern printf\n" +
                    "extern sprintf\n" +
+                   "extern scanf\n" +
+                   "extern strlen\n" +
+                   "extern strcpy\n" +
+                   "extern strcat\n" +
+                   "extern getline\n" +
+                   "extern stdin\n" +
+                   "extern __stack_chk_fail\n" +
                    "\n" +
                    "\n" +
                    "SECTION .text   \n" +

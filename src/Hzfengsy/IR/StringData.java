@@ -7,6 +7,8 @@ import java.util.*;
 public class StringData
 {
     private Map<String, IRExpr> pool = new HashMap<>();
+    private Set<String> labels = new HashSet<>();
+
 
     private StringData() {}
 
@@ -18,6 +20,7 @@ public class StringData
 
     public void insert(IRExpr label, String string) {
         pool.put(string, label);
+        labels.add(label.toString());
     }
 
     public IRExpr getLabel(String string) {
@@ -25,7 +28,7 @@ public class StringData
     }
 
     public boolean containLabel(IRExpr label) {
-        return pool.containsValue(label);
+        return labels.contains(label.toString());
     }
 
     public Collection<Map.Entry<String,IRExpr>> getEntry(){
