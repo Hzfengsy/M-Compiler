@@ -85,7 +85,9 @@ public class IRGenerator extends MBaseVisitor<IRBase>
                 FuncType func = entry.getValue();
                 IRVar[] parameter = getIRMemberParameter(func);
                 IRFuncNode function = new IRFuncNode(funcName, parameter);
+                function.allocVar(parameter[0]);
                 funcNodeMap.put(funcName, function);
+
             }
         }
         globeVariable.setLabel(new IRLable("main"));
@@ -103,9 +105,8 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         Vector<String> parameterList = func.getParameterName();
         IRVar[] ans = new IRVar[parameterList.size() + 1];
         ans[0] = variables.insertTempVar();
-        //        funcStack.peek().allocVar(ans[0]);
         for (int i = 1; i <= parameterList.size(); i++)
-            ans[i] = new IRVar(parameterList.elementAt(i), false);
+            ans[i] = new IRVar(parameterList.elementAt(i - 1), false);
         return ans;
     }
 
@@ -121,7 +122,12 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         IRProgNode ans = new IRProgNode();
         for (ParseTree x : ctx.define()) {
             IRBase define = visit(x);
-            globeVariable.join((IRBaseBlock) define);
+            if (define instanceof IRBaseBlock)
+                globeVariable.join((IRBaseBlock) define);
+            else if (define != null){
+                globeVariable.join(((IRNode) define).getHead());
+                globeVariable = ((IRNode) define).getTail();
+            }
         }
         for (ParseTree x : ctx.func()) {
             visit(x);
@@ -166,7 +172,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         }
         else {
             node = new IRBaseBlock();
-            node.setLabel(labels.insert(funcName));
+            node.setLabel(labels.insert(classStack.empty() ? funcName : classStack.peek().getName() + "." + funcName));
         }
         func.appendNode(node);
         funcStack.push(func);
@@ -673,6 +679,9 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             BaseType Class = classStack.peek();
             Integer index = Class.varIndex(ctx.getText());
             IRVar result = variables.insertTempVar();
+            if (ASTSet.getInstance().getLeftValue(ctx)) {
+                return new IRMem(func.getThis(), new IRConst(index));
+            }
             funcStack.peek().allocVar(result);
             IRBaseInstruction inst = new IRUnaryExprInstruction(result, IROperations.unaryOp.MOV, new IRMem(func.getThis(), new IRConst(index)));
             return new IRBaseBlock(inst);
@@ -801,7 +810,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             if (first instanceof IRBaseBlock)
                 head.join((IRBaseBlock) first);
         }
-        IRFuncNode func = funcStack.peek();
+        IRFuncNode func = funcStack.empty() ? funcNodeMap.get("main") : funcStack.peek();
         IRBaseBlock bodyBlock = new IRBaseBlock();
         IRBaseBlock nowBody = bodyBlock;
         bodyBlock.setLabel(labels.insertTemp());
@@ -835,7 +844,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
                 nowBody = ((IRNode) second).getTail();
             }
             IRVar tempResult = variables.insertTempVar();
-            funcStack.peek().allocVar(tempResult);
+            (funcStack.empty() ? funcNodeMap.get("main") : funcStack.peek()).allocVar(tempResult);
             IRBaseInstruction jump = new IRjumpInstruction(result, IROperations.jmpOp.JZ, tail);
             nowBody.join(jump);
         }
@@ -923,6 +932,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         loopContinue.pop();
         return new IRNode(head, tail);
     }
+
     @Override
     public IRBase visitFor_Stat(MParser.For_StatContext ctx) {
         IRBase first = ctx.first == null ? null : visit(ctx.first);
@@ -1062,12 +1072,26 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     @Override
     public IRBase visitFunction(MParser.FunctionContext ctx) {
         String funcName = ctx.id().getText();
+        if (ASTSet.getInstance().getMembervar(ctx)) {
+            UserType type = classStack.peek();
+            funcName = type.getName() + "." + funcName;
+        }
         IRFuncNode func = funcNodeMap.get(funcName);
         IRArgs args = (IRArgs) visit(ctx.expr_list());
         IRVar result = null;
-        if (!(functions.safeQuery(funcName).getReturnType() instanceof VoidType)) {
-            result = variables.insertTempVar();
-            funcStack.peek().allocVar(result);
+        if (ASTSet.getInstance().getMembervar(ctx)) {
+            UserType type = classStack.peek();
+            if (!(type.safeQueryFunc(ctx.id().getText()).getReturnType() instanceof VoidType)) {
+                result = variables.insertTempVar();
+                funcStack.peek().allocVar(result);
+            }
+            args.addArg(funcStack.peek().getThis());
+        }
+        else {
+            if (!(functions.safeQuery(funcName).getReturnType() instanceof VoidType)) {
+                result = variables.insertTempVar();
+                funcStack.peek().allocVar(result);
+            }
         }
         IRBaseBlock block = new IRBaseBlock(args);
         IRBaseInstruction inst = new IRCallInstruction(result, func, args.getArgs());

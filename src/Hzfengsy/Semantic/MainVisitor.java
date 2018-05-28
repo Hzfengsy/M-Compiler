@@ -382,9 +382,13 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
             if (classStack.empty()) func = functions.query(ctx.id().getText());
             else {
                 UserType userClass = (UserType) classStack.peek().getType();
-                try { func = userClass.queryFunc(ctx.id().getText()); } catch (Exception e) {
+                try {
+                    func = userClass.queryFunc(ctx.id().getText());
+                    ASTSet.getInstance().putMemberVar(ctx);
+                } catch (Exception e) {
                     func = functions.query(ctx.id().getText());
                 }
+
             }
         } catch (Exception e) { error(e.getMessage(), ctx); }
         Vector<BaseType> list = func.getParameterList();
