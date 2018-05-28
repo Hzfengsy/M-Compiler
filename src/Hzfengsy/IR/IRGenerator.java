@@ -400,7 +400,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         }
         IRVar result = variables.insertTempVar();
         funcStack.peek().allocVar(result);
-        nowBlock.join(new IRjumpInstruction(right_expr, IROperations.jmpOp.JNZ, end));
+        nowBlock.join(new IRjumpInstruction(right_expr, IROperations.jmpOp.JZ, setResult));
         nowBlock.join(new IRUnaryExprInstruction(result, IROperations.unaryOp.MOV, new IRConst(1)));
         nowBlock.join(new IRjumpInstruction(end));
 
