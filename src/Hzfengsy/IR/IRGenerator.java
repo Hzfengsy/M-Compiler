@@ -858,12 +858,76 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         return new IRNode(head, tail);
     }
 
+    private IRBase forLoop(IRBase first, IRBase second, IRBase step, ParseTree ctx) {
+        IRBaseBlock head = new IRBaseBlock();
+        if (first != null) {
+            if (first instanceof IRBaseBlock)
+                head.join((IRBaseBlock) first);
+        }
+        IRFuncNode func = funcStack.peek();
+        IRBaseBlock bodyBlock = new IRBaseBlock();
+        IRBaseBlock nowBody = bodyBlock;
+        bodyBlock.setLabel(labels.insertTemp());
+        func.appendNode(bodyBlock);
+        head.join(new IRjumpInstruction(bodyBlock));
+        IRBaseBlock stepBlock = null;
+        if (step != null) {
+            stepBlock = new IRBaseBlock();
+            stepBlock.setLabel(labels.insertTemp());
+            func.appendNode(stepBlock);
+            loopContinue.push(stepBlock);
+            if (step instanceof IRBaseBlock)
+                stepBlock.join((IRBaseBlock) step);
+            stepBlock.join(new IRjumpInstruction(bodyBlock));
+        }
+        else loopContinue.push(bodyBlock);
+        IRBaseBlock tail = new IRBaseBlock();
+        loopBreak.push(tail);
+        tail.setLabel(labels.insertTemp());
+        if (second != null) {
+            IRExpr result;
+            if (second instanceof IRExpr)
+                result = (IRExpr) second;
+            else if (second instanceof IRBaseBlock) {
+                bodyBlock.join((IRBaseBlock) second);
+                result = ((IRBaseBlock) second).getResult();
+            }
+            else {
+                bodyBlock.join(((IRNode) second).getHead());
+                result = ((IRNode) second).getResult();
+                nowBody = ((IRNode) second).getTail();
+            }
+            IRVar tempResult = variables.insertTempVar();
+            funcStack.peek().allocVar(tempResult);
+            IRBaseInstruction jump = new IRjumpInstruction(result, IROperations.jmpOp.JZ, tail);
+            nowBody.join(jump);
+        }
+        IRBase body = visit(ctx);
+        if (body instanceof IRBaseBlock) {
+            nowBody.join((IRBaseBlock) body);
+        }
+        else if (((IRNode) body).getHead() == ((IRNode) body).getTail()) {
+            nowBody.join(((IRNode) body).getHead());
+        }
+        else {
+            nowBody.join(((IRNode) body).getHead());
+            nowBody = ((IRNode) body).getTail();
+        }
+        if (step != null) {
+            nowBody.join(new IRjumpInstruction(stepBlock));
+        }
+        else nowBody.join(new IRjumpInstruction(bodyBlock));
+        func.appendNode(tail);
+        loopBreak.pop();
+        loopContinue.pop();
+        return new IRNode(head, tail);
+    }
     @Override
     public IRBase visitFor_Stat(MParser.For_StatContext ctx) {
         IRBase first = ctx.first == null ? null : visit(ctx.first);
         IRBase second = ctx.second == null ? null : visit(ctx.second);
         IRBase third = ctx.third == null ? null : visit(ctx.third);
-        return forLoop(first, second, third, visit(ctx.stat()));
+        return forLoop(first, second, third, ctx.stat());
     }
 
     @Override
@@ -957,7 +1021,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
 
     @Override
     public IRBase visitWhile_Stat(MParser.While_StatContext ctx) {
-        return forLoop(null, visit(ctx.expr()), null, visit(ctx.stat()));
+        return forLoop(null, visit(ctx.expr()), null, ctx.stat());
     }
 
     @Override
