@@ -436,26 +436,54 @@ public class IRGenerator extends MBaseVisitor<IRBase>
 
     @Override
     public IRBase visitLOr(MParser.LOrContext ctx) {
-        IRBase left = visit(ctx.expr(0));
-        IRBase right = visit(ctx.expr(1));
-        IRBaseBlock ans = new IRBaseBlock();
+        IRBaseBlock head, nowBlock;
+        IRBaseBlock setResult = new IRBaseBlock();
+        setResult.setLabel(labels.insertTemp());
+        funcStack.peek().appendNode(setResult);
+        IRBaseBlock end = new IRBaseBlock();
+        end.setLabel(labels.insertTemp());
+        funcStack.peek().appendNode(end);
         IRExpr left_expr, right_expr;
+
+        IRBase left = visit(ctx.expr(0));
         if (left instanceof IRBaseBlock) {
-            ans.join((IRBaseBlock) left);
+            nowBlock = head = new IRBaseBlock((IRBaseBlock) left);
             left_expr = ((IRBaseBlock) left).getResult();
         }
-        else left_expr = (IRExpr) left;
+        else if (left instanceof IRNode) {
+            head = ((IRNode) left).getHead();
+            left_expr = ((IRNode) left).getResult();
+            nowBlock = ((IRNode) left).getTail();
+        }
+        else {
+            nowBlock = head = new IRBaseBlock();
+            left_expr = (IRExpr) left;
+        }
+        nowBlock.join(new IRjumpInstruction(left_expr, IROperations.jmpOp.JNZ, setResult));
+
+        IRBase right = visit(ctx.expr(1));
         if (right instanceof IRBaseBlock) {
-            ans.join((IRBaseBlock) right);
+            nowBlock.join((IRBaseBlock) right);
             right_expr = ((IRBaseBlock) right).getResult();
         }
-        else right_expr = (IRExpr) right;
+        else if (right instanceof IRNode) {
+            head = ((IRNode) right).getHead();
+            right_expr = ((IRNode) right).getResult();
+            nowBlock = ((IRNode) right).getTail();
+        }
+        else {
+            right_expr = (IRExpr) right;
+        }
         IRVar result = variables.insertTempVar();
         funcStack.peek().allocVar(result);
-        IROperations.binaryOp op = IROperations.binaryOp.OR;
-        IRBaseInstruction inst = new IRBinaryExprInstruction(result, op, left_expr, right_expr);
-        ans.join(inst);
-        return ans;
+        nowBlock.join(new IRjumpInstruction(right_expr, IROperations.jmpOp.JNZ, setResult));
+        nowBlock.join(new IRUnaryExprInstruction(result, IROperations.unaryOp.MOV, new IRConst(0)));
+        nowBlock.join(new IRjumpInstruction(end));
+
+        setResult.join(new IRUnaryExprInstruction(result, IROperations.unaryOp.MOV, new IRConst(1)));
+        setResult.join(new IRjumpInstruction(end));
+        end.setResult(result);
+        return new IRNode(head, end);
     }
 
     @Override
