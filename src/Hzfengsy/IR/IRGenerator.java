@@ -797,7 +797,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             nowBody.join(((IRNode) body).getHead());
         }
         else {
-            bodyBlock.join(((IRNode) body).getHead());
+            nowBody.join(((IRNode) body).getHead());
             nowBody = ((IRNode) body).getTail();
         }
         if (step != null) {
