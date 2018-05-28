@@ -91,6 +91,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             }
         }
         globeVariable.setLabel(new IRLable("main"));
+        funcNodeMap.get("main").appendNode(globeVariable);
     }
 
     private IRVar[] getIRParameter(FuncType func) {
@@ -173,8 +174,9 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         else {
             node = new IRBaseBlock();
             node.setLabel(labels.insert(classStack.empty() ? funcName : classStack.peek().getName() + "." + funcName));
+            func.appendNode(node);
         }
-        func.appendNode(node);
+
         funcStack.push(func);
         IRBaseBlock nowBlock = node;
         for (Pair<String, BaseType> var : funcType.getVars()) {
@@ -223,7 +225,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         }
         else {
             IRBaseBlock tail = ((IRNode) expr).getTail();
-            IRBaseInstruction inst = new IRUnaryExprInstruction(result, op, tail.getResult());
+            IRBaseInstruction inst = new IRUnaryExprInstruction(result, op, ((IRNode) expr).getResult());
             tail.join(inst);
             return expr;
         }
@@ -1174,8 +1176,10 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         IRBaseInstruction step = new IRBinaryExprInstruction(index, IROperations.binaryOp.ADD, index, new IRConst(1));
         IRNode loop = (IRNode) forLoop(new IRBaseBlock(first), new IRBaseBlock(second), new IRBaseBlock(step), next);
         baseBlock.join(loop.getHead());
-        baseBlock.setResult(result);
-        return new IRNode(baseBlock, loop.getTail());
+        baseBlock.setResult(temp);
+        IRNode ans = new IRNode(baseBlock, loop.getTail());
+        ans.setResult(temp);
+        return ans;
     }
 
     @Override
@@ -1232,7 +1236,12 @@ public class IRGenerator extends MBaseVisitor<IRBase>
                 IRNode node = (IRNode) result;
                 baseBlock.join(node.getHead());
                 if (node.getHead() == node.getTail()) return baseBlock;
-                else return new IRNode(baseBlock, node.getTail());
+
+                else {
+                    IRNode ans = new IRNode(baseBlock, node.getTail());
+                    ans.setResult(node.getResult());
+                    return ans;
+                }
             }
         }
     }
