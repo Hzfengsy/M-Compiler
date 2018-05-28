@@ -556,7 +556,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         else if (ctx.op.getText().equals(">"))
             op = IROperations.binaryOp.GT;
         else op = IROperations.binaryOp.GE;
-        if (typeRecorder.get(ctx.expr(0)) instanceof StringType || typeRecorder.get(ctx.expr(1)) instanceof StringType ) {
+        if (typeRecorder.get(ctx.expr(0)) instanceof StringType || typeRecorder.get(ctx.expr(1)) instanceof StringType) {
             IRBaseInstruction inst = new IRCallInstruction(result, funcNodeMap.get("strcmp"), left_expr, right_expr);
             ans.join(inst);
             IRVar result_new = variables.insertTempVar();
@@ -783,11 +783,12 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             else {
                 bodyBlock.join(((IRNode) second).getHead());
                 result = ((IRNode) second).getResult();
+                nowBody = ((IRNode) second).getTail();
             }
             IRVar tempResult = variables.insertTempVar();
             funcStack.peek().allocVar(tempResult);
             IRBaseInstruction jump = new IRjumpInstruction(result, IROperations.jmpOp.JZ, tail);
-            bodyBlock.join(jump);
+            nowBody.join(jump);
         }
         if (body instanceof IRBaseBlock) {
             nowBody.join((IRBaseBlock) body);
@@ -1146,7 +1147,12 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         }
         BaseType Class = typeRecorder.get(ctx.expr());
         if (Class instanceof ArrayType) {
-            if (funcName.equals("size")) return new IRMem(expr_result, new IRConst(-1));
+            if (funcName.equals("size")) {
+                IRVar result = variables.insertTempVar();
+                funcStack.peek().allocVar(result);
+                ans.join(new IRUnaryExprInstruction(result, IROperations.unaryOp.MOV, new IRMem(expr_result, new IRConst(-1))));
+                return ans;
+            }
         }
         if (Class instanceof StringType) {
             IRVar result = variables.insertTempVar();
