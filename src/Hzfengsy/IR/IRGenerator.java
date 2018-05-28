@@ -630,7 +630,8 @@ public class IRGenerator extends MBaseVisitor<IRBase>
 
     @Override
     public IRBase visitReturn_Stat(MParser.Return_StatContext ctx) {
-        if (ctx.expr() == null) return null;
+        if (ctx.expr() == null)
+            return new IRBaseBlock(new IRRetInstruction(null));
         IRBase expr = visit(ctx.expr());
         IRBaseBlock ans = new IRBaseBlock();
         IRExpr _expr;
@@ -1320,4 +1321,8 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         else return get;
     }
 
+    @Override
+    public IRBase visitNull(MParser.NullContext ctx) {
+        return new IRConst(0);
+    }
 }

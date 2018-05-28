@@ -22,7 +22,7 @@ public class IRVar extends IRExpr
     }
 
     public String getName() {
-        return name;
+        return (globe ? "_" : "") + name;
     }
 
     @Override
