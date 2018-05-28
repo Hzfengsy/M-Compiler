@@ -38,6 +38,9 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         buildin.add("println");
         buildin.add("toString");
         buildin.add("getString");
+        buildin.add("parseInt");
+        buildin.add("ord");
+        buildin.add("substring");
         IRFuncNode malloc = new IRFuncNode("malloc", true, new IRVar("size", false));
         funcNodeMap.put("malloc", malloc);
         IRFuncNode print = new IRFuncNode("print", true, new IRVar("str", false));
@@ -50,6 +53,16 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         funcNodeMap.put("getString", getString);
         IRFuncNode getInt = new IRFuncNode("getInt", true);
         funcNodeMap.put("getInt", getInt);
+        IRFuncNode strCombine = new IRFuncNode("strCombine", true, new IRVar("str1", false), new IRVar("str2", false));
+        funcNodeMap.put("strCombine", strCombine);
+        IRFuncNode strlen = new IRFuncNode("strlen", true, new IRVar("str", false));
+        funcNodeMap.put("strlen", strlen);
+        IRFuncNode parseInt = new IRFuncNode("parseInt", true, new IRVar("str", false));
+        funcNodeMap.put("parseInt", parseInt);
+        IRFuncNode ord = new IRFuncNode("ord", true, new IRVar("str", false), new IRVar("i", false));
+        funcNodeMap.put("ord", ord);
+        IRFuncNode substring = new IRFuncNode("substring", true, new IRVar("str", false), new IRVar("left", false), new IRVar("right", false));
+        funcNodeMap.put("substring", substring);
     }
 
     public IRGenerator() {
@@ -306,9 +319,15 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         else right_expr = (IRExpr) right;
         IRVar result = variables.insertTempVar();
         funcStack.peek().allocVar(result);
-        IROperations.binaryOp op = ctx.op.getText().equals("+") ? IROperations.binaryOp.ADD : IROperations.binaryOp.SUB;
-        IRBaseInstruction inst = new IRBinaryExprInstruction(result, op, left_expr, right_expr);
-        ans.join(inst);
+        if (typeRecorder.get(ctx.expr(0)) instanceof StringType || typeRecorder.get(ctx.expr(1)) instanceof StringType) {
+            IRBaseInstruction inst = new IRCallInstruction(result, funcNodeMap.get("strCombine"), left_expr, right_expr);
+            ans.join(inst);
+        }
+        else {
+            IROperations.binaryOp op = ctx.op.getText().equals("+") ? IROperations.binaryOp.ADD : IROperations.binaryOp.SUB;
+            IRBaseInstruction inst = new IRBinaryExprInstruction(result, op, left_expr, right_expr);
+            ans.join(inst);
+        }
         return ans;
     }
 
@@ -971,7 +990,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         return visit(ctx.expr());
     }
 
-    private IRFuncNode nowFunc(){
+    private IRFuncNode nowFunc() {
         if (funcStack.empty()) return funcNodeMap.get("main");
         else return funcStack.peek();
     }
@@ -1116,6 +1135,28 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         if (Class instanceof ArrayType) {
             if (funcName.equals("size")) return new IRMem(expr_result, new IRConst(-1));
         }
+        if (Class instanceof StringType) {
+            IRVar result = variables.insertTempVar();
+            funcStack.peek().allocVar(result);
+            if (funcName.equals("length")) {
+                return new IRBaseBlock(new IRCallInstruction(result, funcNodeMap.get("strlen"), expr_result));
+            }
+            if (funcName.equals("parseInt")) {
+                return new IRBaseBlock(new IRCallInstruction(result, funcNodeMap.get("parseInt"), expr_result));
+            }
+            if (funcName.equals("ord")) {
+                IRArgs args = new IRArgs();
+                args.addArg(expr_result);
+                args.join((IRArgs) visit(ctx.expr_list()));
+                return new IRBaseBlock(new IRCallInstruction(result, funcNodeMap.get("ord"), args.getArgs()));
+            }
+            if (funcName.equals("substring")) {
+                IRArgs args = new IRArgs();
+                args.addArg(expr_result);
+                args.join((IRArgs) visit(ctx.expr_list()));
+                return new IRBaseBlock(new IRCallInstruction(result, funcNodeMap.get("substring"), args.getArgs()));
+            }
+        }
         String className = ((UserType) Class).getName();
         IRFuncNode func = funcNodeMap.get(className + "." + funcName);
         IRArgs args = new IRArgs();
@@ -1126,7 +1167,6 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             result = variables.insertTempVar();
             funcStack.peek().allocVar(result);
         }
-
         IRBaseInstruction inst = new IRCallInstruction(result, func, args.getArgs());
         return new IRBaseBlock(inst);
     }

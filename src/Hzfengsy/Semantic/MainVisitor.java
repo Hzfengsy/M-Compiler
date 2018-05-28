@@ -447,6 +447,8 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
     public SemanticBaseNode visitAddSub(MParser.AddSubContext ctx) {
         BaseType expr0 = visit(ctx.expr(0)).getType();
         BaseType expr1 = visit(ctx.expr(1)).getType();
+        typeRecorder.put(ctx.expr(0), expr0);
+        typeRecorder.put(ctx.expr(1), expr1);
         Boolean ans;
         if (ctx.op.getText().equals("+"))
             ans = typeChecker.typeCheck(typeChecker.Plus, expr0, expr1);

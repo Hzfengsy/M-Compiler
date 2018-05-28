@@ -295,6 +295,7 @@ public class BaseGenerator
                    "extern scanf\n" +
                    "extern strlen\n" +
                    "extern strcpy\n" +
+                   "extern strncpy\n" +
                    "extern strcat\n" +
                    "extern getline\n" +
                    "extern stdin\n" +
