@@ -693,20 +693,40 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             IRBaseInstruction inst = new IRBinaryExprInstruction((IRVar) expr, op, (IRExpr) expr, new IRConst(1));
             return new IRBaseBlock(inst);
         }
+        else if (expr instanceof IRBaseBlock) {
+            IRBaseBlock ans = new IRBaseBlock((IRBaseBlock) expr);
+            IRExpr var = ((IRBaseBlock) expr).getResult();
+            IROperations.binaryOp op = ctx.op.getText().equals("++") ? IROperations.binaryOp.ADD : IROperations.binaryOp.SUB;
+            IRBaseInstruction inst = new IRBinaryExprInstruction(var, op, var, new IRConst(1));
+            ans.join(inst);
+            return ans;
+        }
         else return null;
     }
 
     @Override
     public IRBase visitPostfix(MParser.PostfixContext ctx) {
         IRBase expr = visit(ctx.expr());
+        IRVar temp = variables.insertTempVar();
+        IRBaseBlock ans = new IRBaseBlock();
+        funcStack.peek().allocVar(temp);
         if (expr instanceof IRExpr) {
             IRVar var = (IRVar) expr;
-            IRVar temp = variables.insertTempVar();
-            funcStack.peek().allocVar(temp);
             IRBaseInstruction tempCopy = new IRUnaryExprInstruction(temp, IROperations.unaryOp.MOV, var);
-            IRBaseBlock ans = new IRBaseBlock(tempCopy);
+            ans.join(tempCopy);
             IROperations.binaryOp op = ctx.op.getText().equals("++") ? IROperations.binaryOp.ADD : IROperations.binaryOp.SUB;
-            IRBaseInstruction inst = new IRBinaryExprInstruction((IRVar) expr, op, (IRExpr) expr, new IRConst(1));
+            IRBaseInstruction inst = new IRBinaryExprInstruction(var, op, var, new IRConst(1));
+            ans.join(inst);
+            ans.setResult(temp);
+            return ans;
+        }
+        else if (expr instanceof IRBaseBlock) {
+            ans.join((IRBaseBlock) expr);
+            IRExpr var = ((IRBaseBlock) expr).getResult();
+            IRBaseInstruction tempCopy = new IRUnaryExprInstruction(temp, IROperations.unaryOp.MOV, var);
+            ans.join(tempCopy);
+            IROperations.binaryOp op = ctx.op.getText().equals("++") ? IROperations.binaryOp.ADD : IROperations.binaryOp.SUB;
+            IRBaseInstruction inst = new IRBinaryExprInstruction(var, op, var, new IRConst(1));
             ans.join(inst);
             ans.setResult(temp);
             return ans;
