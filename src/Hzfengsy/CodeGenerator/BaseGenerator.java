@@ -23,10 +23,33 @@ public class BaseGenerator
         this.program = program;
     }
 
+    private String str2Data(String str) {
+        StringBuilder ans = new StringBuilder();
+        for (int i = 0; i < str.length(); i++){
+            Integer x = 0;
+            if (str.charAt(i) == '\\') {
+                i++;
+                switch (str.charAt(i)) {
+                    case 'n': x = 10; break;
+                    case '\\': x = 92; break;
+                    case '\"': x = 34; break;
+                }
+            }
+            else {
+                x = (int)str.charAt(i);
+            }
+            String temp = Long.toHexString(x).toUpperCase();
+            if (temp.length() < 2) ans.append("0" + temp + "H, ");
+            else ans.append(temp + "H, ");
+        }
+        ans.append("00H");
+        return ans.toString();
+    }
+
     private void dataSection() {
         for (Map.Entry<String,IRExpr> entry : stringData.getEntry()) {
             ans.append(((IRVar)entry.getValue()).getName() + ":\n");
-            ans.append("\tdb \"" + entry.getKey() + "\", 0\n");
+            ans.append("\tdb " + str2Data(entry.getKey()) + "\n");
         }
     }
 
@@ -344,7 +367,7 @@ public class BaseGenerator
                    "SECTION .bss    \n");
         Collection<IRVar> globe = IRVariables.getInstance().getGlobe();
         for (IRVar var : globe) {
-            ans.append(var.getName() + ":\tresq\t1\n");
+            ans.append("\t" + var.getName() + ":\tresq\t1\n");
         }
 
         ans.append("\n\nSECTION .rodata    \n");
