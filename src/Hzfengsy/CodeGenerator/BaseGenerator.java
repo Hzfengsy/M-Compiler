@@ -25,18 +25,24 @@ public class BaseGenerator
 
     private String str2Data(String str) {
         StringBuilder ans = new StringBuilder();
-        for (int i = 0; i < str.length(); i++){
+        for (int i = 0; i < str.length(); i++) {
             Integer x = 0;
             if (str.charAt(i) == '\\') {
                 i++;
                 switch (str.charAt(i)) {
-                    case 'n': x = 10; break;
-                    case '\\': x = 92; break;
-                    case '\"': x = 34; break;
+                    case 'n':
+                        x = 10;
+                        break;
+                    case '\\':
+                        x = 92;
+                        break;
+                    case '\"':
+                        x = 34;
+                        break;
                 }
             }
             else {
-                x = (int)str.charAt(i);
+                x = (int) str.charAt(i);
             }
             String temp = Long.toHexString(x).toUpperCase();
             if (temp.length() < 2) ans.append("0" + temp + "H, ");
@@ -47,8 +53,8 @@ public class BaseGenerator
     }
 
     private void dataSection() {
-        for (Map.Entry<String,IRExpr> entry : stringData.getEntry()) {
-            ans.append(((IRVar)entry.getValue()).getName() + ":\n");
+        for (Map.Entry<String, IRExpr> entry : stringData.getEntry()) {
+            ans.append(((IRVar) entry.getValue()).getName() + ":\n");
             ans.append("\tdb " + str2Data(entry.getKey()) + "\n");
         }
     }
@@ -80,8 +86,14 @@ public class BaseGenerator
 
     private void storeArgs(IRFuncNode func) {
         IRVar[] args = func.getArgs();
-        for (int i = 0; i < args.length; i++) {
+        for (int i = 0; i < args.length && i < 6; i++) {
             store(args[i], Register.getParm(i));
+        }
+        Integer offset = 8;
+        for (int i = 6; i < args.length; i++) {
+            offset += 8;
+            ans.append("\tmov\trdx, [rbp+" + offset.toString() + "]\n");
+            store(args[i], Register.rdx);
         }
     }
 
@@ -294,12 +306,21 @@ public class BaseGenerator
 
     private void call(IRCallInstruction inst) {
         IRExpr[] args = inst.getArgs();
-        if (args.length <= 6) {
-            for (int i = 0; i < args.length; i++) {
-                load(args[i], Register.getParm(i));
+        for (int i = 0; i < args.length && i < 6; i++) {
+            load(args[i], Register.getParm(i));
+        }
+        for (int i = args.length - 1; i >= 6; i--) {
+            if (args[i] instanceof IRConst) {
+                ans.append("\tpush\t" + args[i] + "\n");
+            }
+            else {
+                ans.append("\tpush\t" + var2Mem((IRVar) args[i]) + "\n");
+
             }
         }
-        ans.append("\tcall " + inst.getFunc().getName() + "\n");
+        ans.append("\tcall\t" + inst.getFunc().getName() + "\n");
+        if (args.length > 6)
+            ans.append("\tadd\trsp, " + Integer.toString((args.length - 6) * 8) + "\n");
         if (inst.getResult() != null) {
             store(inst.getResult(), Register.rax);
         }

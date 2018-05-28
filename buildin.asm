@@ -96,30 +96,17 @@ strCombine:
 getString:
         push    rbp
         mov     rbp, rsp
-        sub     rsp, 32
-
-
-        mov     rax, qword [fs:abs 28H]
-        mov     qword [rbp-8H], rax
-        xor     eax, eax
+        sub     rsp, 16
         mov     edi, 256
         call    malloc
-        mov     qword [rbp-18H], rax
-        mov     qword [rbp-10H], 256
-        mov     rdx, qword [rel stdin]
-        lea     rcx, [rbp-10H]
-        lea     rax, [rbp-18H]
-        mov     rsi, rcx
-        mov     rdi, rax
-        call    getline
-        mov     rax, qword [rbp-18H]
-        mov     rsi, qword [rbp-8H]
-
-
-        xor     rsi, qword [fs:abs 28H]
-        jz      L_001
-        call    __stack_chk_fail
-L_001:  leave
+        mov     qword [rbp-8H], rax
+        mov     rax, qword [rbp-8H]
+        mov     rsi, rax
+        mov     edi, format_string
+        mov     eax, 0
+        call    scanf
+        mov     rax, qword [rbp-8H]
+        leave
         ret
 
 getInt:
