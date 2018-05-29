@@ -329,7 +329,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         }
         else right_expr = (IRExpr) right;
         IRVar result = variables.insertTempVar();
-        funcStack.peek().allocVar(result);
+        (funcStack.empty() ? funcNodeMap.get("main") : funcStack.peek()).allocVar(result);
         if (typeRecorder.get(ctx.expr(0)) instanceof StringType || typeRecorder.get(ctx.expr(1)) instanceof StringType) {
             IRBaseInstruction inst = new IRCallInstruction(result, funcNodeMap.get("strCombine"), left_expr, right_expr);
             ans.join(inst);
@@ -535,7 +535,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         }
         else right_expr = (IRExpr) right;
         IRVar result = variables.insertTempVar();
-        funcStack.peek().allocVar(result);
+        (funcStack.empty() ? funcNodeMap.get("main") : funcStack.peek()).allocVar(result);
         IROperations.binaryOp op = ctx.op.getText().equals("<<") ? IROperations.binaryOp.LSHIFT : IROperations.binaryOp.RSHIFT;
         IRBaseInstruction inst = new IRBinaryExprInstruction(result, op, left_expr, right_expr);
         ans.join(inst);
@@ -624,7 +624,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         }
         else right_expr = (IRExpr) right;
         IRVar result = variables.insertTempVar();
-        funcStack.peek().allocVar(result);
+        (funcStack.empty() ? funcNodeMap.get("main") : funcStack.peek()).allocVar(result);
         IROperations.binaryOp op;
         if (ctx.op.getText().equals("*"))
             op = IROperations.binaryOp.MUL;
@@ -915,7 +915,10 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             nowBody.join(jump);
         }
         IRBase body = visit(ctx);
-        if (body instanceof IRBaseBlock) {
+        if (body == null) {
+
+        }
+        else if (body instanceof IRBaseBlock) {
             nowBody.join((IRBaseBlock) body);
         }
         else if (((IRNode) body).getHead() == ((IRNode) body).getTail()) {
@@ -1172,7 +1175,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         IRBaseInstruction first = new IRUnaryExprInstruction(index, IROperations.unaryOp.MOV, new IRConst(0));
         IRVar condition = variables.insertTempVar();
         nowFunc().allocVar(condition);
-        IRBaseInstruction second = new IRBinaryExprInstruction(condition, IROperations.binaryOp.LT, index, expr.getValue());
+        IRBaseInstruction second = new IRBinaryExprInstruction(condition, IROperations.binaryOp.LT, index, expr.getKey());
         IRBaseInstruction step = new IRBinaryExprInstruction(index, IROperations.binaryOp.ADD, index, new IRConst(1));
         IRNode loop = (IRNode) forLoop(new IRBaseBlock(first), new IRBaseBlock(second), new IRBaseBlock(step), next);
         baseBlock.join(loop.getHead());
