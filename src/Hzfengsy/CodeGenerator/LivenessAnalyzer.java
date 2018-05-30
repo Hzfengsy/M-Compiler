@@ -19,7 +19,8 @@ public class LivenessAnalyzer
                 IRBaseInstruction inst = blockInsts.elementAt(i);
                 if (inst instanceof IRjumpInstruction) {
                     IRjumpInstruction jmpInst = (IRjumpInstruction) inst;
-                    inst.succ.add(jmpInst.getBlock().getInstructions().elementAt(0));
+                    if (jmpInst.getBlock().getInstructions().size() >0 )
+                        inst.succ.add(jmpInst.getBlock().getInstructions().elementAt(0));
                     if (jmpInst.getOp() != IROperations.jmpOp.JMP) {
                         if (i < blockInsts.size() - 1)
                             inst.succ.add(blockInsts.elementAt(i + 1));

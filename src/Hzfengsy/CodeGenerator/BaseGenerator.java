@@ -177,7 +177,7 @@ public class BaseGenerator
                 offsetAddr = var2Reg((IRVar) offset).toString();
             }
             else {
-                load(base, Register.r15);
+                load(offset, Register.r15);
                 offsetAddr = Register.r15.toString();
             }
         }
@@ -274,7 +274,7 @@ public class BaseGenerator
 
     private void moveOperator(IRExpr dest, IRExpr rhs) {
         if (dest instanceof IRVar) {
-            Register destination = Register.r12;
+            Register destination = Register.rax;
             boolean allocated = var2Reg((IRVar) dest) != null;
             if (allocated) destination = var2Reg((IRVar) dest);
             if (rhs instanceof IRVar) {
@@ -283,7 +283,7 @@ public class BaseGenerator
             }
             else if (rhs instanceof IRMem) {
                 ans.append("\tmov\t" + destination + ", " + memAddr((IRMem) rhs) + "\n");
-                if (!allocated) store(dest, Register.r12);
+                if (!allocated) store(dest, Register.rax);
             }
             else if (rhs instanceof IRConst) {
                 if (allocated) ans.append("\tmov\t" + destination + ", " + rhs + "\n");
@@ -296,8 +296,8 @@ public class BaseGenerator
                     ans.append("\tmov\t" + memAddr((IRMem) dest) + ", " + var2Reg((IRVar) rhs) + "\n");
                 }
                 else {
-                    load(rhs, Register.r15);
-                    ans.append("\tmov\t" + memAddr((IRMem) dest) + ", r15\n");
+                    load(rhs, Register.rax);
+                    ans.append("\tmov\t" + memAddr((IRMem) dest) + ", rax\n");
                 }
             }
             else if (rhs instanceof IRMem) {
