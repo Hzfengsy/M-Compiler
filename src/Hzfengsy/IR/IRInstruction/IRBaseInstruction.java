@@ -61,10 +61,7 @@ public abstract class IRBaseInstruction
     }
 
     public void setConflict(ConflictGraph graph) {
-        for (IRVar a : in)
-            for (IRVar b : in)
-                if (a != b) graph.setConflict(a, b);
-        for (IRVar a : out)
+        for (IRVar a : def)
             for (IRVar b : out)
                 if (a != b) graph.setConflict(a, b);
     }
