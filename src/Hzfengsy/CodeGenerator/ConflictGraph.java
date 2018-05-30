@@ -11,11 +11,13 @@ public class ConflictGraph
     private final int regs = 4;
 
     public void setConflict(IRVar a, IRVar b) {
+        if (a.isGlobe() || b.isGlobe()) return;
         conflict.get(a).add(b);
         conflict.get(b).add(a);
     }
 
     public void setVar(IRVar var) {
+        if (var.isGlobe()) return;
         unhandled.add(var);
         conflict.put(var, new HashSet<>());
     }

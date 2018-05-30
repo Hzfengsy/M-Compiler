@@ -184,9 +184,7 @@ public class BaseGenerator
     }
 
     private void addLikeOperator(IRExpr dest, IRExpr lhs, IROperations.binaryOp op, IRExpr rhs) {
-        Register destination = Register.r14;
-        if (dest instanceof IRVar && ((IRVar) dest).register != null)
-            destination = ((IRVar) dest).register;
+        Register destination = Register.rax;
         load(lhs, destination);
         if (rhs instanceof IRConst) {
             ans.append("\t" + op.toNASM() + "\t" + destination + ", " + rhs + "\n");
@@ -196,7 +194,7 @@ public class BaseGenerator
         }
         if (dest instanceof IRVar)
             store(dest, destination);
-        else ans.append("\tmov\t" + memAddr((IRMem) dest) + ", rcx\n");
+        else ans.append("\tmov\t" + memAddr((IRMem) dest) + ", " + destination + "\n");
     }
 
     private void cmpOperator(IRExpr dest, IRExpr lhs, IROperations.binaryOp op, IRExpr rhs) {
