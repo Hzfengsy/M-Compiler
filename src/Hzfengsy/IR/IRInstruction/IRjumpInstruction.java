@@ -50,4 +50,13 @@ public class IRjumpInstruction extends IRBaseInstruction
     public IROperations.jmpOp getOp() {
         return op;
     }
+
+    public IRBaseBlock getBlock() {
+        return block;
+    }
+
+    @Override
+    public void analyze() {
+        this.setUse(expr);
+    }
 }

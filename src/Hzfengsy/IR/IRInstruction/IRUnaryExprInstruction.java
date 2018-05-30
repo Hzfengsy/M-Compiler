@@ -35,4 +35,10 @@ public class IRUnaryExprInstruction extends IRBaseInstruction
     public IRExpr getRight() {
         return right;
     }
+
+    @Override
+    public void analyze() {
+        this.setUse(right);
+        this.setDef(result);
+    }
 }

@@ -27,4 +27,9 @@ public class IRRetInstruction extends IRBaseInstruction
     public IRExpr getVal() {
         return right;
     }
+
+    @Override
+    public void analyze() {
+        this.setUse(right);
+    }
 }

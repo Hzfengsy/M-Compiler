@@ -761,7 +761,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         if (right instanceof IRBaseBlock) {
             ans.join((IRBaseBlock) right);
             right_expr = ((IRBaseBlock) right).getResult();
-            if (((IRBaseBlock) right).AssignValid() && ((IRVar) right_expr).isTemp())
+            if (((IRBaseBlock) right).AssignValid() && ((IRVar) right_expr).isTemp() && !(left_expr instanceof IRMem))
                 ans.setLastInstResult(left_expr);
             else {
                 IROperations.unaryOp op = IROperations.unaryOp.MOV;

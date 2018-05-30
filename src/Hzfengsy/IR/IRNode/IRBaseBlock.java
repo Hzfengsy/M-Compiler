@@ -9,7 +9,7 @@ import java.util.*;
 
 public class IRBaseBlock extends IRBase
 {
-    protected List<IRBaseInstruction> instructions = new LinkedList<>();
+    protected Vector<IRBaseInstruction> instructions = new Vector<>();
     private IRExpr result;
     private IRLable label = null;
     private Vector<IRBaseBlock> nextNodes = new Vector<>();
@@ -71,7 +71,7 @@ public class IRBaseBlock extends IRBase
         return ans;
     }
 
-    public List<IRBaseInstruction> getInstructions() {
+    public Vector<IRBaseInstruction> getInstructions() {
         return instructions;
     }
 

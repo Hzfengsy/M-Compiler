@@ -22,4 +22,8 @@ public class StackAlloc
     public Integer getOffset(IRVar var) {
         return location.get(var);
     }
+
+    public Collection<IRVar> getVars() {
+        return location.keySet();
+    }
 }

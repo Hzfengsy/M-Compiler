@@ -3,6 +3,8 @@ package Hzfengsy.IR.IRExpr;
 import Hzfengsy.IR.IRExpr.*;
 import Hzfengsy.IR.IRInstruction.*;
 
+import java.util.*;
+
 public class IRMem extends IRExpr
 {
     private IRExpr addr;
@@ -25,5 +27,12 @@ public class IRMem extends IRExpr
 
     public IRExpr getOffset() {
         return offset;
+    }
+
+    public Set<IRVar> getUse(){
+        Set<IRVar> ans = new HashSet<>();
+        if (addr instanceof IRVar) ans.add((IRVar) addr);
+        if (offset instanceof IRVar) ans.add((IRVar) offset);
+        return ans;
     }
 }

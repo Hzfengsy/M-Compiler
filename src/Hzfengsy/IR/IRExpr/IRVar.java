@@ -1,11 +1,14 @@
 package Hzfengsy.IR.IRExpr;
 
+import Hzfengsy.CodeGenerator.*;
+
 import java.util.regex.*;
 
 public class IRVar extends IRExpr
 {
     private String name;
     private Boolean globe;
+    public Register register = null;
 
     public IRVar(String name, Boolean globe) {
         this.name = name;

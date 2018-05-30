@@ -47,4 +47,10 @@ public class IRCallInstruction extends IRBaseInstruction
     public IRFuncNode getFunc() {
         return func;
     }
+
+    @Override
+    public void analyze() {
+        for (IRExpr expr : args) this.setUse(expr);
+        this.setDef(result);
+    }
 }

@@ -40,4 +40,11 @@ public class IRBinaryExprInstruction extends IRBaseInstruction
     public IRExpr getRight() {
         return right;
     }
+
+    @Override
+    public void analyze() {
+        this.setUse(left);
+        this.setUse(right);
+        this.setDef(result);
+    }
 }

@@ -18,6 +18,12 @@ public class BaseGenerator
     private StringBuilder ans = new StringBuilder();
     private IRLable endLable;
     private StringData stringData = StringData.getInstance();
+    private LivenessAnalyzer analyzer = new LivenessAnalyzer();
+
+    private Register var2Reg(IRVar var) {
+        if (var.isGlobe()) return null;
+        return var.register;
+    }
 
     public BaseGenerator(IRProgNode program) {
         this.program = program;
@@ -97,12 +103,15 @@ public class BaseGenerator
         }
     }
 
-    private String var2Mem(IRVar var) {
+    private String var2Str(IRVar var) {
         if (stringData.containLabel(var)) {
             return var.getName();
         }
         else if (var.isGlobe()) {
             return "qword [" + var.getName() + "]";
+        }
+        else if (var.register != null) {
+            return var.register.toString();
         }
         else {
             Integer offset = allocor.getOffset(var);
@@ -116,7 +125,8 @@ public class BaseGenerator
             ans.append("\tmov\t" + reg + ", " + var + "\n");
         }
         else if (var instanceof IRVar) {
-            ans.append("\tmov\t" + reg + ", " + var2Mem((IRVar) var) + "\n");
+            if (((IRVar) var).register == reg) return;
+            ans.append("\tmov\t" + reg + ", " + var2Str((IRVar) var) + "\n");
         }
         else {
             ans.append("\tmov\t" + reg + ", " + memAddr((IRMem) var) + "\n");
@@ -125,7 +135,8 @@ public class BaseGenerator
 
     private void store(IRExpr var, Register reg) {
         if (var instanceof IRVar) {
-            ans.append("\tmov\t" + var2Mem((IRVar) var) + ", " + reg + "\n");
+            if (((IRVar) var).register == reg) return;
+            ans.append("\tmov\t" + var2Str((IRVar) var) + ", " + reg + "\n");
         }
         else {
             ans.append("\tmov\t" + memAddr((IRMem) var) + ", " + reg + "\n");
@@ -133,19 +144,28 @@ public class BaseGenerator
 
     }
 
-
     private String memAddr(IRMem irMem) {
         IRExpr base = irMem.getAddr();
         IRExpr offset = irMem.getOffset();
         String baseAddr = base.toString();
         String offsetAddr = offset.toString();
         if (base instanceof IRVar) {
-            load(base, Register.r14);
-            baseAddr = Register.r14.toString();
+            if (var2Reg((IRVar) base) != null) {
+                baseAddr = var2Reg((IRVar) base).toString();
+            }
+            else {
+                load(base, Register.r14);
+                baseAddr = Register.r14.toString();
+            }
         }
         if (offset instanceof IRVar) {
-            load(offset, Register.r15);
-            offsetAddr = Register.r15.toString();
+            if (var2Reg((IRVar) offset) != null) {
+                baseAddr = var2Reg((IRVar) offset).toString();
+            }
+            else {
+                load(base, Register.r15);
+                baseAddr = Register.r15.toString();
+            }
         }
         return "qword [" + baseAddr + "+" + offsetAddr + " * 8]";
     }
@@ -164,25 +184,29 @@ public class BaseGenerator
     }
 
     private void addLikeOperator(IRExpr dest, IRExpr lhs, IROperations.binaryOp op, IRExpr rhs) {
-        load(lhs, Register.rcx);
+        Register destination = Register.r14;
+        if (dest instanceof IRVar && ((IRVar) dest).register != null)
+            destination = ((IRVar) dest).register;
+        load(lhs, destination);
         if (rhs instanceof IRConst) {
-            ans.append("\t" + op.toNASM() + "\trcx, " + rhs + "\n");
+            ans.append("\t" + op.toNASM() + "\t" + destination + ", " + rhs + "\n");
         }
         else {
-            load(rhs, Register.r11);
-            ans.append("\t" + op.toNASM() + "\trcx, r11\n");
+            ans.append("\t" + op.toNASM() + "\t" + destination + ", " + var2Str((IRVar) rhs) + "\n");
         }
         if (dest instanceof IRVar)
-            store(dest, Register.rcx);
+            store(dest, destination);
         else ans.append("\tmov\t" + memAddr((IRMem) dest) + ", rcx\n");
     }
 
     private void cmpOperator(IRExpr dest, IRExpr lhs, IROperations.binaryOp op, IRExpr rhs) {
-        load(lhs, Register.rcx);
-        load(rhs, Register.r11);
-        ans.append("\tcmp\trcx, r11\n");
-        ans.append("\t" + op.toNASM() + "\tcl\n\tmovzx\trcx, cl\n");
-        store(dest, Register.rcx);
+        Register reg1 = (lhs instanceof IRVar && var2Reg((IRVar) lhs) != null) ? var2Reg((IRVar) lhs) : Register.r14;
+        Register reg2 = (rhs instanceof IRVar && var2Reg((IRVar) rhs) != null) ? var2Reg((IRVar) rhs) : Register.r15;
+        load(lhs, reg1);
+        load(rhs, reg2);
+        ans.append("\tcmp\t" + reg1 + ", " + reg2 + "\n");
+        ans.append("\t" + op.toNASM() + "\t" + "r15b" + "\n\tmovzx\t" + reg1 + ", " + "r15b" + "\n");
+        store(dest, reg1);
     }
 
     private void divLikeOperator(IRExpr dest, IRExpr lhs, IROperations.binaryOp op, IRExpr rhs) {
@@ -195,8 +219,8 @@ public class BaseGenerator
     }
 
     private void shiftOperator(IRExpr dest, IRExpr lhs, IROperations.binaryOp op, IRExpr rhs) {
-        load(lhs, Register.r10);
-        load(rhs, Register.r11);
+        load(lhs, Register.r14);
+        load(rhs, Register.r15);
         ans.append("\tmov\trax, r10\n");
         ans.append("\tmov\trcx, r11\n");
         ans.append("\t" + op.toNASM() + "\trax, cl\n");
@@ -238,26 +262,35 @@ public class BaseGenerator
 
     private void moveOperator(IRExpr dest, IRExpr rhs) {
         if (dest instanceof IRVar) {
+            Register destination = Register.r12;
+            boolean allocated = var2Reg((IRVar) dest) != null;
+            if (allocated) destination = var2Reg((IRVar) dest);
             if (rhs instanceof IRVar) {
-                load(rhs, Register.rcx);
-                store(dest, Register.rcx);
+                load(rhs, destination);
+                if (!allocated) store(dest, destination);
             }
             else if (rhs instanceof IRMem) {
-                ans.append("\tmov\trcx, " + memAddr((IRMem) rhs) + "\n");
-                store(dest, Register.rcx);
+                ans.append("\tmov\t" + destination + ", " + memAddr((IRMem) rhs) + "\n");
+                if (!allocated) store(dest, Register.r12);
             }
             else if (rhs instanceof IRConst) {
-                ans.append("\tmov\t" + var2Mem((IRVar) dest) + ", " + rhs + "\n");
+                if (allocated) ans.append("\tmov\t" + destination + ", " + rhs + "\n");
+                else ans.append("\tmov\t" + var2Str((IRVar) dest) + ", " + rhs + "\n");
             }
         }
         else {
             if (rhs instanceof IRVar) {
-                load(rhs, Register.rcx);
-                ans.append("\tmov\t" + memAddr((IRMem) dest) + ", rcx\n");
+                if (var2Reg((IRVar) rhs) != null) {
+                    ans.append("\tmov\t" + memAddr((IRMem) dest) + ", " + var2Reg((IRVar) rhs) + "\n");
+                }
+                else {
+                    load(rhs, Register.r15);
+                    ans.append("\tmov\t" + memAddr((IRMem) dest) + ", r15\n");
+                }
             }
             else if (rhs instanceof IRMem) {
-                ans.append("\tmov\trcx, " + memAddr((IRMem) rhs) + "\n");
-                ans.append("\tmov\t" + memAddr((IRMem) dest) + ", rcx\n");
+                ans.append("\tmov\tr15, " + memAddr((IRMem) rhs) + "\n");
+                ans.append("\tmov\t" + memAddr((IRMem) dest) + ", r15\n");
             }
             else if (rhs instanceof IRConst) {
                 ans.append("\tmov\t" + memAddr((IRMem) dest) + ", " + rhs + "\n");
@@ -292,8 +325,10 @@ public class BaseGenerator
             ans.append("\tjmp\t" + inst.getLable().getName() + "\n");
         }
         else {
-            load(inst.getExpr(), Register.rcx);
-            ans.append("\tcmp\trcx, 0\n");
+            IRExpr expr = inst.getExpr();
+            Register reg = (expr instanceof IRVar && (var2Reg((IRVar) expr)) != null) ? var2Reg((IRVar) expr) : Register.r15;
+            load(inst.getExpr(), reg);
+            ans.append("\tcmp\t" + reg + ", 0\n");
             ans.append("\t" + inst.getOp().toNASM() + "\t" + inst.getLable().getName() + "\n");
         }
     }
@@ -314,7 +349,7 @@ public class BaseGenerator
                 ans.append("\tpush\t" + args[i] + "\n");
             }
             else {
-                ans.append("\tpush\t" + var2Mem((IRVar) args[i]) + "\n");
+                ans.append("\tpush\t" + var2Str((IRVar) args[i]) + "\n");
 
             }
         }
@@ -354,6 +389,7 @@ public class BaseGenerator
             if (funcNode.getContainNodes().size() == 0) continue;
             allocor = funcNode.getAlloc();
             Integer size = funcNode.getContainNodes().size();
+            analyzer.analyze(funcNode);
             endLable = funcNode.getContainNodes().get(size - 1).getLabel();
             boolean first = true;
             for (IRBaseBlock baseBlock : funcNode.getContainNodes()) {
