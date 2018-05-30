@@ -110,8 +110,10 @@ public class BaseGenerator
             if (reg != null) {
                 ans.append("\tmov\t" + reg + ", [rbp+" + offset.toString() + "]\n");
             }
-            ans.append("\tmov\trax, [rbp+" + offset.toString() + "]\n");
-            ans.append("\tmov\t" + var2Mem(args[i]) + ", " + Register.rax + "\n");
+            else {
+                ans.append("\tmov\trax, [rbp+" + offset.toString() + "]\n");
+                ans.append("\tmov\t" + var2Mem(args[i]) + ", " + Register.rax + "\n");
+            }
         }
     }
 

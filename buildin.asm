@@ -138,29 +138,33 @@ ord:
 
 
 substring:
-        push    r13
-        push    r12
-        mov     r12, rdi
         push    rbp
-        push    rbx
-        mov     ebx, edx
-        sub     ebx, esi
-        mov     ebp, esi
-        lea     edi, [rbx+2H]
-        sub     rsp, 8
-        movsxd  rdi, edi
-        call    malloc
-        lea     edx, [rbx+1H]
-        movsxd  rsi, ebp
+        mov     rbp, rsp
+        sub     rsp, 32
+        mov     qword [rbp-18H], rdi
+        mov     dword [rbp-1CH], esi
+        mov     rdx, qword[rbp+10H]
+        mov     dword [rbp-20H], edx
+        mov     eax, dword [rbp-20H]
+        sub     eax, dword [rbp-1CH]
+        add     eax, 1
+        mov     dword [rbp-0CH], eax
+        mov     eax, dword [rbp-0CH]
+        add     eax, 1
+        cdqe
         mov     rdi, rax
-        add     rsi, r12
-        mov     r13, rax
-        movsxd  rdx, edx
+        call    malloc
+        mov     qword [rbp-8H], rax
+        mov     eax, dword [rbp-0CH]
+        movsxd  rdx, eax
+        mov     eax, dword [rbp-1CH]
+        movsxd  rcx, eax
+        mov     rax, qword [rbp-18H]
+        add     rcx, rax
+        mov     rax, qword [rbp-8H]
+        mov     rsi, rcx
+        mov     rdi, rax
         call    strncpy
-        add     rsp, 8
-        mov     rax, r13
-        pop     rbx
-        pop     rbp
-        pop     r12
-        pop     r13
+        mov     rax, qword [rbp-8H]
+        leave
         ret
