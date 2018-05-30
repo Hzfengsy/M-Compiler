@@ -22,6 +22,7 @@ public class Register
     private String name;
     private Integer index;
 
+
     private Register(String name, Integer index) {
         this.name = name;
         this.index = index;
@@ -71,14 +72,6 @@ public class Register
                 return rdi;
             case 1:
                 return rsi;
-            case 2:
-                return rdx;
-            case 3:
-                return rcx;
-            case 4:
-                return r8;
-            case 5:
-                return r9;
         }
         return null;
     }
@@ -91,20 +84,16 @@ public class Register
     public static Register alloc(int index) {
         switch (index) {
             case 0:
-                return rdi;
-            case 1:
-                return rsi;
-            case 2:
                 return r8;
-            case 3:
+            case 1:
                 return r9;
-            case 4:
+            case 2:
                 return r10;
-            case 5:
+            case 3:
                 return r11;
-            case 6:
+            case 4:
                 return r12;
-            case 7:
+            case 5:
                 return r13;
             default:
                 return null;
@@ -124,6 +113,18 @@ public class Register
     }
 
     public static int registerNum() {
-        return 8;
+        return 6;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return o.toString().equals(this.toString());
+    }
+
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
     }
 }

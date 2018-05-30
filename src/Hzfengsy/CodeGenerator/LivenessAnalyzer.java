@@ -38,7 +38,7 @@ public class LivenessAnalyzer
     public void analyze(IRFuncNode funcNode) {
         instructions.clear();
         getSucc(funcNode);
-        for (IRVar var : funcNode.getAlloc().getVars())
+        for (IRVar var : funcNode.getUsedVar())
             graph.setVar(var);
         for (IRBaseInstruction instruction : instructions)
             instruction.analyze();

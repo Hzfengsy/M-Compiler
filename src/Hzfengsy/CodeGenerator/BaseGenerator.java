@@ -98,22 +98,20 @@ public class BaseGenerator
 
     private void storeArgs(IRFuncNode func) {
         IRVar[] args = func.getArgs();
-        for (int i = 0; i < args.length && i < 6; i++) {
-            ans.append("\tmov\t" + var2Mem(args[i]) + ", " + Register.getParm(i) + "\n");
+        for (int i = 0; i < args.length && i < 2; i++) {
+            Register reg = RegisterAllocator.get(args[i]);
+            if (reg != null) ans.append("\tmov\t" + reg + ", " + Register.getParm(i) + "\n");
+            else ans.append("\tmov\t" + var2Mem(args[i]) + ", " + Register.getParm(i) + "\n");
         }
         Integer offset = 8;
-        for (int i = 6; i < args.length; i++) {
+        for (int i = 2; i < args.length; i++) {
             offset += 8;
-            ans.append("\tmov\trax, [rbp+" + offset.toString() + "]\n");
-            ans.append("\tmov\t" + var2Mem(args[i]) + ", " + Register.rax + "\n");
-        }
-
-        for (int i = 0; i < args.length; i++) {
             Register reg = RegisterAllocator.get(args[i]);
             if (reg != null) {
-                ans.append("\tmov\t" + reg + ", " + var2Mem(args[i]) + "\n");
-
+                ans.append("\tmov\t" + reg + ", [rbp+" + offset.toString() + "]\n");
             }
+            ans.append("\tmov\trax, [rbp+" + offset.toString() + "]\n");
+            ans.append("\tmov\t" + var2Mem(args[i]) + ", " + Register.rax + "\n");
         }
     }
 
@@ -353,21 +351,15 @@ public class BaseGenerator
 
     private void call(IRCallInstruction inst) {
         IRExpr[] args = inst.getArgs();
+        Set<Register> usedRegs = inst.getFunc().getUsedReg();
         for (int i = 0; i < Register.registerNum(); i++) {
+            if (!inst.getFunc().isExtend() && !usedRegs.contains(Register.alloc(i))) continue;
             ans.append("\tpush\t" + Register.alloc(i) + "\n");
         }
-        for (int i = 0; i < args.length && i < 6; i++) {
-            if (args[i] instanceof IRVar && var2Reg((IRVar) args[i]) != null) {
-                int index = Register.allocIndex(RegisterAllocator.get((IRVar) args[i]));
-                if (index >= 0) {
-                    Integer offset = Register.registerNum() - index - 1;
-                    ans.append("\tmov\t" + Register.getParm(i) + ", qword [rsp + " + offset.toString() + " * 8]\n");
-                }
-                else load(args[i], Register.getParm(i));
-            }
-            else load(args[i], Register.getParm(i));
+        for (int i = 0; i < args.length && i < 2; i++) {
+            load(args[i], Register.getParm(i));
         }
-        for (int i = args.length - 1; i >= 6; i--) {
+        for (int i = args.length - 1; i >= 2; i--) {
             if (args[i] instanceof IRConst) {
                 ans.append("\tpush\t" + args[i] + "\n");
             }
@@ -377,9 +369,10 @@ public class BaseGenerator
             }
         }
         ans.append("\tcall\t" + inst.getFunc().getName() + "\n");
-        if (args.length > 6)
-            ans.append("\tadd\trsp, " + Integer.toString((args.length - 6) * 8) + "\n");
+        if (args.length > 2)
+            ans.append("\tadd\trsp, " + Integer.toString((args.length - 2) * 8) + "\n");
         for (int i = Register.registerNum() - 1; i >= 0; i--) {
+            if (!inst.getFunc().isExtend() && !usedRegs.contains(Register.alloc(i))) continue;
             ans.append("\tpop\t" + Register.alloc(i) + "\n");
         }
         if (inst.getResult() != null) {
@@ -387,7 +380,7 @@ public class BaseGenerator
         }
     }
 
-    public String genrate() {
+    public String generate() {
         ans.append("default rel\n" +
                    "\n" +
                    "global main\n" +
@@ -405,19 +398,25 @@ public class BaseGenerator
                    "extern stdin\n" +
                    "extern strcmp\n" +
                    "extern __stack_chk_fail\n" +
+                   "extern __printf_chk\n" +
+                   "extern memcpy\n" +
+                   "extern __sprintf_chk\n" +
                    "\n" +
                    "\n" +
                    "SECTION .text   \n" +
                    "\n");
+        for (IRFuncNode funcNode : program.getFuncs())
+            analyzer.analyze(funcNode);
         ans.append(readFile("buildin.asm"));
         for (IRFuncNode funcNode : program.getFuncs()) {
             if (funcNode.getContainNodes().size() == 0) continue;
+            funcNode.allocStack();
             allocor = funcNode.getAlloc();
             Integer size = funcNode.getContainNodes().size();
-            analyzer.analyze(funcNode);
             endLable = funcNode.getContainNodes().get(size - 1).getLabel();
             boolean first = true;
-            for (IRBaseBlock baseBlock : funcNode.getContainNodes()) {
+            for (int i = 0; i < funcNode.getContainNodes().size(); i++) {
+                IRBaseBlock baseBlock = funcNode.getContainNodes().elementAt(i);
                 ans.append(baseBlock.getLabel().getName() + ":\n");
                 if (first) {
                     enterFunc();
@@ -430,10 +429,20 @@ public class BaseGenerator
                         binaryOpeation((IRBinaryExprInstruction) inst);
                     else if (inst instanceof IRUnaryExprInstruction)
                         unaryOpeation((IRUnaryExprInstruction) inst);
-                    else if (inst instanceof IRjumpInstruction)
+                    else if (inst instanceof IRjumpInstruction) {
+                        if (inst == baseBlock.getInstructions().elementAt(baseBlock.getInstructions().size() - 1)
+                            && ((IRjumpInstruction) inst).getExpr() == null
+                            && i < funcNode.getContainNodes().size() - 1
+                            && ((IRjumpInstruction) inst).getBlock() == funcNode.getContainNodes().elementAt(i + 1))
+                            continue;
                         jumpOperator((IRjumpInstruction) inst);
-                    else if (inst instanceof IRRetInstruction)
+                    }
+                    else if (inst instanceof IRRetInstruction) {
+                        if (inst == baseBlock.getInstructions().elementAt(baseBlock.getInstructions().size() - 1)
+                            && i == funcNode.getContainNodes().size() - 1)
+                            continue;
                         retOperator((IRRetInstruction) inst);
+                    }
                     else if (inst instanceof IRCallInstruction)
                         call((IRCallInstruction) inst);
                 }

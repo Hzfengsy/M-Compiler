@@ -11,6 +11,7 @@ public class IRFuncNode extends IRBase
     private String funcName;
     private IRVar[] args;
     private Vector<IRBaseBlock> containNodes = new Vector<>();
+    private Set<IRVar> usedVar = new HashSet<>();
     private StackAlloc alloc = new StackAlloc();
     private boolean extend = false;
 
@@ -64,12 +65,27 @@ public class IRFuncNode extends IRBase
         return args[0];
     }
 
-    public List<IRBaseBlock> getContainNodes() {
+    public Vector<IRBaseBlock> getContainNodes() {
         return containNodes;
     }
 
-    public void allocVar(IRVar var) {
-        alloc.SetVar(var);
+    public void addVar(IRVar var) {
+        usedVar.add(var);
+    }
+
+    public void allocStack() {
+        for (IRVar var : usedVar) {
+            if (RegisterAllocator.get(var) == null) alloc.SetVar(var);
+        }
+    }
+
+    public Set<Register> getUsedReg() {
+        Set<Register> ans = new HashSet<>();
+        for (IRVar var : usedVar) {
+            Register reg = RegisterAllocator.get(var);
+            if (reg != null) ans.add(reg);
+        }
+        return ans;
     }
 
     public StackAlloc getAlloc() {
@@ -80,11 +96,11 @@ public class IRFuncNode extends IRBase
         return args;
     }
 
-    public boolean containVar(String varName) {
-        for (IRVar var : args) {
-            if (var.getName().equals(varName))
-                return true;
-        }
-        return false;
+    public boolean isExtend() {
+        return extend;
+    }
+
+    public Set<IRVar> getUsedVar() {
+        return usedVar;
     }
 }

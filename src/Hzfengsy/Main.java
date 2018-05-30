@@ -84,7 +84,7 @@ public class Main
 
     private static String codeGenrate(IRProgNode progNode) {
         BaseGenerator generator = new BaseGenerator(progNode);
-        return generator.genrate();
+        return generator.generate();
     }
 
     private static void writeFile(String text, String fileName) {

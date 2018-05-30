@@ -85,7 +85,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
                 FuncType func = entry.getValue();
                 IRVar[] parameter = getIRMemberParameter(func);
                 IRFuncNode function = new IRFuncNode(funcName, parameter);
-                function.allocVar(parameter[0]);
+                function.addVar(parameter[0]);
                 funcNodeMap.put(funcName, function);
 
             }
@@ -184,7 +184,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         IRBaseBlock nowBlock = node;
         for (Pair<String, BaseType> var : funcType.getVars()) {
             IRVar irVar = variables.insertVar(var.getKey(), false);
-            func.allocVar(irVar);
+            func.addVar(irVar);
         }
         for (MParser.StatContext x : ctx.stat()) {
             IRBase result = visit(x);
@@ -246,7 +246,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     public IRBase visitUnary(MParser.UnaryContext ctx) {
         IRBase expr = visit(ctx.expr());
         IRVar result = variables.insertTempVar();
-        funcStack.peek().allocVar(result);
+        funcStack.peek().addVar(result);
         if (ctx.op.getText().equals("+")) return null;
         IROperations.unaryOp op = IROperations.unaryOp.NEG;
         if (expr instanceof IRExpr) {
@@ -271,7 +271,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     public IRBase visitNot(MParser.NotContext ctx) {
         IRBase expr = visit(ctx.expr());
         IRVar result = variables.insertTempVar();
-        funcStack.peek().allocVar(result);
+        funcStack.peek().addVar(result);
         IROperations.unaryOp op = IROperations.unaryOp.NOT;
         if (expr instanceof IRExpr) {
             IRBaseInstruction inst = new IRUnaryExprInstruction(result, op, (IRExpr) expr);
@@ -295,7 +295,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     public IRBase visitLNot(MParser.LNotContext ctx) {
         IRBase expr = visit(ctx.expr());
         IRVar result = variables.insertTempVar();
-        funcStack.peek().allocVar(result);
+        funcStack.peek().addVar(result);
         IROperations.unaryOp op = IROperations.unaryOp.LNOT;
         if (expr instanceof IRExpr) {
             IRBaseInstruction inst = new IRUnaryExprInstruction(result, op, (IRExpr) expr);
@@ -332,7 +332,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         }
         else right_expr = (IRExpr) right;
         IRVar result = variables.insertTempVar();
-        (funcStack.empty() ? funcNodeMap.get("main") : funcStack.peek()).allocVar(result);
+        (funcStack.empty() ? funcNodeMap.get("main") : funcStack.peek()).addVar(result);
         if (typeRecorder.get(ctx.expr(0)) instanceof StringType || typeRecorder.get(ctx.expr(1)) instanceof StringType) {
             IRBaseInstruction inst = new IRCallInstruction(result, funcNodeMap.get("strCombine"), left_expr, right_expr);
             ans.join(inst);
@@ -362,7 +362,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         }
         else right_expr = (IRExpr) right;
         IRVar result = variables.insertTempVar();
-        funcStack.peek().allocVar(result);
+        funcStack.peek().addVar(result);
         IROperations.binaryOp op = IROperations.binaryOp.AND;
         IRBaseInstruction inst = new IRBinaryExprInstruction(result, op, left_expr, right_expr);
         ans.join(inst);
@@ -410,7 +410,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             right_expr = (IRExpr) right;
         }
         IRVar result = variables.insertTempVar();
-        funcStack.peek().allocVar(result);
+        funcStack.peek().addVar(result);
         nowBlock.join(new IRjumpInstruction(right_expr, IROperations.jmpOp.JZ, setResult));
         nowBlock.join(new IRUnaryExprInstruction(result, IROperations.unaryOp.MOV, new IRConst(1)));
         nowBlock.join(new IRjumpInstruction(end));
@@ -438,7 +438,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         }
         else right_expr = (IRExpr) right;
         IRVar result = variables.insertTempVar();
-        funcStack.peek().allocVar(result);
+        funcStack.peek().addVar(result);
         IROperations.binaryOp op = IROperations.binaryOp.OR;
         IRBaseInstruction inst = new IRBinaryExprInstruction(result, op, left_expr, right_expr);
         ans.join(inst);
@@ -486,7 +486,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             right_expr = (IRExpr) right;
         }
         IRVar result = variables.insertTempVar();
-        funcStack.peek().allocVar(result);
+        funcStack.peek().addVar(result);
         nowBlock.join(new IRjumpInstruction(right_expr, IROperations.jmpOp.JNZ, setResult));
         nowBlock.join(new IRUnaryExprInstruction(result, IROperations.unaryOp.MOV, new IRConst(0)));
         nowBlock.join(new IRjumpInstruction(end));
@@ -514,7 +514,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         }
         else right_expr = (IRExpr) right;
         IRVar result = variables.insertTempVar();
-        funcStack.peek().allocVar(result);
+        funcStack.peek().addVar(result);
         IROperations.binaryOp op = IROperations.binaryOp.XOR;
         IRBaseInstruction inst = new IRBinaryExprInstruction(result, op, left_expr, right_expr);
         ans.join(inst);
@@ -538,7 +538,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         }
         else right_expr = (IRExpr) right;
         IRVar result = variables.insertTempVar();
-        (funcStack.empty() ? funcNodeMap.get("main") : funcStack.peek()).allocVar(result);
+        (funcStack.empty() ? funcNodeMap.get("main") : funcStack.peek()).addVar(result);
         IROperations.binaryOp op = ctx.op.getText().equals("<<") ? IROperations.binaryOp.LSHIFT : IROperations.binaryOp.RSHIFT;
         IRBaseInstruction inst = new IRBinaryExprInstruction(result, op, left_expr, right_expr);
         ans.join(inst);
@@ -562,7 +562,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         }
         else right_expr = (IRExpr) right;
         IRVar result = variables.insertTempVar();
-        funcStack.peek().allocVar(result);
+        funcStack.peek().addVar(result);
         IROperations.binaryOp op = ctx.op.getText().equals("==") ? IROperations.binaryOp.EQ : IROperations.binaryOp.NE;
         IRBaseInstruction inst = new IRBinaryExprInstruction(result, op, left_expr, right_expr);
         ans.join(inst);
@@ -586,7 +586,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         }
         else right_expr = (IRExpr) right;
         IRVar result = variables.insertTempVar();
-        funcStack.peek().allocVar(result);
+        funcStack.peek().addVar(result);
         IROperations.binaryOp op;
         if (ctx.op.getText().equals("<"))
             op = IROperations.binaryOp.LT;
@@ -599,7 +599,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             IRBaseInstruction inst = new IRCallInstruction(result, funcNodeMap.get("strcmp"), left_expr, right_expr);
             ans.join(inst);
             IRVar result_new = variables.insertTempVar();
-            funcStack.peek().allocVar(result_new);
+            funcStack.peek().addVar(result_new);
             ans.join(new IRBinaryExprInstruction(result_new, op, result, new IRConst(0)));
             return ans;
         }
@@ -627,7 +627,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         }
         else right_expr = (IRExpr) right;
         IRVar result = variables.insertTempVar();
-        (funcStack.empty() ? funcNodeMap.get("main") : funcStack.peek()).allocVar(result);
+        (funcStack.empty() ? funcNodeMap.get("main") : funcStack.peek()).addVar(result);
         IROperations.binaryOp op;
         if (ctx.op.getText().equals("*"))
             op = IROperations.binaryOp.MUL;
@@ -687,7 +687,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             if (ASTSet.getInstance().getLeftValue(ctx)) {
                 return new IRMem(func.getThis(), new IRConst(index));
             }
-            funcStack.peek().allocVar(result);
+            funcStack.peek().addVar(result);
             IRBaseInstruction inst = new IRUnaryExprInstruction(result, IROperations.unaryOp.MOV, new IRMem(func.getThis(), new IRConst(index)));
             return new IRBaseBlock(inst);
         }
@@ -724,7 +724,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         IRBase expr = visit(ctx.expr());
         IRVar temp = variables.insertTempVar();
         IRBaseBlock ans = new IRBaseBlock();
-        funcStack.peek().allocVar(temp);
+        funcStack.peek().addVar(temp);
         if (expr instanceof IRExpr) {
             IRVar var = (IRVar) expr;
             IRBaseInstruction tempCopy = new IRUnaryExprInstruction(temp, IROperations.unaryOp.MOV, var);
@@ -849,7 +849,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
                 nowBody = ((IRNode) second).getTail();
             }
             IRVar tempResult = variables.insertTempVar();
-            (funcStack.empty() ? funcNodeMap.get("main") : funcStack.peek()).allocVar(tempResult);
+            (funcStack.empty() ? funcNodeMap.get("main") : funcStack.peek()).addVar(tempResult);
             IRBaseInstruction jump = new IRjumpInstruction(result, IROperations.jmpOp.JZ, tail);
             nowBody.join(jump);
         }
@@ -913,7 +913,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
                 nowBody = ((IRNode) second).getTail();
             }
             IRVar tempResult = variables.insertTempVar();
-            funcStack.peek().allocVar(tempResult);
+            funcStack.peek().addVar(tempResult);
             IRBaseInstruction jump = new IRjumpInstruction(result, IROperations.jmpOp.JZ, tail);
             nowBody.join(jump);
         }
@@ -1091,14 +1091,14 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             UserType type = classStack.peek();
             if (!(type.safeQueryFunc(ctx.id().getText()).getReturnType() instanceof VoidType)) {
                 result = variables.insertTempVar();
-                funcStack.peek().allocVar(result);
+                funcStack.peek().addVar(result);
             }
             args.addArg(funcStack.peek().getThis());
         }
         else {
             if (!(functions.safeQuery(funcName).getReturnType() instanceof VoidType)) {
                 result = variables.insertTempVar();
-                funcStack.peek().allocVar(result);
+                funcStack.peek().addVar(result);
             }
         }
         IRBaseBlock block = new IRBaseBlock(args);
@@ -1128,7 +1128,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
 
         if (!ASTSet.getInstance().getLeftValue(ctx)) {
             IRVar result = variables.insertTempVar();
-            funcStack.peek().allocVar(result);
+            funcStack.peek().addVar(result);
             IRBaseInstruction inst = new IRUnaryExprInstruction(result, IROperations.unaryOp.MOV, new IRMem(id_result, index_result));
             block.join(inst);
         }
@@ -1157,17 +1157,17 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     private IRBase NewStack(Vector<Pair<IRExpr, IRExpr>> exprs, Integer deep) {
         Pair<IRExpr, IRExpr> expr = exprs.elementAt(deep);
         IRVar result = variables.insertTempVar();
-        nowFunc().allocVar(result);
+        nowFunc().addVar(result);
         IRBaseInstruction inst = new IRCallInstruction(result, funcNodeMap.get("malloc"), expr.getValue());
         IRBaseBlock baseBlock = new IRBaseBlock(inst);
         IRVar temp = variables.insertTempVar();
-        nowFunc().allocVar(temp);
+        nowFunc().addVar(temp);
         baseBlock.join(new IRUnaryExprInstruction(new IRMem(result, new IRConst(0)), IROperations.unaryOp.MOV, expr.getKey()));
         baseBlock.join(new IRBinaryExprInstruction(temp, IROperations.binaryOp.ADD, result, new IRConst(8)));
         if (deep.equals(exprs.size() - 1))
             return baseBlock;
         IRVar index = variables.insertTempVar();
-        nowFunc().allocVar(index);
+        nowFunc().addVar(index);
         IRBase next = NewStack(exprs, deep + 1);
         IRExpr addr = new IRMem(baseBlock.getResult(), index);
         if (next instanceof IRNode)
@@ -1177,7 +1177,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         }
         IRBaseInstruction first = new IRUnaryExprInstruction(index, IROperations.unaryOp.MOV, new IRConst(0));
         IRVar condition = variables.insertTempVar();
-        nowFunc().allocVar(condition);
+        nowFunc().addVar(condition);
         IRBaseInstruction second = new IRBinaryExprInstruction(condition, IROperations.binaryOp.LT, index, expr.getKey());
         IRBaseInstruction step = new IRBinaryExprInstruction(index, IROperations.binaryOp.ADD, index, new IRConst(1));
         IRNode loop = (IRNode) forLoop(new IRBaseBlock(first), new IRBaseBlock(second), new IRBaseBlock(step), next);
@@ -1199,7 +1199,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             if (className.equals("String")) return null;
             else {
                 IRVar result = variables.insertTempVar();
-                nowFunc().allocVar(result);
+                nowFunc().addVar(result);
                 IRBaseInstruction inst = new IRCallInstruction(result, funcNodeMap.get("malloc"), new IRConst(userClass.memSize()));
                 baseBlock.join(inst);
                 if (userClass.construction) {
@@ -1222,12 +1222,12 @@ public class IRGenerator extends MBaseVisitor<IRBase>
                     expr = ((IRBaseBlock) dimension).getResult();
                 }
                 IRVar plus = variables.insertTempVar();
-                nowFunc().allocVar(plus);
+                nowFunc().addVar(plus);
 
                 IRBaseInstruction plus_inst = new IRBinaryExprInstruction(plus, IROperations.binaryOp.ADD, expr, new IRConst(1));
                 baseBlock.join(plus_inst);
                 IRVar size = variables.insertTempVar();
-                nowFunc().allocVar(size);
+                nowFunc().addVar(size);
 
                 IRBaseInstruction sizeChange = new IRBinaryExprInstruction(size, IROperations.binaryOp.LSHIFT, plus, new IRConst(3));
                 baseBlock.join(sizeChange);
@@ -1269,7 +1269,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
 
         if (!ASTSet.getInstance().getLeftValue(ctx)) {
             IRVar result = variables.insertTempVar();
-            funcStack.peek().allocVar(result);
+            funcStack.peek().addVar(result);
             IRBaseInstruction inst = new IRUnaryExprInstruction(result, IROperations.unaryOp.MOV, new IRMem(expr_result, new IRConst(index)));
             block.join(inst);
         }
@@ -1301,14 +1301,14 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         if (Class instanceof ArrayType) {
             if (funcName.equals("size")) {
                 IRVar result = variables.insertTempVar();
-                funcStack.peek().allocVar(result);
+                funcStack.peek().addVar(result);
                 ans.join(new IRUnaryExprInstruction(result, IROperations.unaryOp.MOV, new IRMem(expr_result, new IRConst(-1))));
                 return ans;
             }
         }
         if (Class instanceof StringType) {
             IRVar result = variables.insertTempVar();
-            funcStack.peek().allocVar(result);
+            funcStack.peek().addVar(result);
             if (funcName.equals("length")) {
                 ans.join(new IRCallInstruction(result, funcNodeMap.get("strlen"), expr_result));
             }
@@ -1340,7 +1340,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         IRVar result = null;
         if (!(Class.safeQueryFunc(funcName).getReturnType() instanceof VoidType)) {
             result = variables.insertTempVar();
-            funcStack.peek().allocVar(result);
+            funcStack.peek().addVar(result);
         }
         IRBaseInstruction inst = new IRCallInstruction(result, func, args.getArgs());
         ans.join(inst);
