@@ -108,6 +108,6 @@ public class Main
         String code = codeGenrate(IRProg);
         if (args.length > 0) writeFile(code, "code.asm");
         else System.out.println(code);
-
+        System.err.println(RegisterAllocator.print());
     }
 }

@@ -2,6 +2,8 @@ package Hzfengsy.CodeGenerator;
 
 import Hzfengsy.IR.IRExpr.*;
 
+import javax.swing.text.html.parser.*;
+import java.security.*;
 import java.util.*;
 
 public class RegisterAllocator
@@ -14,5 +16,12 @@ public class RegisterAllocator
 
     public static Register get(IRVar var) {
         return registerMap.get(var);
+    }
+
+    static public String print() {
+        StringBuilder ans = new StringBuilder();
+        for (Map.Entry<IRVar, Register> entry : registerMap.entrySet())
+            ans.append(entry.getKey().toString() + " " + entry.getValue().toString() + "\n");
+        return ans.toString();
     }
 }
