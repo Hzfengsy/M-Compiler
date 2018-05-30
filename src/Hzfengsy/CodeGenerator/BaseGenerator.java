@@ -357,10 +357,13 @@ public class BaseGenerator
             ans.append("\tpush\t" + Register.alloc(i) + "\n");
         }
         for (int i = 0; i < args.length && i < 6; i++) {
-            int index = Register.allocIndex(Register.getParm(i));
-            if (index >= 0 && args[i] instanceof IRVar && var2Reg((IRVar) args[i]) != null) {
-                Integer offset = Register.registerNum() - index - 1;
-                ans.append("\tmov\t" + Register.getParm(i) + ", qword [rsp + " + offset.toString() + " * 8]\n");
+            if (args[i] instanceof IRVar && var2Reg((IRVar) args[i]) != null) {
+                int index = Register.allocIndex(RegisterAllocator.get((IRVar) args[i]));
+                if (index >= 0) {
+                    Integer offset = Register.registerNum() - index - 1;
+                    ans.append("\tmov\t" + Register.getParm(i) + ", qword [rsp + " + offset.toString() + " * 8]\n");
+                }
+                else load(args[i], Register.getParm(i));
             }
             else load(args[i], Register.getParm(i));
         }
