@@ -95,6 +95,10 @@ public class Register
                 return r12;
             case 5:
                 return r13;
+            case 6:
+                return r14;
+            case 7:
+                return r15;
             default:
                 return null;
         }
@@ -113,7 +117,7 @@ public class Register
     }
 
     public static int registerNum() {
-        return 6;
+        return 8;
     }
 
     @Override

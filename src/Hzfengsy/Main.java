@@ -83,7 +83,7 @@ public class Main
     }
 
     private static String codeGenrate(IRProgNode progNode) {
-        BaseGenerator generator = new BaseGenerator(progNode);
+        CodeGenerator generator = new CodeGenerator(progNode);
         return generator.generate();
     }
 

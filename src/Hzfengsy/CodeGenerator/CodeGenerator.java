@@ -11,7 +11,7 @@ import java.io.*;
 import java.util.*;
 
 
-public class BaseGenerator
+public class CodeGenerator
 {
     private IRProgNode program;
     private StackAlloc allocor;
@@ -25,7 +25,7 @@ public class BaseGenerator
         return RegisterAllocator.get(var);
     }
 
-    public BaseGenerator(IRProgNode program) {
+    public CodeGenerator(IRProgNode program) {
         this.program = program;
     }
 
@@ -168,8 +168,8 @@ public class BaseGenerator
                 baseAddr = var2Reg((IRVar) base).toString();
             }
             else {
-                load(base, Register.r14);
-                baseAddr = Register.r14.toString();
+                load(base, Register.rdx);
+                baseAddr = Register.rdx.toString();
             }
         }
         if (offset instanceof IRVar) {
@@ -177,8 +177,8 @@ public class BaseGenerator
                 offsetAddr = var2Reg((IRVar) offset).toString();
             }
             else {
-                load(offset, Register.r15);
-                offsetAddr = Register.r15.toString();
+                load(offset, Register.rbx);
+                offsetAddr = Register.rbx.toString();
             }
         }
         return "qword [" + baseAddr + " + " + offsetAddr + " * 8]";
@@ -301,8 +301,8 @@ public class BaseGenerator
                 }
             }
             else if (rhs instanceof IRMem) {
-                ans.append("\tmov\tr15, " + memAddr((IRMem) rhs) + "\n");
-                ans.append("\tmov\t" + memAddr((IRMem) dest) + ", r15\n");
+                ans.append("\tmov\trbx, " + memAddr((IRMem) rhs) + "\n");
+                ans.append("\tmov\t" + memAddr((IRMem) dest) + ", rbx\n");
             }
             else if (rhs instanceof IRConst) {
                 ans.append("\tmov\t" + memAddr((IRMem) dest) + ", " + rhs + "\n");
@@ -338,7 +338,7 @@ public class BaseGenerator
         }
         else {
             IRExpr expr = inst.getExpr();
-            Register reg = (expr instanceof IRVar && (var2Reg((IRVar) expr)) != null) ? var2Reg((IRVar) expr) : Register.r15;
+            Register reg = (expr instanceof IRVar && (var2Reg((IRVar) expr)) != null) ? var2Reg((IRVar) expr) : Register.rbx;
             load(inst.getExpr(), reg);
             ans.append("\tcmp\t" + reg + ", 0\n");
             ans.append("\t" + inst.getOp().toNASM() + "\t" + inst.getLable().getName() + "\n");
