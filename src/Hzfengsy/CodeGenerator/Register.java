@@ -97,4 +97,8 @@ public class Register
             default: return null;
         }
     }
+
+    public static int registerNum() {
+        return 4;
+    }
 }

@@ -1,5 +1,6 @@
 package Hzfengsy.CodeGenerator;
 
+import Hzfengsy.IR.*;
 import Hzfengsy.IR.IRExpr.*;
 
 import java.util.*;
@@ -8,10 +9,12 @@ public class ConflictGraph
 {
     private Map<IRVar, Set<IRVar>> conflict = new HashMap<>();
     private Set<IRVar> unhandled = new HashSet<>();
-    private final int regs = 4;
+    private final int regs = Register.registerNum();
+    private StringData stringData = StringData.getInstance();
 
     public void setConflict(IRVar a, IRVar b) {
         if (a.isGlobe() || b.isGlobe()) return;
+        if (stringData.containLabel(a) || stringData.containLabel(b)) return;
         conflict.get(a).add(b);
         conflict.get(b).add(a);
     }

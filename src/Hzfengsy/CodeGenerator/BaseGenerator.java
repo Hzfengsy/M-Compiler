@@ -160,11 +160,11 @@ public class BaseGenerator
         }
         if (offset instanceof IRVar) {
             if (var2Reg((IRVar) offset) != null) {
-                baseAddr = var2Reg((IRVar) offset).toString();
+                offsetAddr = var2Reg((IRVar) offset).toString();
             }
             else {
                 load(base, Register.r15);
-                baseAddr = Register.r15.toString();
+                offsetAddr = Register.r15.toString();
             }
         }
         return "qword [" + baseAddr + "+" + offsetAddr + " * 8]";
@@ -339,6 +339,9 @@ public class BaseGenerator
 
     private void call(IRCallInstruction inst) {
         IRExpr[] args = inst.getArgs();
+        for (int i = 0; i < Register.registerNum(); i++) {
+            ans.append("\tpush\t" + Register.alloc(i) + "\n");
+        }
         for (int i = 0; i < args.length && i < 6; i++) {
             load(args[i], Register.getParm(i));
         }
@@ -354,10 +357,12 @@ public class BaseGenerator
         ans.append("\tcall\t" + inst.getFunc().getName() + "\n");
         if (args.length > 6)
             ans.append("\tadd\trsp, " + Integer.toString((args.length - 6) * 8) + "\n");
+        for (int i = Register.registerNum() - 1; i >= 0 ; i--) {
+            ans.append("\tpop\t" + Register.alloc(i) + "\n");
+        }
         if (inst.getResult() != null) {
             store(inst.getResult(), Register.rax);
         }
-
     }
 
     public String genrate() {
