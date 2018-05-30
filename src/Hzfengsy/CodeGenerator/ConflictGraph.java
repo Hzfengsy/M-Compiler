@@ -1,7 +1,7 @@
 package Hzfengsy.CodeGenerator;
 
-import Hzfengsy.IR.*;
 import Hzfengsy.IR.IRExpr.*;
+import Hzfengsy.IR.*;
 
 import java.util.*;
 
@@ -28,15 +28,15 @@ public class ConflictGraph
     public void allocate() {
         for (int registerIndex = 0; registerIndex < regs; registerIndex++) {
             for (IRVar var : unhandled) {
-                if (var.register != null) continue;
+                if (RegisterAllocator.get(var) != null) continue;
                 boolean flag = true;
                 for (IRVar other : conflict.get(var))
-                    if (other.register == Register.alloc(registerIndex)) {
+                    if (RegisterAllocator.get(other) == Register.alloc(registerIndex)) {
                         flag = false;
                         break;
                     }
                 if (flag) {
-                    var.register = Register.alloc(registerIndex);
+                    RegisterAllocator.put(var, Register.alloc(registerIndex));
                 }
             }
         }

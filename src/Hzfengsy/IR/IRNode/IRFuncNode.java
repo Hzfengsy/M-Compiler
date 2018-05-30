@@ -79,4 +79,12 @@ public class IRFuncNode extends IRBase
     public IRVar[] getArgs() {
         return args;
     }
+
+    public boolean containVar(String varName) {
+        for (IRVar var : args) {
+            if (var.getName().equals(varName))
+                return true;
+        }
+        return false;
+    }
 }

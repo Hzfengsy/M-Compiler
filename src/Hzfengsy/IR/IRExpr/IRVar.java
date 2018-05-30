@@ -8,7 +8,6 @@ public class IRVar extends IRExpr
 {
     private String name;
     private Boolean globe;
-    public Register register = null;
 
     public IRVar(String name, Boolean globe) {
         this.name = name;

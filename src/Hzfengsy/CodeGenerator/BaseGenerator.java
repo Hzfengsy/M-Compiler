@@ -22,7 +22,7 @@ public class BaseGenerator
 
     private Register var2Reg(IRVar var) {
         if (var.isGlobe()) return null;
-        return var.register;
+        return RegisterAllocator.get(var);
     }
 
     public BaseGenerator(IRProgNode program) {
@@ -56,6 +56,12 @@ public class BaseGenerator
         }
         ans.append("00H");
         return ans.toString();
+    }
+
+    private String var2Mem(IRVar var) {
+        Integer offset = allocor.getOffset(var);
+        String offsetString = offset < 0 ? offset.toString() : "+" + offset.toString();
+        return "qword [" + Register.rbp + offsetString + "]";
     }
 
     private void dataSection() {
@@ -93,13 +99,21 @@ public class BaseGenerator
     private void storeArgs(IRFuncNode func) {
         IRVar[] args = func.getArgs();
         for (int i = 0; i < args.length && i < 6; i++) {
-            store(args[i], Register.getParm(i));
+            ans.append("\tmov\t" + var2Mem(args[i]) + ", " + Register.getParm(i) + "\n");
         }
         Integer offset = 8;
         for (int i = 6; i < args.length; i++) {
             offset += 8;
-            ans.append("\tmov\trdx, [rbp+" + offset.toString() + "]\n");
-            store(args[i], Register.rdx);
+            ans.append("\tmov\trax, [rbp+" + offset.toString() + "]\n");
+            ans.append("\tmov\t" + var2Mem(args[i]) + ", " + Register.rax + "\n");
+        }
+
+        for (int i = 0; i < args.length; i++) {
+            Register reg = RegisterAllocator.get(args[i]);
+            if (reg != null) {
+                ans.append("\tmov\t" + reg + ", " + var2Mem(args[i]) + "\n");
+
+            }
         }
     }
 
@@ -110,8 +124,8 @@ public class BaseGenerator
         else if (var.isGlobe()) {
             return "qword [" + var.getName() + "]";
         }
-        else if (var.register != null) {
-            return var.register.toString();
+        else if (RegisterAllocator.get(var) != null) {
+            return RegisterAllocator.get(var).toString();
         }
         else {
             Integer offset = allocor.getOffset(var);
@@ -125,7 +139,7 @@ public class BaseGenerator
             ans.append("\tmov\t" + reg + ", " + var + "\n");
         }
         else if (var instanceof IRVar) {
-            if (((IRVar) var).register == reg) return;
+            if (RegisterAllocator.get((IRVar) var) == reg) return;
             ans.append("\tmov\t" + reg + ", " + var2Str((IRVar) var) + "\n");
         }
         else {
@@ -135,7 +149,7 @@ public class BaseGenerator
 
     private void store(IRExpr var, Register reg) {
         if (var instanceof IRVar) {
-            if (((IRVar) var).register == reg) return;
+            if (RegisterAllocator.get((IRVar) var) == reg) return;
             ans.append("\tmov\t" + var2Str((IRVar) var) + ", " + reg + "\n");
         }
         else {
@@ -167,7 +181,7 @@ public class BaseGenerator
                 offsetAddr = Register.r15.toString();
             }
         }
-        return "qword [" + baseAddr + "+" + offsetAddr + " * 8]";
+        return "qword [" + baseAddr + " + " + offsetAddr + " * 8]";
     }
 
     private void enterFunc() {
@@ -343,7 +357,12 @@ public class BaseGenerator
             ans.append("\tpush\t" + Register.alloc(i) + "\n");
         }
         for (int i = 0; i < args.length && i < 6; i++) {
-            load(args[i], Register.getParm(i));
+            int index = Register.allocIndex(Register.getParm(i));
+            if (index >= 0 && args[i] instanceof IRVar && var2Reg((IRVar) args[i]) != null) {
+                Integer offset = Register.registerNum() - index - 1;
+                ans.append("\tmov\t" + Register.getParm(i) + ", qword [rsp + " + offset.toString() + " * 8]\n");
+            }
+            else load(args[i], Register.getParm(i));
         }
         for (int i = args.length - 1; i >= 6; i--) {
             if (args[i] instanceof IRConst) {
@@ -357,7 +376,7 @@ public class BaseGenerator
         ans.append("\tcall\t" + inst.getFunc().getName() + "\n");
         if (args.length > 6)
             ans.append("\tadd\trsp, " + Integer.toString((args.length - 6) * 8) + "\n");
-        for (int i = Register.registerNum() - 1; i >= 0 ; i--) {
+        for (int i = Register.registerNum() - 1; i >= 0; i--) {
             ans.append("\tpop\t" + Register.alloc(i) + "\n");
         }
         if (inst.getResult() != null) {

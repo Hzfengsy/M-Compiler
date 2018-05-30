@@ -90,12 +90,25 @@ public class Register
 
     public static Register alloc(int index) {
         switch (index) {
-            case 0: return rsi;
-            case 1: return rdi;
-            case 2: return r8;
-            case 3: return r9;
-            default: return null;
+            case 0:
+                return rdi;
+            case 1:
+                return rsi;
+            case 2:
+                return r8;
+            case 3:
+                return r9;
+            default:
+                return null;
         }
+    }
+
+    public static int allocIndex(Register reg) {
+        if (reg == rdi) return 0;
+        if (reg == rsi) return 1;
+        if (reg == r8) return 2;
+        if (reg == r9) return 3;
+        return -1;
     }
 
     public static int registerNum() {
