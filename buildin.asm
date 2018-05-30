@@ -2,14 +2,14 @@ toString:
         push    rbp
         push    rbx
         mov     ebp, edi
-        mov     edi, 11
+        mov     edi, 12
         sub     rsp, 8
         call    malloc
         mov     r8d, ebp
         mov     rbx, rax
         mov     rdi, rax
         mov     ecx, format_int
-        mov     edx, 11
+        mov     edx, 12
         mov     esi, 1
         xor     eax, eax
         call    __sprintf_chk
