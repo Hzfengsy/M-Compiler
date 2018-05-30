@@ -26,12 +26,12 @@ public class ConflictGraph
                 if (var.register != null) continue;
                 boolean flag = true;
                 for (IRVar other : conflict.get(var))
-                    if (other.register == Register.get(registerIndex)) {
+                    if (other.register == Register.alloc(registerIndex)) {
                         flag = false;
                         break;
                     }
                 if (flag) {
-                    var.register = Register.get(registerIndex);
+                    var.register = Register.alloc(registerIndex);
                 }
             }
         }

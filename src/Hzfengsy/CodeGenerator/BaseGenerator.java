@@ -200,29 +200,29 @@ public class BaseGenerator
     }
 
     private void cmpOperator(IRExpr dest, IRExpr lhs, IROperations.binaryOp op, IRExpr rhs) {
-        Register reg1 = (lhs instanceof IRVar && var2Reg((IRVar) lhs) != null) ? var2Reg((IRVar) lhs) : Register.r14;
-        Register reg2 = (rhs instanceof IRVar && var2Reg((IRVar) rhs) != null) ? var2Reg((IRVar) rhs) : Register.r15;
+        Register reg1 = (lhs instanceof IRVar && var2Reg((IRVar) lhs) != null) ? var2Reg((IRVar) lhs) : Register.rax;
+        Register reg2 = (rhs instanceof IRVar && var2Reg((IRVar) rhs) != null) ? var2Reg((IRVar) rhs) : Register.rcx;
         load(lhs, reg1);
         load(rhs, reg2);
         ans.append("\tcmp\t" + reg1 + ", " + reg2 + "\n");
-        ans.append("\t" + op.toNASM() + "\t" + "r15b" + "\n\tmovzx\t" + reg1 + ", " + "r15b" + "\n");
-        store(dest, reg1);
+        Register destReg = (dest instanceof IRVar && var2Reg((IRVar) dest) != null) ? var2Reg((IRVar) dest) : Register.rcx;
+        ans.append("\t" + op.toNASM() + "\tcl\n\tmovzx\t" + destReg + ", cl" + "\n");
+        store(dest, destReg);
     }
 
     private void divLikeOperator(IRExpr dest, IRExpr lhs, IROperations.binaryOp op, IRExpr rhs) {
         load(lhs, Register.rax);
-        load(rhs, Register.rcx);
+        Register reg2 = (rhs instanceof IRVar && var2Reg((IRVar) rhs) != null) ? var2Reg((IRVar) rhs) : Register.rcx;
+        load(rhs, reg2);
         ans.append("\txor\trdx, rdx\n");
-        ans.append("\tcqo\n\tidiv\trcx\n");
+        ans.append("\tcqo\n\tidiv\t" + reg2 + "\n");
         Register src = op.toNASM().equals("div") ? Register.rax : Register.rdx;
         store(dest, src);
     }
 
     private void shiftOperator(IRExpr dest, IRExpr lhs, IROperations.binaryOp op, IRExpr rhs) {
-        load(lhs, Register.r14);
-        load(rhs, Register.r15);
-        ans.append("\tmov\trax, r10\n");
-        ans.append("\tmov\trcx, r11\n");
+        load(lhs, Register.rax);
+        load(rhs, Register.rcx);
         ans.append("\t" + op.toNASM() + "\trax, cl\n");
         store(dest, Register.rax);
     }
@@ -300,9 +300,9 @@ public class BaseGenerator
     }
 
     private void unaryOpeartor(IRExpr dest, IROperations.unaryOp op, IRExpr rhs) {
-        load(rhs, Register.r10);
-        ans.append("\t" + op.toNASM() + "\t" + Register.r10 + "\n");
-        store(dest, Register.r10);
+        load(rhs, Register.rax);
+        ans.append("\t" + op.toNASM() + "\t" + Register.rax + "\n");
+        store(dest, Register.rax);
     }
 
     private void unaryOpeation(IRUnaryExprInstruction inst) {

@@ -87,4 +87,14 @@ public class Register
     public String toString() {
         return name;
     }
+
+    public static Register alloc(int index) {
+        switch (index) {
+            case 0: return rsi;
+            case 1: return rdi;
+            case 2: return r8;
+            case 3: return r9;
+            default: return null;
+        }
+    }
 }
