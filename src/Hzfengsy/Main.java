@@ -110,8 +110,8 @@ public class Main
         System.err.println("----------------------------");
 
         InlineOptim optim = new InlineOptim(IRProg);
-
         optim.optim();
+
         System.err.println(IRProg);
         String code = codeGenrate(IRProg);
         if (args.length > 0) writeFile(code, "code.asm");

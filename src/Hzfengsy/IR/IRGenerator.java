@@ -194,6 +194,8 @@ public class IRGenerator extends MBaseVisitor<IRBase>
                 nowBlock = ((IRNode) result).getTail();
             }
         }
+        if (!classStack.empty() && classStack.peek().getName().equals(funcName))
+            nowBlock.join(new IRRetInstruction(func.getArgs()[0]));
         func.appendNode(funcEnd);
         funcStack.pop();
         return func;
