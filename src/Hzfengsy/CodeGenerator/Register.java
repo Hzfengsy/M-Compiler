@@ -98,6 +98,14 @@ public class Register
                 return r8;
             case 3:
                 return r9;
+            case 4:
+                return r10;
+            case 5:
+                return r11;
+            case 6:
+                return r12;
+            case 7:
+                return r13;
             default:
                 return null;
         }
@@ -108,10 +116,14 @@ public class Register
         if (reg == rsi) return 1;
         if (reg == r8) return 2;
         if (reg == r9) return 3;
+        if (reg == r10) return 4;
+        if (reg == r11) return 5;
+        if (reg == r12) return 6;
+        if (reg == r13) return 7;
         return -1;
     }
 
     public static int registerNum() {
-        return 4;
+        return 8;
     }
 }

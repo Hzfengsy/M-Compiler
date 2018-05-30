@@ -402,7 +402,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             right_expr = ((IRBaseBlock) right).getResult();
         }
         else if (right instanceof IRNode) {
-            head = ((IRNode) right).getHead();
+            nowBlock.join(((IRNode) right).getHead());
             right_expr = ((IRNode) right).getResult();
             nowBlock = ((IRNode) right).getTail();
         }
@@ -478,7 +478,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             right_expr = ((IRBaseBlock) right).getResult();
         }
         else if (right instanceof IRNode) {
-            head = ((IRNode) right).getHead();
+            nowBlock.join(((IRNode) right).getHead());
             right_expr = ((IRNode) right).getResult();
             nowBlock = ((IRNode) right).getTail();
         }
