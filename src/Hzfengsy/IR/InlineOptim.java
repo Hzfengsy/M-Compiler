@@ -21,6 +21,7 @@ public class InlineOptim
 
     private boolean InlineAble(IRFuncNode funcNode) {
         int insts = 0;
+        if (funcNode.getName().equals("main")) return false;
         if (funcNode.getContainNodes().size() > 2) return false;
         for (IRBaseBlock block : funcNode.getContainNodes()) {
             for (IRBaseInstruction inst : block.getInstructions())
@@ -34,8 +35,10 @@ public class InlineOptim
     private IRExpr get(Map<IRVar, IRVar> varMap, IRExpr expr) {
         if (expr instanceof IRConst)
             return expr;
-        else if (expr instanceof IRVar)
-            return varMap.get(expr);
+        else if (expr instanceof IRVar) {
+            if (((IRVar) expr).isGlobe()) return expr;
+            else return varMap.get(expr);
+        }
         else {
             IRMem mem = (IRMem) expr;
             return new IRMem(get(varMap, mem.getAddr()), get(varMap, mem.getOffset()));
