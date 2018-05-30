@@ -7,6 +7,14 @@ public class IRLabelList
     private Map<String, IRLable> labelList = new HashMap<>();
     private Integer temp = 0;
 
+    private static IRLabelList labels = new IRLabelList();
+
+    private IRLabelList() {}
+
+    public static IRLabelList getInstance() {
+        return labels;
+    }
+
 
     public IRLable query(String name) {
         return labelList.get(name);

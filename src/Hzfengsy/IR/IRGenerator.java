@@ -22,26 +22,26 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     private Stack<UserType> classStack = new Stack<>();
     private RenameMap renameMap = RenameMap.getInstance();
     private IRVariables variables = IRVariables.getInstance();
-    private IRLabelList labels = new IRLabelList();
+    private IRLabelList labels = IRLabelList.getInstance();
     private Stack<IRBaseBlock> loopContinue = new Stack<>();
     private Stack<IRBaseBlock> loopBreak = new Stack<>();
     private TypeRecorder typeRecorder = TypeRecorder.getInstance();
     private IRBaseBlock globeVariable = new IRBaseBlock();
 
-    private Set<String> buildin = new HashSet<>();
+    private Set<String> builtin = new HashSet<>();
     private StringData stringData = StringData.getInstance();
 
-    private void initBuildIn() {
-        buildin.add("malloc");
-        buildin.add("getInt");
-        buildin.add("print");
-        buildin.add("println");
-        buildin.add("toString");
-        buildin.add("getString");
-        buildin.add("parseInt");
-        buildin.add("ord");
-        buildin.add("substring");
-        buildin.add("strcmp");
+    private void initBuiltIn() {
+        builtin.add("malloc");
+        builtin.add("getInt");
+        builtin.add("print");
+        builtin.add("println");
+        builtin.add("toString");
+        builtin.add("getString");
+        builtin.add("parseInt");
+        builtin.add("ord");
+        builtin.add("substring");
+        builtin.add("strcmp");
         IRFuncNode malloc = new IRFuncNode("malloc", true, new IRVar("size", false));
         funcNodeMap.put("malloc", malloc);
         IRFuncNode print = new IRFuncNode("print", true, new IRVar("str", false));
@@ -69,10 +69,10 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     }
 
     public IRGenerator() {
-        initBuildIn();
+        initBuiltIn();
         for (Map.Entry<String, FuncType> entry : functions.values()) {
             String funcName = entry.getKey();
-            if (buildin.contains(funcName)) continue;
+            if (builtin.contains(funcName)) continue;
             FuncType func = entry.getValue();
             IRVar[] parameter = getIRParameter(func);
             IRFuncNode function = new IRFuncNode(funcName, parameter);
@@ -114,7 +114,6 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     @Override
     public IRBase visitMain_prog(MParser.Main_progContext ctx) {
         IRBase ans = visit(ctx.prog());
-        System.err.println(ans.toString());
         return ans;
     }
 
