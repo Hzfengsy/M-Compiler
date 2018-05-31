@@ -105,9 +105,6 @@ public class Main
         else program = readTestFile("program.txt");
         semantic(program);
         IRProgNode IRProg = IRGenerate();
-        System.err.println(IRProg);
-
-        System.err.println("----------------------------");
 
         InlineOptim optim = new InlineOptim(IRProg);
         optim.optim();
