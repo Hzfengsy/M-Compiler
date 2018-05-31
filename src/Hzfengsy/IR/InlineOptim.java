@@ -40,11 +40,11 @@ public class InlineOptim
             if (((IRVar) expr).isGlobe()) return expr;
             else return varMap.get(expr);
         }
-        else {
+        else if (expr instanceof IRMem){
             IRMem mem = (IRMem) expr;
             return new IRMem(get(varMap, mem.getAddr()), get(varMap, mem.getOffset()));
         }
-
+        return null;
     }
 
     private boolean setInline(IRFuncNode funcNode, IRBaseBlock block) {
