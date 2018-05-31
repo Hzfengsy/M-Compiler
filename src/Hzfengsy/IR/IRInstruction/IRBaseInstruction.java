@@ -64,11 +64,5 @@ public abstract class IRBaseInstruction
         for (IRVar a : def)
             for (IRVar b : out)
                 if (a != b) graph.setConflict(a, b);
-//        for (IRVar a : in)
-//            for (IRVar b :in)
-//                if (a != b) graph.setConflict(a, b);
-//        for (IRVar a : out)
-//            for (IRVar b :out)
-//                if (a != b) graph.setConflict(a, b);
     }
 }

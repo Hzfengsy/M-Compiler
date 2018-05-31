@@ -243,7 +243,6 @@ public class CodeGenerator
         load(lhs, Register.rax);
         Register reg2 = (rhs instanceof IRVar && var2Reg((IRVar) rhs) != null) ? var2Reg((IRVar) rhs) : Register.rcx;
         load(rhs, reg2);
-//        ans.append("\txor\trdx, rdx\n");
         ans.append("\tcqo\n\tidiv\t" + reg2.Reg32() + "\n");
         Register src = op.toNASM().equals("div") ? Register.rax : Register.rdx;
         store(dest, src);
@@ -440,7 +439,6 @@ public class CodeGenerator
                 if (first) {
                     enterFunc();
                     storeArgs(funcNode);
-
                     first = false;
                 }
                 for (IRBaseInstruction inst : baseBlock.getInstructions()) {
