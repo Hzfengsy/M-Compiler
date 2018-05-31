@@ -218,10 +218,10 @@ public class CodeGenerator
         Register destination = Register.rax;
         load(lhs, destination);
         if (rhs instanceof IRConst) {
-            ans.append("\t" + op.toNASM() + "\t" + destination.Reg32() + ", " + rhs + "\n");
+            ans.append("\t" + op.toNASM() + "\t" + destination + ", " + rhs + "\n");
         }
         else {
-            ans.append("\t" + op.toNASM() + "\t" + destination.Reg32() + ", " + var2Str32((IRVar) rhs) + "\n");
+            ans.append("\t" + op.toNASM() + "\t" + destination + ", " + var2Str((IRVar) rhs) + "\n");
         }
         if (dest instanceof IRVar)
             store(dest, destination);
