@@ -1,20 +1,22 @@
 package Hzfengsy.CodeGenerator;
 
-import Hzfengsy.IR.*;
 import Hzfengsy.IR.IRExpr.*;
 import Hzfengsy.IR.IRInstruction.*;
 import Hzfengsy.IR.IRNode.*;
+import Hzfengsy.IR.*;
 
 import java.util.*;
 
 public class InlineOptim
 {
     private IRProgNode progNode;
-    private int threshold = 100;
+    private int threshold = 20;
 
-    //    private Map<IRFuncNode, Set<IRFuncNode>> request;
+    private Map<IRFuncNode, Set<IRFuncNode>> linkTo = new HashMap<>();
+    private Map<IRFuncNode, Integer> request = new HashMap<>();
     private Set<IRFuncNode> inlineable = new HashSet<>();
     private IRVariables variables = IRVariables.getInstance();
+    private Queue<IRFuncNode> waiting = new LinkedList<>();
 
     public InlineOptim(IRProgNode progNode) {
         this.progNode = progNode;
@@ -26,12 +28,27 @@ public class InlineOptim
         if (funcNode.getName().equals("main")) return false;
         if (funcNode.getContainNodes().size() > 2) return false;
         for (IRBaseBlock block : funcNode.getContainNodes()) {
-//            for (IRBaseInstruction inst : block.getInstructions())
-//                if (inst instanceof IRCallInstruction) return false;
+            //            for (IRBaseInstruction inst : block.getInstructions())
+            //                if (inst instanceof IRCallInstruction) return false;
             insts += block.getInstructions().size();
         }
         if (insts < threshold) return true;
         return false;
+    }
+
+    private void getRequest(IRFuncNode funcNode) {
+
+        if (funcNode.isExtend()) return;
+        int requests = 0;
+        for (IRBaseBlock block : funcNode.getContainNodes()) {
+            for (IRBaseInstruction inst : block.getInstructions())
+                if (inst instanceof IRCallInstruction) {
+                    if (!linkTo.get(((IRCallInstruction) inst).getFunc()).contains(funcNode))
+                        requests++;
+                    linkTo.get(((IRCallInstruction) inst).getFunc()).add(funcNode);
+                }
+        }
+        request.put(funcNode, requests);
     }
 
     private IRExpr get(Map<IRVar, IRVar> varMap, IRExpr expr) {
@@ -42,7 +59,7 @@ public class InlineOptim
             else if (StringData.getInstance().containLabel(expr)) return expr;
             else return varMap.get(expr);
         }
-        else if (expr instanceof IRMem){
+        else if (expr instanceof IRMem) {
             IRMem mem = (IRMem) expr;
             return new IRMem(get(varMap, mem.getAddr()), get(varMap, mem.getOffset()));
         }
@@ -65,19 +82,20 @@ public class InlineOptim
                 varMap.put(var, tempVar);
                 funcNode.addVar(tempVar);
             }
-            if (funcNode == call.getFunc()) continue;;
+            if (funcNode == call.getFunc()) continue;
+            ;
 
             flag = true;
             IRBaseBlock newBlock = new IRBaseBlock();
             for (int j = 0; j < call.getArgs().length; j++) {
                 newBlock.join(new IRUnaryExprInstruction(varMap.get(func.getArgs()[j]), IROperations.unaryOp.MOV, call.getArgs()[j]));
             }
-            for (IRBaseInstruction funcInst: func.getContainNodes().elementAt(0).getInstructions()) {
+            for (IRBaseInstruction funcInst : func.getContainNodes().elementAt(0).getInstructions()) {
                 if (funcInst instanceof IRRetInstruction) {
                     IRRetInstruction instruction = (IRRetInstruction) funcInst;
                     newBlock.join(new IRUnaryExprInstruction(call.getResult(), IROperations.unaryOp.MOV, get(varMap, instruction.getVal())));
                 }
-                else if (funcInst instanceof IRBinaryExprInstruction){
+                else if (funcInst instanceof IRBinaryExprInstruction) {
                     IRBinaryExprInstruction instruction = (IRBinaryExprInstruction) funcInst;
                     newBlock.join(new IRBinaryExprInstruction(get(varMap, instruction.getResult()), instruction.getOperator(), get(varMap, instruction.getLeft()), get(varMap, instruction.getRight())));
                 }
@@ -105,19 +123,43 @@ public class InlineOptim
 
     public void optim() {
         for (IRFuncNode func : progNode.getFuncs()) {
-            if (InlineAble(func)) inlineable.add(func);
+            linkTo.put(func, new HashSet<>());
         }
-        if (inlineable.size() == 0) return;
-        boolean flag;
-        do {
-            flag = false;
-            for (IRFuncNode func : progNode.getFuncs()) {
-                for (IRBaseBlock block : func.getContainNodes())
-                    flag |= setInline(func, block);
+        for (IRFuncNode func : progNode.getFuncs()) {
+            getRequest(func);
+        }
+        for (IRFuncNode func : progNode.getFuncs()) {
+            if (request.get(func) != null && request.get(func) == 0 && InlineAble(func))
+                waiting.offer(func);
+        }
+
+        while (!waiting.isEmpty()) {
+            IRFuncNode func = waiting.poll();
+            if (!InlineAble(func)) continue;
+            inlineable.add(func);
+            for (IRFuncNode nextFunc : linkTo.get(func)) {
+                for (IRBaseBlock block : nextFunc.getContainNodes())
+                    setInline(nextFunc, block);
+                int requests = request.get(nextFunc) - 1;
+                if (requests == 0) waiting.offer(nextFunc);
+                request.put(nextFunc, requests);
             }
-        } while (flag);
+        }
         for (IRFuncNode func : inlineable) {
             progNode.getFuncs().remove(func);
         }
+
+        //        if (inlineable.size() == 0) return;
+        //        boolean flag;
+        //        do {
+        //            flag = false;
+        //            for (IRFuncNode func : progNode.getFuncs()) {
+        //                for (IRBaseBlock block : func.getContainNodes())
+        //                    flag |= setInline(func, block);
+        //            }
+        //        } while (flag);
+        //        for (IRFuncNode func : inlineable) {
+        //            progNode.getFuncs().remove(func);
+        //        }
     }
 }
