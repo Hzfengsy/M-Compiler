@@ -1,5 +1,6 @@
-package Hzfengsy.IR;
+package Hzfengsy.CodeGenerator;
 
+import Hzfengsy.IR.*;
 import Hzfengsy.IR.IRExpr.*;
 import Hzfengsy.IR.IRInstruction.*;
 import Hzfengsy.IR.IRNode.*;
@@ -38,6 +39,7 @@ public class InlineOptim
             return expr;
         else if (expr instanceof IRVar) {
             if (((IRVar) expr).isGlobe()) return expr;
+            else if (StringData.getInstance().containLabel(expr)) return expr;
             else return varMap.get(expr);
         }
         else if (expr instanceof IRMem){

@@ -134,6 +134,23 @@ public class CodeGenerator
         }
     }
 
+    private String var2Str32(IRVar var) {
+        if (stringData.containLabel(var)) {
+            return var.getName();
+        }
+        else if (var.isGlobe()) {
+            return "dword [" + var.getName() + "]";
+        }
+        else if (RegisterAllocator.get(var) != null) {
+            return RegisterAllocator.get(var).Reg32();
+        }
+        else {
+            Integer offset = allocor.getOffset(var);
+            String offsetString = offset < 0 ? offset.toString() : "+" + offset.toString();
+            return "dword [" + Register.rbp + offsetString + "]";
+        }
+    }
+
     private void load(IRExpr var, Register reg) {
         if (var instanceof IRConst) {
             ans.append("\tmov\t" + reg + ", " + var + "\n");
@@ -201,10 +218,10 @@ public class CodeGenerator
         Register destination = Register.rax;
         load(lhs, destination);
         if (rhs instanceof IRConst) {
-            ans.append("\t" + op.toNASM() + "\t" + destination + ", " + rhs + "\n");
+            ans.append("\t" + op.toNASM() + "\t" + destination.Reg32() + ", " + rhs + "\n");
         }
         else {
-            ans.append("\t" + op.toNASM() + "\t" + destination + ", " + var2Str((IRVar) rhs) + "\n");
+            ans.append("\t" + op.toNASM() + "\t" + destination.Reg32() + ", " + var2Str32((IRVar) rhs) + "\n");
         }
         if (dest instanceof IRVar)
             store(dest, destination);
@@ -226,8 +243,8 @@ public class CodeGenerator
         load(lhs, Register.rax);
         Register reg2 = (rhs instanceof IRVar && var2Reg((IRVar) rhs) != null) ? var2Reg((IRVar) rhs) : Register.rcx;
         load(rhs, reg2);
-        ans.append("\txor\trdx, rdx\n");
-        ans.append("\tcqo\n\tidiv\t" + reg2 + "\n");
+//        ans.append("\txor\trdx, rdx\n");
+        ans.append("\tcqo\n\tidiv\t" + reg2.Reg32() + "\n");
         Register src = op.toNASM().equals("div") ? Register.rax : Register.rdx;
         store(dest, src);
     }

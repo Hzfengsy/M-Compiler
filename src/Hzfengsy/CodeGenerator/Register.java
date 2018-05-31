@@ -2,29 +2,31 @@ package Hzfengsy.CodeGenerator;
 
 public class Register
 {
-    public static Register rax = new Register("rax", 0);
-    public static Register rcx = new Register("rcx", 1);
-    public static Register rdx = new Register("rdx", 2);
-    public static Register rbx = new Register("rbx", 3);
-    public static Register rsp = new Register("rsp", 4);
-    public static Register rbp = new Register("rbp", 5);
-    public static Register rsi = new Register("rsi", 6);
-    public static Register rdi = new Register("rdi", 7);
-    public static Register r8 = new Register("r8", 8);
-    public static Register r9 = new Register("r9", 9);
-    public static Register r10 = new Register("r10", 10);
-    public static Register r11 = new Register("r11", 11);
-    public static Register r12 = new Register("r12", 12);
-    public static Register r13 = new Register("r13", 13);
-    public static Register r14 = new Register("r14", 14);
-    public static Register r15 = new Register("r15", 15);
+    public static Register rax = new Register("rax", "eax", 0);
+    public static Register rcx = new Register("rcx", "ecx", 1);
+    public static Register rdx = new Register("rdx", "edx", 2);
+    public static Register rbx = new Register("rbx", "ebx", 3);
+    public static Register rsp = new Register("rsp", "esp", 4);
+    public static Register rbp = new Register("rbp", "ebp", 5);
+    public static Register rsi = new Register("rsi", "esi", 6);
+    public static Register rdi = new Register("rdi", "edi", 7);
+    public static Register r8  = new Register("r8",  "r8d", 8);
+    public static Register r9  = new Register("r9",  "r9d", 9);
+    public static Register r10 = new Register("r10", "r10d", 10);
+    public static Register r11 = new Register("r11", "r11d", 11);
+    public static Register r12 = new Register("r12", "r12d", 12);
+    public static Register r13 = new Register("r13", "r13d", 13);
+    public static Register r14 = new Register("r14", "r14d", 14);
+    public static Register r15 = new Register("r15", "r15d", 15);
 
     private String name;
+    private String name32;
     private Integer index;
 
 
-    private Register(String name, Integer index) {
+    private Register(String name, String name32, Integer index) {
         this.name = name;
+        this.name32 = name32;
         this.index = index;
     }
 
@@ -114,6 +116,10 @@ public class Register
         if (reg == r12) return 6;
         if (reg == r13) return 7;
         return -1;
+    }
+
+    public String Reg32() {
+        return this.name32;
     }
 
     public static int registerNum() {
