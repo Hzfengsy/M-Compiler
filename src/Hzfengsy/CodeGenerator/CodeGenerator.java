@@ -434,7 +434,7 @@ public class CodeGenerator
             endLable = funcNode.getContainNodes().get(size - 1).getLabel();
             boolean first = true;
             for (int i = 0; i < funcNode.getContainNodes().size(); i++) {
-                IRBaseBlock baseBlock = funcNode.getContainNodes().elementAt(i);
+                IRBasicBlock baseBlock = funcNode.getContainNodes().elementAt(i);
                 ans.append(baseBlock.getLabel().getName() + ":\n");
                 if (first) {
                     enterFunc();

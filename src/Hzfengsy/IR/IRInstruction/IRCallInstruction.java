@@ -50,7 +50,15 @@ public class IRCallInstruction extends IRBaseInstruction
 
     @Override
     public void analyze() {
-        for (IRExpr expr : args) this.setUse(expr);
         this.setDef(result);
+        useInst();
+    }
+
+    @Override
+    public void useInst() {
+        if (!this.used) {
+            for (IRExpr expr : args) this.setUse(expr);
+            this.used = true;
+        }
     }
 }

@@ -7,16 +7,16 @@ import Hzfengsy.IR.IRNode.*;
 public class IRjumpInstruction extends IRBaseInstruction
 {
     private IRExpr expr;
-    private IRBaseBlock block;
+    private IRBasicBlock block;
     private IROperations.jmpOp op;
 
-    public IRjumpInstruction(IRExpr expr, IROperations.jmpOp op, IRBaseBlock block) {
+    public IRjumpInstruction(IRExpr expr, IROperations.jmpOp op, IRBasicBlock block) {
         this.expr = expr;
         this.block = block;
         this.op = op;
     }
 
-    public IRjumpInstruction(IRBaseBlock block) {
+    public IRjumpInstruction(IRBasicBlock block) {
         this.expr = null;
         this.block = block;
         this.op = IROperations.jmpOp.JMP;
@@ -51,12 +51,20 @@ public class IRjumpInstruction extends IRBaseInstruction
         return op;
     }
 
-    public IRBaseBlock getBlock() {
+    public IRBasicBlock getBlock() {
         return block;
     }
 
     @Override
     public void analyze() {
-        this.setUse(expr);
+        useInst();
+    }
+
+    @Override
+    public void useInst() {
+        if (!this.used) {
+            this.setUse(expr);
+            this.used = true;
+        }
     }
 }

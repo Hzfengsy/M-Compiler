@@ -23,10 +23,10 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     private RenameMap renameMap = RenameMap.getInstance();
     private IRVariables variables = IRVariables.getInstance();
     private IRLabelList labels = IRLabelList.getInstance();
-    private Stack<IRBaseBlock> loopContinue = new Stack<>();
-    private Stack<IRBaseBlock> loopBreak = new Stack<>();
+    private Stack<IRBasicBlock> loopContinue = new Stack<>();
+    private Stack<IRBasicBlock> loopBreak = new Stack<>();
     private TypeRecorder typeRecorder = TypeRecorder.getInstance();
-    private IRBaseBlock globeVariable = new IRBaseBlock();
+    private IRBasicBlock globeVariable = new IRBasicBlock();
 
     private Set<String> builtin = new HashSet<>();
     private StringData stringData = StringData.getInstance();
@@ -122,8 +122,8 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         IRProgNode ans = new IRProgNode();
         for (ParseTree x : ctx.define()) {
             IRBase define = visit(x);
-            if (define instanceof IRBaseBlock)
-                globeVariable.join((IRBaseBlock) define);
+            if (define instanceof IRBasicBlock)
+                globeVariable.join((IRBasicBlock) define);
             else if (define != null){
                 globeVariable.join(((IRNode) define).getHead());
                 globeVariable = ((IRNode) define).getTail();
@@ -155,7 +155,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         String funcName = ctx.id().getText();
         FuncType funcType;
         IRFuncNode func;
-        IRBaseBlock funcEnd = new IRBaseBlock();
+        IRBasicBlock funcEnd = new IRBasicBlock();
         funcEnd.setLabel(new IRLable("end_" + funcName));
         if (classStack.empty()) {
             funcType = functions.safeQuery(funcName);
@@ -166,12 +166,12 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             funcType = type.safeQueryFunc(funcName);
             func = funcNodeMap.get(type.getName() + "." + funcName);
         }
-        IRBaseBlock node;
+        IRBasicBlock node;
         if (funcName.equals("main")) {
             node = globeVariable;
         }
         else {
-            node = new IRBaseBlock();
+            node = new IRBasicBlock();
             node.setLabel(labels.insert(classStack.empty() ? funcName : classStack.peek().getName() + "." + funcName));
             func.appendNode(node);
             for (IRVar var : func.getArgs()) {
@@ -180,15 +180,15 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         }
 
         funcStack.push(func);
-        IRBaseBlock nowBlock = node;
+        IRBasicBlock nowBlock = node;
         for (Pair<String, BaseType> var : funcType.getVars()) {
             IRVar irVar = variables.insertVar(var.getKey(), false);
             func.addVar(irVar);
         }
         for (MParser.StatContext x : ctx.stat()) {
             IRBase result = visit(x);
-            if (result instanceof IRBaseBlock)
-                nowBlock.join((IRBaseBlock) result);
+            if (result instanceof IRBasicBlock)
+                nowBlock.join((IRBasicBlock) result);
             else if (result instanceof IRNode) {
                 nowBlock.join(((IRNode) result).getHead());
                 nowBlock = ((IRNode) result).getTail();
@@ -205,7 +205,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     public IRBase visitExpr_Stat(MParser.Expr_StatContext ctx) {
         if (ctx.expr() != null) {
             IRBase ans = visit(ctx.expr());
-            if (ans instanceof IRBaseBlock || ans instanceof IRNode) return ans;
+            if (ans instanceof IRBasicBlock || ans instanceof IRNode) return ans;
         }
         return null;
     }
@@ -220,15 +220,15 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         IROperations.unaryOp op = IROperations.unaryOp.MOV;
         if (expr instanceof IRExpr) {
             IRBaseInstruction inst = new IRUnaryExprInstruction(result, op, (IRExpr) expr);
-            return new IRBaseBlock(inst);
+            return new IRBasicBlock(inst);
         }
-        else if (expr instanceof IRBaseBlock) {
-            IRBaseBlock ans = new IRBaseBlock((IRBaseBlock) expr);
+        else if (expr instanceof IRBasicBlock) {
+            IRBasicBlock ans = new IRBasicBlock((IRBasicBlock) expr);
             ans.setLastInstResult(result);
             return ans;
         }
         else {
-            IRBaseBlock tail = ((IRNode) expr).getTail();
+            IRBasicBlock tail = ((IRNode) expr).getTail();
             IRBaseInstruction inst = new IRUnaryExprInstruction(result, op, ((IRNode) expr).getResult());
             tail.join(inst);
             return expr;
@@ -252,16 +252,16 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         IROperations.unaryOp op = IROperations.unaryOp.NEG;
         if (expr instanceof IRExpr) {
             IRBaseInstruction inst = new IRUnaryExprInstruction(result, op, (IRExpr) expr);
-            return new IRBaseBlock(inst);
+            return new IRBasicBlock(inst);
         }
-        else if (expr instanceof IRBaseBlock) {
-            IRBaseBlock ans = new IRBaseBlock((IRBaseBlock) expr);
+        else if (expr instanceof IRBasicBlock) {
+            IRBasicBlock ans = new IRBasicBlock((IRBasicBlock) expr);
             IRBaseInstruction inst = new IRUnaryExprInstruction(result, op, ans.getResult());
             ans.join(inst);
             return ans;
         }
         else {
-            IRBaseBlock ans = ((IRNode) expr).getTail();
+            IRBasicBlock ans = ((IRNode) expr).getTail();
             IRBaseInstruction inst = new IRUnaryExprInstruction(result, op, ans.getResult());
             ans.join(inst);
             return new IRNode(((IRNode) expr).getHead(), ans);
@@ -276,16 +276,16 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         IROperations.unaryOp op = IROperations.unaryOp.NOT;
         if (expr instanceof IRExpr) {
             IRBaseInstruction inst = new IRUnaryExprInstruction(result, op, (IRExpr) expr);
-            return new IRBaseBlock(inst);
+            return new IRBasicBlock(inst);
         }
-        else if (expr instanceof IRBaseBlock) {
-            IRBaseBlock ans = new IRBaseBlock((IRBaseBlock) expr);
+        else if (expr instanceof IRBasicBlock) {
+            IRBasicBlock ans = new IRBasicBlock((IRBasicBlock) expr);
             IRBaseInstruction inst = new IRUnaryExprInstruction(result, op, ans.getResult());
             ans.join(inst);
             return ans;
         }
         else {
-            IRBaseBlock ans = ((IRNode) expr).getTail();
+            IRBasicBlock ans = ((IRNode) expr).getTail();
             IRBaseInstruction inst = new IRUnaryExprInstruction(result, op, ans.getResult());
             ans.join(inst);
             return new IRNode(((IRNode) expr).getHead(), ans);
@@ -300,16 +300,16 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         IROperations.unaryOp op = IROperations.unaryOp.LNOT;
         if (expr instanceof IRExpr) {
             IRBaseInstruction inst = new IRUnaryExprInstruction(result, op, (IRExpr) expr);
-            return new IRBaseBlock(inst);
+            return new IRBasicBlock(inst);
         }
-        else if (expr instanceof IRBaseBlock) {
-            IRBaseBlock ans = new IRBaseBlock((IRBaseBlock) expr);
+        else if (expr instanceof IRBasicBlock) {
+            IRBasicBlock ans = new IRBasicBlock((IRBasicBlock) expr);
             IRBaseInstruction inst = new IRUnaryExprInstruction(result, op, ans.getResult());
             ans.join(inst);
             return ans;
         }
         else {
-            IRBaseBlock ans = ((IRNode) expr).getTail();
+            IRBasicBlock ans = ((IRNode) expr).getTail();
             IRBaseInstruction inst = new IRUnaryExprInstruction(result, op, ans.getResult());
             ans.join(inst);
             return new IRNode(((IRNode) expr).getHead(), ans);
@@ -320,16 +320,16 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     public IRBase visitAddSub(MParser.AddSubContext ctx) {
         IRBase left = visit(ctx.expr(0));
         IRBase right = visit(ctx.expr(1));
-        IRBaseBlock ans = new IRBaseBlock();
+        IRBasicBlock ans = new IRBasicBlock();
         IRExpr left_expr, right_expr;
-        if (left instanceof IRBaseBlock) {
-            ans.join((IRBaseBlock) left);
-            left_expr = ((IRBaseBlock) left).getResult();
+        if (left instanceof IRBasicBlock) {
+            ans.join((IRBasicBlock) left);
+            left_expr = ((IRBasicBlock) left).getResult();
         }
         else left_expr = (IRExpr) left;
-        if (right instanceof IRBaseBlock) {
-            ans.join((IRBaseBlock) right);
-            right_expr = ((IRBaseBlock) right).getResult();
+        if (right instanceof IRBasicBlock) {
+            ans.join((IRBasicBlock) right);
+            right_expr = ((IRBasicBlock) right).getResult();
         }
         else right_expr = (IRExpr) right;
         IRVar result = variables.insertTempVar();
@@ -350,16 +350,16 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     public IRBase visitAnd(MParser.AndContext ctx) {
         IRBase left = visit(ctx.expr(0));
         IRBase right = visit(ctx.expr(1));
-        IRBaseBlock ans = new IRBaseBlock();
+        IRBasicBlock ans = new IRBasicBlock();
         IRExpr left_expr, right_expr;
-        if (left instanceof IRBaseBlock) {
-            ans.join((IRBaseBlock) left);
-            left_expr = ((IRBaseBlock) left).getResult();
+        if (left instanceof IRBasicBlock) {
+            ans.join((IRBasicBlock) left);
+            left_expr = ((IRBasicBlock) left).getResult();
         }
         else left_expr = (IRExpr) left;
-        if (right instanceof IRBaseBlock) {
-            ans.join((IRBaseBlock) right);
-            right_expr = ((IRBaseBlock) right).getResult();
+        if (right instanceof IRBasicBlock) {
+            ans.join((IRBasicBlock) right);
+            right_expr = ((IRBasicBlock) right).getResult();
         }
         else right_expr = (IRExpr) right;
         IRVar result = variables.insertTempVar();
@@ -372,19 +372,19 @@ public class IRGenerator extends MBaseVisitor<IRBase>
 
     @Override
     public IRBase visitLAnd(MParser.LAndContext ctx) {
-        IRBaseBlock head, nowBlock;
-        IRBaseBlock setResult = new IRBaseBlock();
+        IRBasicBlock head, nowBlock;
+        IRBasicBlock setResult = new IRBasicBlock();
         setResult.setLabel(labels.insertTemp());
         funcStack.peek().appendNode(setResult);
-        IRBaseBlock end = new IRBaseBlock();
+        IRBasicBlock end = new IRBasicBlock();
         end.setLabel(labels.insertTemp());
         funcStack.peek().appendNode(end);
         IRExpr left_expr, right_expr;
 
         IRBase left = visit(ctx.expr(0));
-        if (left instanceof IRBaseBlock) {
-            nowBlock = head = new IRBaseBlock((IRBaseBlock) left);
-            left_expr = ((IRBaseBlock) left).getResult();
+        if (left instanceof IRBasicBlock) {
+            nowBlock = head = new IRBasicBlock((IRBasicBlock) left);
+            left_expr = ((IRBasicBlock) left).getResult();
         }
         else if (left instanceof IRNode) {
             head = ((IRNode) left).getHead();
@@ -392,15 +392,15 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             nowBlock = ((IRNode) left).getTail();
         }
         else {
-            nowBlock = head = new IRBaseBlock();
+            nowBlock = head = new IRBasicBlock();
             left_expr = (IRExpr) left;
         }
         nowBlock.join(new IRjumpInstruction(left_expr, IROperations.jmpOp.JZ, setResult));
 
         IRBase right = visit(ctx.expr(1));
-        if (right instanceof IRBaseBlock) {
-            nowBlock.join((IRBaseBlock) right);
-            right_expr = ((IRBaseBlock) right).getResult();
+        if (right instanceof IRBasicBlock) {
+            nowBlock.join((IRBasicBlock) right);
+            right_expr = ((IRBasicBlock) right).getResult();
         }
         else if (right instanceof IRNode) {
             nowBlock.join(((IRNode) right).getHead());
@@ -426,16 +426,16 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     public IRBase visitOr(MParser.OrContext ctx) {
         IRBase left = visit(ctx.expr(0));
         IRBase right = visit(ctx.expr(1));
-        IRBaseBlock ans = new IRBaseBlock();
+        IRBasicBlock ans = new IRBasicBlock();
         IRExpr left_expr, right_expr;
-        if (left instanceof IRBaseBlock) {
-            ans.join((IRBaseBlock) left);
-            left_expr = ((IRBaseBlock) left).getResult();
+        if (left instanceof IRBasicBlock) {
+            ans.join((IRBasicBlock) left);
+            left_expr = ((IRBasicBlock) left).getResult();
         }
         else left_expr = (IRExpr) left;
-        if (right instanceof IRBaseBlock) {
-            ans.join((IRBaseBlock) right);
-            right_expr = ((IRBaseBlock) right).getResult();
+        if (right instanceof IRBasicBlock) {
+            ans.join((IRBasicBlock) right);
+            right_expr = ((IRBasicBlock) right).getResult();
         }
         else right_expr = (IRExpr) right;
         IRVar result = variables.insertTempVar();
@@ -448,19 +448,19 @@ public class IRGenerator extends MBaseVisitor<IRBase>
 
     @Override
     public IRBase visitLOr(MParser.LOrContext ctx) {
-        IRBaseBlock head, nowBlock;
-        IRBaseBlock setResult = new IRBaseBlock();
+        IRBasicBlock head, nowBlock;
+        IRBasicBlock setResult = new IRBasicBlock();
         setResult.setLabel(labels.insertTemp());
         funcStack.peek().appendNode(setResult);
-        IRBaseBlock end = new IRBaseBlock();
+        IRBasicBlock end = new IRBasicBlock();
         end.setLabel(labels.insertTemp());
         funcStack.peek().appendNode(end);
         IRExpr left_expr, right_expr;
 
         IRBase left = visit(ctx.expr(0));
-        if (left instanceof IRBaseBlock) {
-            nowBlock = head = new IRBaseBlock((IRBaseBlock) left);
-            left_expr = ((IRBaseBlock) left).getResult();
+        if (left instanceof IRBasicBlock) {
+            nowBlock = head = new IRBasicBlock((IRBasicBlock) left);
+            left_expr = ((IRBasicBlock) left).getResult();
         }
         else if (left instanceof IRNode) {
             head = ((IRNode) left).getHead();
@@ -468,15 +468,15 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             nowBlock = ((IRNode) left).getTail();
         }
         else {
-            nowBlock = head = new IRBaseBlock();
+            nowBlock = head = new IRBasicBlock();
             left_expr = (IRExpr) left;
         }
         nowBlock.join(new IRjumpInstruction(left_expr, IROperations.jmpOp.JNZ, setResult));
 
         IRBase right = visit(ctx.expr(1));
-        if (right instanceof IRBaseBlock) {
-            nowBlock.join((IRBaseBlock) right);
-            right_expr = ((IRBaseBlock) right).getResult();
+        if (right instanceof IRBasicBlock) {
+            nowBlock.join((IRBasicBlock) right);
+            right_expr = ((IRBasicBlock) right).getResult();
         }
         else if (right instanceof IRNode) {
             nowBlock.join(((IRNode) right).getHead());
@@ -502,16 +502,16 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     public IRBase visitXor(MParser.XorContext ctx) {
         IRBase left = visit(ctx.expr(0));
         IRBase right = visit(ctx.expr(1));
-        IRBaseBlock ans = new IRBaseBlock();
+        IRBasicBlock ans = new IRBasicBlock();
         IRExpr left_expr, right_expr;
-        if (left instanceof IRBaseBlock) {
-            ans.join((IRBaseBlock) left);
-            left_expr = ((IRBaseBlock) left).getResult();
+        if (left instanceof IRBasicBlock) {
+            ans.join((IRBasicBlock) left);
+            left_expr = ((IRBasicBlock) left).getResult();
         }
         else left_expr = (IRExpr) left;
-        if (right instanceof IRBaseBlock) {
-            ans.join((IRBaseBlock) right);
-            right_expr = ((IRBaseBlock) right).getResult();
+        if (right instanceof IRBasicBlock) {
+            ans.join((IRBasicBlock) right);
+            right_expr = ((IRBasicBlock) right).getResult();
         }
         else right_expr = (IRExpr) right;
         IRVar result = variables.insertTempVar();
@@ -526,16 +526,16 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     public IRBase visitBitwise(MParser.BitwiseContext ctx) {
         IRBase left = visit(ctx.expr(0));
         IRBase right = visit(ctx.expr(1));
-        IRBaseBlock ans = new IRBaseBlock();
+        IRBasicBlock ans = new IRBasicBlock();
         IRExpr left_expr, right_expr;
-        if (left instanceof IRBaseBlock) {
-            ans.join((IRBaseBlock) left);
-            left_expr = ((IRBaseBlock) left).getResult();
+        if (left instanceof IRBasicBlock) {
+            ans.join((IRBasicBlock) left);
+            left_expr = ((IRBasicBlock) left).getResult();
         }
         else left_expr = (IRExpr) left;
-        if (right instanceof IRBaseBlock) {
-            ans.join((IRBaseBlock) right);
-            right_expr = ((IRBaseBlock) right).getResult();
+        if (right instanceof IRBasicBlock) {
+            ans.join((IRBasicBlock) right);
+            right_expr = ((IRBasicBlock) right).getResult();
         }
         else right_expr = (IRExpr) right;
         IRVar result = variables.insertTempVar();
@@ -550,16 +550,16 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     public IRBase visitEqual(MParser.EqualContext ctx) {
         IRBase left = visit(ctx.expr(0));
         IRBase right = visit(ctx.expr(1));
-        IRBaseBlock ans = new IRBaseBlock();
+        IRBasicBlock ans = new IRBasicBlock();
         IRExpr left_expr, right_expr;
-        if (left instanceof IRBaseBlock) {
-            ans.join((IRBaseBlock) left);
-            left_expr = ((IRBaseBlock) left).getResult();
+        if (left instanceof IRBasicBlock) {
+            ans.join((IRBasicBlock) left);
+            left_expr = ((IRBasicBlock) left).getResult();
         }
         else left_expr = (IRExpr) left;
-        if (right instanceof IRBaseBlock) {
-            ans.join((IRBaseBlock) right);
-            right_expr = ((IRBaseBlock) right).getResult();
+        if (right instanceof IRBasicBlock) {
+            ans.join((IRBasicBlock) right);
+            right_expr = ((IRBasicBlock) right).getResult();
         }
         else right_expr = (IRExpr) right;
         IRVar result = variables.insertTempVar();
@@ -574,16 +574,16 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     public IRBase visitCompare(MParser.CompareContext ctx) {
         IRBase left = visit(ctx.expr(0));
         IRBase right = visit(ctx.expr(1));
-        IRBaseBlock ans = new IRBaseBlock();
+        IRBasicBlock ans = new IRBasicBlock();
         IRExpr left_expr, right_expr;
-        if (left instanceof IRBaseBlock) {
-            ans.join((IRBaseBlock) left);
-            left_expr = ((IRBaseBlock) left).getResult();
+        if (left instanceof IRBasicBlock) {
+            ans.join((IRBasicBlock) left);
+            left_expr = ((IRBasicBlock) left).getResult();
         }
         else left_expr = (IRExpr) left;
-        if (right instanceof IRBaseBlock) {
-            ans.join((IRBaseBlock) right);
-            right_expr = ((IRBaseBlock) right).getResult();
+        if (right instanceof IRBasicBlock) {
+            ans.join((IRBasicBlock) right);
+            right_expr = ((IRBasicBlock) right).getResult();
         }
         else right_expr = (IRExpr) right;
         IRVar result = variables.insertTempVar();
@@ -615,16 +615,16 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     public IRBase visitMulDivMod(MParser.MulDivModContext ctx) {
         IRBase left = visit(ctx.expr(0));
         IRBase right = visit(ctx.expr(1));
-        IRBaseBlock ans = new IRBaseBlock();
+        IRBasicBlock ans = new IRBasicBlock();
         IRExpr left_expr, right_expr;
-        if (left instanceof IRBaseBlock) {
-            ans.join((IRBaseBlock) left);
-            left_expr = ((IRBaseBlock) left).getResult();
+        if (left instanceof IRBasicBlock) {
+            ans.join((IRBasicBlock) left);
+            left_expr = ((IRBasicBlock) left).getResult();
         }
         else left_expr = (IRExpr) left;
-        if (right instanceof IRBaseBlock) {
-            ans.join((IRBaseBlock) right);
-            right_expr = ((IRBaseBlock) right).getResult();
+        if (right instanceof IRBasicBlock) {
+            ans.join((IRBasicBlock) right);
+            right_expr = ((IRBasicBlock) right).getResult();
         }
         else right_expr = (IRExpr) right;
         IRVar result = variables.insertTempVar();
@@ -643,13 +643,13 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     @Override
     public IRBase visitReturn_Stat(MParser.Return_StatContext ctx) {
         if (ctx.expr() == null)
-            return new IRBaseBlock(new IRRetInstruction(null));
+            return new IRBasicBlock(new IRRetInstruction(null));
         IRBase expr = visit(ctx.expr());
-        IRBaseBlock ans = new IRBaseBlock();
+        IRBasicBlock ans = new IRBasicBlock();
         IRExpr _expr;
-        if (expr instanceof IRBaseBlock) {
-            ans.join((IRBaseBlock) expr);
-            _expr = ((IRBaseBlock) expr).getResult();
+        if (expr instanceof IRBasicBlock) {
+            ans.join((IRBasicBlock) expr);
+            _expr = ((IRBasicBlock) expr).getResult();
         }
         else if (expr instanceof IRExpr) _expr = (IRExpr) expr;
         else {
@@ -690,7 +690,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             }
             funcStack.peek().addVar(result);
             IRBaseInstruction inst = new IRUnaryExprInstruction(result, IROperations.unaryOp.MOV, new IRMem(func.getThis(), new IRConst(index)));
-            return new IRBaseBlock(inst);
+            return new IRBasicBlock(inst);
         }
         else
             return variables.query(renameMap.get(ctx));
@@ -707,11 +707,11 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         if (expr instanceof IRVar) {
             IROperations.binaryOp op = ctx.op.getText().equals("++") ? IROperations.binaryOp.ADD : IROperations.binaryOp.SUB;
             IRBaseInstruction inst = new IRBinaryExprInstruction((IRVar) expr, op, (IRExpr) expr, new IRConst(1));
-            return new IRBaseBlock(inst);
+            return new IRBasicBlock(inst);
         }
-        else if (expr instanceof IRBaseBlock) {
-            IRBaseBlock ans = new IRBaseBlock((IRBaseBlock) expr);
-            IRExpr var = ((IRBaseBlock) expr).getResult();
+        else if (expr instanceof IRBasicBlock) {
+            IRBasicBlock ans = new IRBasicBlock((IRBasicBlock) expr);
+            IRExpr var = ((IRBasicBlock) expr).getResult();
             IROperations.binaryOp op = ctx.op.getText().equals("++") ? IROperations.binaryOp.ADD : IROperations.binaryOp.SUB;
             IRBaseInstruction inst = new IRBinaryExprInstruction(var, op, var, new IRConst(1));
             ans.join(inst);
@@ -724,7 +724,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     public IRBase visitPostfix(MParser.PostfixContext ctx) {
         IRBase expr = visit(ctx.expr());
         IRVar temp = variables.insertTempVar();
-        IRBaseBlock ans = new IRBaseBlock();
+        IRBasicBlock ans = new IRBasicBlock();
         funcStack.peek().addVar(temp);
         if (expr instanceof IRExpr) {
             IRVar var = (IRVar) expr;
@@ -736,9 +736,9 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             ans.setResult(temp);
             return ans;
         }
-        else if (expr instanceof IRBaseBlock) {
-            ans.join((IRBaseBlock) expr);
-            IRExpr var = ((IRBaseBlock) expr).getResult();
+        else if (expr instanceof IRBasicBlock) {
+            ans.join((IRBasicBlock) expr);
+            IRExpr var = ((IRBasicBlock) expr).getResult();
             IRBaseInstruction tempCopy = new IRUnaryExprInstruction(temp, IROperations.unaryOp.MOV, var);
             ans.join(tempCopy);
             IROperations.binaryOp op = ctx.op.getText().equals("++") ? IROperations.binaryOp.ADD : IROperations.binaryOp.SUB;
@@ -754,18 +754,18 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     public IRBase visitAssignment(MParser.AssignmentContext ctx) {
         IRBase right = visit(ctx.expr(1));
         IRBase left = visit(ctx.expr(0));
-        IRBaseBlock ans = new IRBaseBlock();
+        IRBasicBlock ans = new IRBasicBlock();
         IRExpr left_expr;
         IRExpr right_expr;
-        if (left instanceof IRBaseBlock) {
-            ans.join((IRBaseBlock) left);
-            left_expr = ((IRBaseBlock) left).getResult();
+        if (left instanceof IRBasicBlock) {
+            ans.join((IRBasicBlock) left);
+            left_expr = ((IRBasicBlock) left).getResult();
         }
         else left_expr = (IRExpr) left;
-        if (right instanceof IRBaseBlock) {
-            ans.join((IRBaseBlock) right);
-            right_expr = ((IRBaseBlock) right).getResult();
-            if (((IRBaseBlock) right).AssignValid() && ((IRVar) right_expr).isTemp() && !(left_expr instanceof IRMem))
+        if (right instanceof IRBasicBlock) {
+            ans.join((IRBasicBlock) right);
+            right_expr = ((IRBasicBlock) right).getResult();
+            if (((IRBasicBlock) right).AssignValid() && ((IRVar) right_expr).isTemp() && !(left_expr instanceof IRMem))
                 ans.setLastInstResult(left_expr);
             else {
                 IROperations.unaryOp op = IROperations.unaryOp.MOV;
@@ -782,7 +782,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             return ans;
         }
         else {
-            IRBaseBlock tail = ((IRNode) right).getTail();
+            IRBasicBlock tail = ((IRNode) right).getTail();
             right_expr = tail.getResult();
             IROperations.unaryOp op = IROperations.unaryOp.MOV;
             IRBaseInstruction inst = new IRUnaryExprInstruction(left_expr, op, right_expr);
@@ -794,13 +794,13 @@ public class IRGenerator extends MBaseVisitor<IRBase>
 
     @Override
     public IRBase visitSegment_Stat(MParser.Segment_StatContext ctx) {
-        IRBaseBlock node = new IRBaseBlock();
+        IRBasicBlock node = new IRBasicBlock();
         IRFuncNode func = funcStack.peek();
-        IRBaseBlock nowBlock = node;
+        IRBasicBlock nowBlock = node;
         for (MParser.StatContext x : ctx.stat()) {
             IRBase result = visit(x);
-            if (result instanceof IRBaseBlock)
-                nowBlock.join((IRBaseBlock) result);
+            if (result instanceof IRBasicBlock)
+                nowBlock.join((IRBasicBlock) result);
             else if (result instanceof IRNode) {
                 nowBlock.join(((IRNode) result).getHead());
                 nowBlock = ((IRNode) result).getTail();
@@ -811,38 +811,38 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     }
 
     private IRBase forLoop(IRBase first, IRBase second, IRBase step, IRBase body) {
-        IRBaseBlock head = new IRBaseBlock();
+        IRBasicBlock head = new IRBasicBlock();
         if (first != null) {
-            if (first instanceof IRBaseBlock)
-                head.join((IRBaseBlock) first);
+            if (first instanceof IRBasicBlock)
+                head.join((IRBasicBlock) first);
         }
         IRFuncNode func = funcStack.empty() ? funcNodeMap.get("main") : funcStack.peek();
-        IRBaseBlock bodyBlock = new IRBaseBlock();
-        IRBaseBlock nowBody = bodyBlock;
+        IRBasicBlock bodyBlock = new IRBasicBlock();
+        IRBasicBlock nowBody = bodyBlock;
         bodyBlock.setLabel(labels.insertTemp());
         func.appendNode(bodyBlock);
         head.join(new IRjumpInstruction(bodyBlock));
-        IRBaseBlock stepBlock = null;
+        IRBasicBlock stepBlock = null;
         if (step != null) {
-            stepBlock = new IRBaseBlock();
+            stepBlock = new IRBasicBlock();
             stepBlock.setLabel(labels.insertTemp());
             func.appendNode(stepBlock);
             loopContinue.push(stepBlock);
-            if (step instanceof IRBaseBlock)
-                stepBlock.join((IRBaseBlock) step);
+            if (step instanceof IRBasicBlock)
+                stepBlock.join((IRBasicBlock) step);
             stepBlock.join(new IRjumpInstruction(bodyBlock));
         }
         else loopContinue.push(bodyBlock);
-        IRBaseBlock tail = new IRBaseBlock();
+        IRBasicBlock tail = new IRBasicBlock();
         loopBreak.push(tail);
         tail.setLabel(labels.insertTemp());
         if (second != null) {
             IRExpr result;
             if (second instanceof IRExpr)
                 result = (IRExpr) second;
-            else if (second instanceof IRBaseBlock) {
-                bodyBlock.join((IRBaseBlock) second);
-                result = ((IRBaseBlock) second).getResult();
+            else if (second instanceof IRBasicBlock) {
+                bodyBlock.join((IRBasicBlock) second);
+                result = ((IRBasicBlock) second).getResult();
             }
             else {
                 bodyBlock.join(((IRNode) second).getHead());
@@ -854,8 +854,8 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             IRBaseInstruction jump = new IRjumpInstruction(result, IROperations.jmpOp.JZ, tail);
             nowBody.join(jump);
         }
-        if (body instanceof IRBaseBlock) {
-            nowBody.join((IRBaseBlock) body);
+        if (body instanceof IRBasicBlock) {
+            nowBody.join((IRBasicBlock) body);
         }
         else if (((IRNode) body).getHead() == ((IRNode) body).getTail()) {
             nowBody.join(((IRNode) body).getHead());
@@ -875,38 +875,38 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     }
 
     private IRBase forLoop(IRBase first, IRBase second, IRBase step, ParseTree ctx) {
-        IRBaseBlock head = new IRBaseBlock();
+        IRBasicBlock head = new IRBasicBlock();
         if (first != null) {
-            if (first instanceof IRBaseBlock)
-                head.join((IRBaseBlock) first);
+            if (first instanceof IRBasicBlock)
+                head.join((IRBasicBlock) first);
         }
         IRFuncNode func = funcStack.peek();
-        IRBaseBlock bodyBlock = new IRBaseBlock();
-        IRBaseBlock nowBody = bodyBlock;
+        IRBasicBlock bodyBlock = new IRBasicBlock();
+        IRBasicBlock nowBody = bodyBlock;
         bodyBlock.setLabel(labels.insertTemp());
         func.appendNode(bodyBlock);
         head.join(new IRjumpInstruction(bodyBlock));
-        IRBaseBlock stepBlock = null;
+        IRBasicBlock stepBlock = null;
         if (step != null) {
-            stepBlock = new IRBaseBlock();
+            stepBlock = new IRBasicBlock();
             stepBlock.setLabel(labels.insertTemp());
             func.appendNode(stepBlock);
             loopContinue.push(stepBlock);
-            if (step instanceof IRBaseBlock)
-                stepBlock.join((IRBaseBlock) step);
+            if (step instanceof IRBasicBlock)
+                stepBlock.join((IRBasicBlock) step);
             stepBlock.join(new IRjumpInstruction(bodyBlock));
         }
         else loopContinue.push(bodyBlock);
-        IRBaseBlock tail = new IRBaseBlock();
+        IRBasicBlock tail = new IRBasicBlock();
         loopBreak.push(tail);
         tail.setLabel(labels.insertTemp());
         if (second != null) {
             IRExpr result;
             if (second instanceof IRExpr)
                 result = (IRExpr) second;
-            else if (second instanceof IRBaseBlock) {
-                bodyBlock.join((IRBaseBlock) second);
-                result = ((IRBaseBlock) second).getResult();
+            else if (second instanceof IRBasicBlock) {
+                bodyBlock.join((IRBasicBlock) second);
+                result = ((IRBasicBlock) second).getResult();
             }
             else {
                 bodyBlock.join(((IRNode) second).getHead());
@@ -922,8 +922,8 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         if (body == null) {
 
         }
-        else if (body instanceof IRBaseBlock) {
-            nowBody.join((IRBaseBlock) body);
+        else if (body instanceof IRBasicBlock) {
+            nowBody.join((IRBasicBlock) body);
         }
         else if (((IRNode) body).getHead() == ((IRNode) body).getTail()) {
             nowBody.join(((IRNode) body).getHead());
@@ -952,21 +952,21 @@ public class IRGenerator extends MBaseVisitor<IRBase>
 
     @Override
     public IRBase visitIf_Stat(MParser.If_StatContext ctx) {
-        IRBaseBlock head = new IRBaseBlock();
-        IRBaseBlock body = new IRBaseBlock();
-        IRBaseBlock now = head;
+        IRBasicBlock head = new IRBasicBlock();
+        IRBasicBlock body = new IRBasicBlock();
+        IRBasicBlock now = head;
         body.setLabel(labels.insertTemp());
         IRFuncNode func = funcStack.peek();
         func.appendNode(body);
-        IRBaseBlock tail = new IRBaseBlock();
+        IRBasicBlock tail = new IRBasicBlock();
         tail.setLabel(labels.insertTemp());
         IRBase IRCondition = visit(ctx.expr());
         IRExpr result;
         if (IRCondition instanceof IRExpr)
             result = (IRExpr) IRCondition;
-        else if (IRCondition instanceof IRBaseBlock) {
-            head.join((IRBaseBlock) IRCondition);
-            result = ((IRBaseBlock) IRCondition).getResult();
+        else if (IRCondition instanceof IRBasicBlock) {
+            head.join((IRBasicBlock) IRCondition);
+            result = ((IRBasicBlock) IRCondition).getResult();
         }
         else {
             head.join(((IRNode) IRCondition).getHead());
@@ -977,8 +977,8 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         now.join(jump);
         now.join(new IRjumpInstruction(tail));
         IRBase body_stat = visit(ctx.stat());
-        if (body_stat instanceof IRBaseBlock)
-            body.join((IRBaseBlock) body_stat);
+        if (body_stat instanceof IRBasicBlock)
+            body.join((IRBasicBlock) body_stat);
         else {
             body.join(((IRNode) body_stat).getHead());
             body = ((IRNode) body_stat).getTail();
@@ -990,24 +990,24 @@ public class IRGenerator extends MBaseVisitor<IRBase>
 
     @Override
     public IRBase visitIfElse_Stat(MParser.IfElse_StatContext ctx) {
-        IRBaseBlock head = new IRBaseBlock();
-        IRBaseBlock now = head;
-        IRBaseBlock body_1 = new IRBaseBlock();
-        IRBaseBlock body_2 = new IRBaseBlock();
+        IRBasicBlock head = new IRBasicBlock();
+        IRBasicBlock now = head;
+        IRBasicBlock body_1 = new IRBasicBlock();
+        IRBasicBlock body_2 = new IRBasicBlock();
         body_1.setLabel(labels.insertTemp());
         body_2.setLabel(labels.insertTemp());
         IRFuncNode func = funcStack.peek();
         func.appendNode(body_1);
         func.appendNode(body_2);
-        IRBaseBlock tail = new IRBaseBlock();
+        IRBasicBlock tail = new IRBasicBlock();
         tail.setLabel(labels.insertTemp());
         IRBase IRCondition = visit(ctx.expr());
         IRExpr result;
         if (IRCondition instanceof IRExpr)
             result = (IRExpr) IRCondition;
-        else if (IRCondition instanceof IRBaseBlock) {
-            head.join((IRBaseBlock) IRCondition);
-            result = ((IRBaseBlock) IRCondition).getResult();
+        else if (IRCondition instanceof IRBasicBlock) {
+            head.join((IRBasicBlock) IRCondition);
+            result = ((IRBasicBlock) IRCondition).getResult();
         }
         else {
             head.join(((IRNode) IRCondition).getHead());
@@ -1019,8 +1019,8 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         now.join(new IRjumpInstruction(body_2));
 
         IRBase body_stat_1 = visit(ctx.stat(0));
-        if (body_stat_1 instanceof IRBaseBlock)
-            body_1.join((IRBaseBlock) body_stat_1);
+        if (body_stat_1 instanceof IRBasicBlock)
+            body_1.join((IRBasicBlock) body_stat_1);
         else {
             body_1.join(((IRNode) body_stat_1).getHead());
             body_1 = ((IRNode) body_stat_1).getTail();
@@ -1028,8 +1028,8 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         body_1.join(new IRjumpInstruction(tail));
 
         IRBase body_stat_2 = visit(ctx.stat(1));
-        if (body_stat_2 instanceof IRBaseBlock)
-            body_2.join((IRBaseBlock) body_stat_2);
+        if (body_stat_2 instanceof IRBasicBlock)
+            body_2.join((IRBasicBlock) body_stat_2);
         else {
             body_2.join(((IRNode) body_stat_2).getHead());
             body_2 = ((IRNode) body_stat_2).getTail();
@@ -1046,16 +1046,16 @@ public class IRGenerator extends MBaseVisitor<IRBase>
 
     @Override
     public IRBase visitBreak_Stat(MParser.Break_StatContext ctx) {
-        IRBaseBlock tail = loopBreak.peek();
+        IRBasicBlock tail = loopBreak.peek();
         IRBaseInstruction inst = new IRjumpInstruction(tail);
-        return new IRBaseBlock(inst);
+        return new IRBasicBlock(inst);
     }
 
     @Override
     public IRBase visitContinue_Stat(MParser.Continue_StatContext ctx) {
-        IRBaseBlock tail = loopContinue.peek();
+        IRBasicBlock tail = loopContinue.peek();
         IRBaseInstruction inst = new IRjumpInstruction(tail);
-        return new IRBaseBlock(inst);
+        return new IRBasicBlock(inst);
     }
 
     @Override
@@ -1064,7 +1064,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         if (ctx.expr() != null) {
             IRBase result = visit(ctx.expr());
             if (result instanceof IRExpr) arg.addArg((IRExpr) result);
-            else if (result instanceof IRBaseBlock) arg.join((IRBaseBlock) result);
+            else if (result instanceof IRBasicBlock) arg.join((IRBasicBlock) result);
         }
         return arg;
     }
@@ -1102,7 +1102,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
                 funcStack.peek().addVar(result);
             }
         }
-        IRBaseBlock block = new IRBaseBlock(args);
+        IRBasicBlock block = new IRBasicBlock(args);
         IRBaseInstruction inst = new IRCallInstruction(result, func, args.getArgs());
         block.join(inst);
         return block;
@@ -1113,18 +1113,18 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         IRBase id = visit(ctx.expr(0));
         IRBase index = visit(ctx.expr(1));
         IRExpr id_result, index_result;
-        IRBaseBlock block = new IRBaseBlock();
+        IRBasicBlock block = new IRBasicBlock();
         if (id instanceof IRExpr)
             id_result = (IRExpr) id;
         else {
-            block.join((IRBaseBlock) id);
-            id_result = ((IRBaseBlock) id).getResult();
+            block.join((IRBasicBlock) id);
+            id_result = ((IRBasicBlock) id).getResult();
         }
         if (index instanceof IRExpr)
             index_result = (IRExpr) index;
         else {
-            block.join((IRBaseBlock) index);
-            index_result = ((IRBaseBlock) index).getResult();
+            block.join((IRBasicBlock) index);
+            index_result = ((IRBasicBlock) index).getResult();
         }
 
         if (!ASTSet.getInstance().getLeftValue(ctx)) {
@@ -1160,7 +1160,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         IRVar result = variables.insertTempVar();
         nowFunc().addVar(result);
         IRBaseInstruction inst = new IRCallInstruction(result, funcNodeMap.get("malloc"), expr.getValue());
-        IRBaseBlock baseBlock = new IRBaseBlock(inst);
+        IRBasicBlock baseBlock = new IRBasicBlock(inst);
         IRVar temp = variables.insertTempVar();
         nowFunc().addVar(temp);
         baseBlock.join(new IRUnaryExprInstruction(new IRMem(result, new IRConst(0)), IROperations.unaryOp.MOV, expr.getKey()));
@@ -1174,14 +1174,14 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         if (next instanceof IRNode)
             ((IRNode) next).getTail().join(new IRUnaryExprInstruction(addr, IROperations.unaryOp.MOV, ((IRNode) next).getResult()));
         else {
-            ((IRBaseBlock) next).join(new IRUnaryExprInstruction(addr, IROperations.unaryOp.MOV, ((IRBaseBlock) next).getResult()));
+            ((IRBasicBlock) next).join(new IRUnaryExprInstruction(addr, IROperations.unaryOp.MOV, ((IRBasicBlock) next).getResult()));
         }
         IRBaseInstruction first = new IRUnaryExprInstruction(index, IROperations.unaryOp.MOV, new IRConst(0));
         IRVar condition = variables.insertTempVar();
         nowFunc().addVar(condition);
         IRBaseInstruction second = new IRBinaryExprInstruction(condition, IROperations.binaryOp.LT, index, expr.getKey());
         IRBaseInstruction step = new IRBinaryExprInstruction(index, IROperations.binaryOp.ADD, index, new IRConst(1));
-        IRNode loop = (IRNode) forLoop(new IRBaseBlock(first), new IRBaseBlock(second), new IRBaseBlock(step), next);
+        IRNode loop = (IRNode) forLoop(new IRBasicBlock(first), new IRBasicBlock(second), new IRBasicBlock(step), next);
         baseBlock.join(loop.getHead());
         baseBlock.setResult(temp);
         IRNode ans = new IRNode(baseBlock, loop.getTail());
@@ -1191,7 +1191,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
 
     @Override
     public IRBase visitClass_new(MParser.Class_newContext ctx) {
-        IRBaseBlock baseBlock = new IRBaseBlock();
+        IRBasicBlock baseBlock = new IRBasicBlock();
         Integer length = ctx.dimension().size();
         Vector<Pair<IRExpr, IRExpr>> exprs = new Vector<>();
         String className = ctx.class_name().getText();
@@ -1219,8 +1219,8 @@ public class IRGenerator extends MBaseVisitor<IRBase>
                 if (dimension instanceof IRExpr)
                     expr = (IRExpr) dimension;
                 else {
-                    baseBlock.join((IRBaseBlock) dimension);
-                    expr = ((IRBaseBlock) dimension).getResult();
+                    baseBlock.join((IRBasicBlock) dimension);
+                    expr = ((IRBasicBlock) dimension).getResult();
                 }
                 IRVar plus = variables.insertTempVar();
                 nowFunc().addVar(plus);
@@ -1235,8 +1235,8 @@ public class IRGenerator extends MBaseVisitor<IRBase>
                 exprs.add(new Pair<>(expr, size));
             }
             IRBase result = NewStack(exprs, 0);
-            if (result instanceof IRBaseBlock) {
-                baseBlock.join((IRBaseBlock) result);
+            if (result instanceof IRBasicBlock) {
+                baseBlock.join((IRBasicBlock) result);
                 return baseBlock;
             }
             else {
@@ -1255,13 +1255,13 @@ public class IRGenerator extends MBaseVisitor<IRBase>
 
     @Override
     public IRBase visitMembervar(MParser.MembervarContext ctx) {
-        IRBaseBlock block = new IRBaseBlock();
+        IRBasicBlock block = new IRBasicBlock();
         IRBase expr = visit(ctx.expr());
         IRExpr expr_result;
         if (expr instanceof IRExpr) expr_result = (IRExpr) expr;
         else {
-            block.join((IRBaseBlock) expr);
-            expr_result = ((IRBaseBlock) expr).getResult();
+            block.join((IRBasicBlock) expr);
+            expr_result = ((IRBasicBlock) expr).getResult();
         }
         String varName = ctx.id().getText();
         BaseType Class = typeRecorder.get(ctx.expr());
@@ -1287,7 +1287,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
 
     @Override
     public IRBase visitMemberfunc(MParser.MemberfuncContext ctx) {
-        IRBaseBlock ans = new IRBaseBlock();
+        IRBasicBlock ans = new IRBasicBlock();
         String funcName = ctx.id().getText();
         IRBase expr = visit(ctx.expr());
         IRExpr expr_result;
@@ -1295,8 +1295,8 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             expr_result = (IRExpr) expr;
         }
         else {
-            ans.join((IRBaseBlock) expr);
-            expr_result = ((IRBaseBlock) expr).getResult();
+            ans.join((IRBasicBlock) expr);
+            expr_result = ((IRBasicBlock) expr).getResult();
         }
         BaseType Class = typeRecorder.get(ctx.expr());
         if (Class instanceof ArrayType) {

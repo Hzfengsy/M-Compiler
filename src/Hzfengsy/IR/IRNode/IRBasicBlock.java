@@ -3,40 +3,39 @@ package Hzfengsy.IR.IRNode;
 import Hzfengsy.IR.*;
 import Hzfengsy.IR.IRExpr.*;
 import Hzfengsy.IR.IRInstruction.*;
-import Hzfengsy.Semantic.Type.VarType.*;
 
 import java.util.*;
 
-public class IRBaseBlock extends IRBase
+public class IRBasicBlock extends IRBase
 {
     protected Vector<IRBaseInstruction> instructions = new Vector<>();
     private IRExpr result;
     private IRLable label = null;
-    private Vector<IRBaseBlock> nextNodes = new Vector<>();
+    private Vector<IRBasicBlock> nextNodes = new Vector<>();
 
     private void updateResult() {
         if (instructions.isEmpty()) return;
         result = instructions.get(instructions.size() - 1).getResult();
     }
 
-    public void appendNext(IRBaseBlock node) {
+    public void appendNext(IRBasicBlock node) {
         nextNodes.add(node);
     }
 
-    public IRBaseBlock() {}
+    public IRBasicBlock() {}
 
-    public IRBaseBlock(IRBaseBlock node) {
+    public IRBasicBlock(IRBasicBlock node) {
         instructions.addAll(node.getInstructions());
         updateResult();
     }
 
-    public IRBaseBlock(IRBaseInstruction... instructions) {
+    public IRBasicBlock(IRBaseInstruction... instructions) {
         for (IRBaseInstruction inst : instructions)
             this.instructions.add(inst);
         updateResult();
     }
 
-    public void join(IRBaseBlock node) {
+    public void join(IRBasicBlock node) {
         if (node == null) return;
         instructions.addAll(node.instructions);
         updateResult();

@@ -5,21 +5,21 @@ import Hzfengsy.IR.IRExpr.*;
 
 public class IRNode extends IRBase
 {
-    private IRBaseBlock head;
-    private IRBaseBlock tail;
+    private IRBasicBlock head;
+    private IRBasicBlock tail;
     private IRExpr result;
 
-    public IRNode(IRBaseBlock head, IRBaseBlock tail) {
+    public IRNode(IRBasicBlock head, IRBasicBlock tail) {
         this.head = head;
         this.tail = tail;
         result = tail.getResult();
     }
 
-    public IRBaseBlock getHead() {
+    public IRBasicBlock getHead() {
         return head;
     }
 
-    public IRBaseBlock getTail() {
+    public IRBasicBlock getTail() {
         return tail;
     }
 

@@ -27,7 +27,7 @@ public class InlineOptim
         if (funcNode.isExtend()) return false;
         if (funcNode.getName().equals("main")) return false;
         if (funcNode.getContainNodes().size() > 2) return false;
-        for (IRBaseBlock block : funcNode.getContainNodes()) {
+        for (IRBasicBlock block : funcNode.getContainNodes()) {
             //            for (IRBaseInstruction inst : block.getInstructions())
             //                if (inst instanceof IRCallInstruction) return false;
             insts += block.getInstructions().size();
@@ -40,7 +40,7 @@ public class InlineOptim
 
         if (funcNode.isExtend()) return;
         int requests = 0;
-        for (IRBaseBlock block : funcNode.getContainNodes()) {
+        for (IRBasicBlock block : funcNode.getContainNodes()) {
             for (IRBaseInstruction inst : block.getInstructions())
                 if (inst instanceof IRCallInstruction) {
                     if (!linkTo.get(((IRCallInstruction) inst).getFunc()).contains(funcNode))
@@ -66,7 +66,7 @@ public class InlineOptim
         return null;
     }
 
-    private boolean setInline(IRFuncNode funcNode, IRBaseBlock block) {
+    private boolean setInline(IRFuncNode funcNode, IRBasicBlock block) {
         Vector<IRBaseInstruction> insts = block.getInstructions();
         boolean flag = false;
         for (int i = 0; i < insts.size(); i++) {
@@ -86,7 +86,7 @@ public class InlineOptim
             ;
 
             flag = true;
-            IRBaseBlock newBlock = new IRBaseBlock();
+            IRBasicBlock newBlock = new IRBasicBlock();
             for (int j = 0; j < call.getArgs().length; j++) {
                 newBlock.join(new IRUnaryExprInstruction(varMap.get(func.getArgs()[j]), IROperations.unaryOp.MOV, call.getArgs()[j]));
             }
@@ -138,7 +138,7 @@ public class InlineOptim
             if (!InlineAble(func)) continue;
             inlineable.add(func);
             for (IRFuncNode nextFunc : linkTo.get(func)) {
-                for (IRBaseBlock block : nextFunc.getContainNodes())
+                for (IRBasicBlock block : nextFunc.getContainNodes())
                     setInline(nextFunc, block);
                 int requests = request.get(nextFunc) - 1;
                 if (requests == 0) waiting.offer(nextFunc);
@@ -154,7 +154,7 @@ public class InlineOptim
         //        do {
         //            flag = false;
         //            for (IRFuncNode func : progNode.getFuncs()) {
-        //                for (IRBaseBlock block : func.getContainNodes())
+        //                for (IRBasicBlock block : func.getContainNodes())
         //                    flag |= setInline(func, block);
         //            }
         //        } while (flag);

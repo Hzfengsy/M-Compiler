@@ -30,6 +30,14 @@ public class IRRetInstruction extends IRBaseInstruction
 
     @Override
     public void analyze() {
-        this.setUse(right);
+        useInst();
+    }
+
+    @Override
+    public void useInst() {
+        if (!this.used) {
+            this.setUse(right);
+            this.used = true;
+        }
     }
 }

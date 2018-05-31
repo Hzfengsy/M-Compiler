@@ -15,7 +15,8 @@ public abstract class IRBaseInstruction
     private Set<IRVar> out = new HashSet<>();
     public Set<IRBaseInstruction> succ = new HashSet<>();
     private Set<IRVar> use = new HashSet<>();
-    private Set<IRVar> def = new HashSet<>();
+    private IRVar def = null;
+    protected boolean used = false;
 
     public abstract void analyze();
 
@@ -30,10 +31,12 @@ public abstract class IRBaseInstruction
     void setDef(IRExpr expr) {
         if (expr == null) return;
         if (expr instanceof IRVar)
-            this.def.add((IRVar) expr);
+            this.def = (IRVar) expr;
         else if (expr instanceof IRMem)
             this.use.addAll(((IRMem) expr).getUse());
     }
+
+    public abstract void useInst();
 
     private boolean setEqual(Set<IRVar> lhs, Set<IRVar> rhs) {
         if (lhs.size() != rhs.size()) return false;
@@ -49,9 +52,10 @@ public abstract class IRBaseInstruction
         Set<IRVar> _out = new HashSet<>();
         _out.addAll(out);
         in.clear();
+        if (out.contains(def)) useInst();
         in.addAll(use);
         for (IRVar var : out) {
-            if (!def.contains(var)) in.add(var);
+            if (!var.equals(def)) in.add(var);
         }
         out.clear();
         for (IRBaseInstruction inst : succ) {
@@ -61,8 +65,12 @@ public abstract class IRBaseInstruction
     }
 
     public void setConflict(ConflictGraph graph) {
-        for (IRVar a : def)
-            for (IRVar b : out)
-                if (a != b) graph.setConflict(a, b);
+        if (def == null) return;
+        for (IRVar b : out)
+            if (!def.equals(b)) graph.setConflict(def, b);
+    }
+
+    public boolean isUsed() {
+        return used;
     }
 }

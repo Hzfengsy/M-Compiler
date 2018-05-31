@@ -32,7 +32,7 @@ public class IRVar extends IRExpr
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         IRVar var = (IRVar) o;
-        return var.toString().equals(o.toString());
+        return this.toString().equals(var.toString());
     }
 
     @Override

@@ -38,7 +38,17 @@ public class IRUnaryExprInstruction extends IRBaseInstruction
 
     @Override
     public void analyze() {
-        this.setUse(right);
         this.setDef(result);
+        if (result instanceof IRMem || (result instanceof IRVar && ((IRVar) result).isGlobe())) {
+            useInst();
+        }
+    }
+
+    @Override
+    public void useInst() {
+        if (!this.used) {
+            this.setUse(right);
+            this.used = true;
+        }
     }
 }

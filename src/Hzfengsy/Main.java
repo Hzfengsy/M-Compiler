@@ -109,8 +109,8 @@ public class Main
         InlineOptim optim = new InlineOptim(IRProg);
         optim.optim();
 
-        System.err.println(IRProg);
         String code = codeGenrate(IRProg);
+        System.err.println(IRProg);
         if (args.length > 0) writeFile(code, "code.asm");
         else System.out.println(code);
         System.err.println(RegisterAllocator.print());

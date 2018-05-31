@@ -12,14 +12,14 @@ public class LivenessAnalyzer
     private ConflictGraph graph = new ConflictGraph();
 
     private void getSucc(IRFuncNode funcNode) {
-        for (IRBaseBlock baseBlock : funcNode.getContainNodes()) {
+        for (IRBasicBlock baseBlock : funcNode.getContainNodes()) {
             Vector<IRBaseInstruction> blockInsts = baseBlock.getInstructions();
             instructions.addAll(blockInsts);
             for (int i = 0; i < blockInsts.size(); i++) {
                 IRBaseInstruction inst = blockInsts.elementAt(i);
                 if (inst instanceof IRjumpInstruction) {
                     IRjumpInstruction jmpInst = (IRjumpInstruction) inst;
-                    if (jmpInst.getBlock().getInstructions().size() >0 )
+                    if (jmpInst.getBlock().getInstructions().size() > 0)
                         inst.succ.add(jmpInst.getBlock().getInstructions().elementAt(0));
                     if (jmpInst.getOp() != IROperations.jmpOp.JMP) {
                         if (i < blockInsts.size() - 1)
@@ -50,8 +50,31 @@ public class LivenessAnalyzer
             for (IRBaseInstruction instruction : instructions)
                 flag &= instruction.update();
         } while (!flag);
-        for (IRBaseInstruction instruction : instructions)
-            instruction.setConflict(graph);
+        for (IRBasicBlock block : funcNode.getContainNodes()) {
+            Vector<IRBaseInstruction> insts = block.getInstructions();
+            for (int i = 0 ; i < insts.size(); i++) {
+                IRBaseInstruction inst = insts.elementAt(i);
+                if (inst.isUsed()) inst.setConflict(graph);
+                else {
+                    block.getInstructions().remove(inst);
+                    i--;
+                }
+            }
+        }
+        for (IRBasicBlock block : funcNode.getContainNodes()) {
+            Vector<IRBaseInstruction> insts = block.getInstructions();
+            for (int i = 0 ; i < insts.size(); i++) {
+                IRBaseInstruction inst = insts.elementAt(i);
+                if (inst.isUsed()) inst.setConflict(graph);
+                else {
+                    block.getInstructions().remove(inst);
+                    i--;
+                }
+            }
+
+        }
+
+
         graph.allocate();
     }
 

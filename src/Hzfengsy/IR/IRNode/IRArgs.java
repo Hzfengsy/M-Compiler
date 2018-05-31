@@ -1,12 +1,10 @@
 package Hzfengsy.IR.IRNode;
 
-import Hzfengsy.IR.*;
 import Hzfengsy.IR.IRExpr.*;
-import Hzfengsy.IR.IRInstruction.*;
 
 import java.util.*;
 
-public class IRArgs extends IRBaseBlock
+public class IRArgs extends IRBasicBlock
 {
     private Vector<IRExpr> args = new Vector<>();
 
@@ -16,7 +14,7 @@ public class IRArgs extends IRBaseBlock
         this.args.addAll(other.args);
     }
 
-    public IRArgs(IRBaseBlock other) {
+    public IRArgs(IRBasicBlock other) {
         instructions.addAll(other.getInstructions());
         this.args.add(other.getResult());
     }
@@ -27,7 +25,7 @@ public class IRArgs extends IRBaseBlock
         this.args.addAll(args.args);
     }
 
-    public void join(IRBaseBlock block) {
+    public void join(IRBasicBlock block) {
         if (args == null) return;
         instructions.addAll(block.instructions);
         this.args.add(block.getResult());
