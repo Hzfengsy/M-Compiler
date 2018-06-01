@@ -914,7 +914,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
                 nowBody = ((IRNode) second).getTail();
             }
             IRVar tempResult = variables.insertTempVar();
-            funcStack.peek().addVar(tempResult);
+            (funcStack.empty() ? funcNodeMap.get("main") : funcStack.peek()).addVar(tempResult);
             IRBaseInstruction jump = new IRjumpInstruction(result, IROperations.jmpOp.JZ, tail);
             nowBody.join(jump);
         }
@@ -1099,7 +1099,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         else {
             if (!(functions.safeQuery(funcName).getReturnType() instanceof VoidType)) {
                 result = variables.insertTempVar();
-                funcStack.peek().addVar(result);
+                (funcStack.empty() ? funcNodeMap.get("main") : funcStack.peek()).addVar(result);
             }
         }
         IRBasicBlock block = new IRBasicBlock(args);
