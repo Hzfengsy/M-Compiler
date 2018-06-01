@@ -81,4 +81,8 @@ public abstract class IRBaseInstruction
     public boolean isUsed() {
         return used;
     }
+
+    public void updateLive() {
+        for (IRVar var : out) var.updateLive();
+    }
 }

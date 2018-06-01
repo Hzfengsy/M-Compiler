@@ -56,6 +56,7 @@ public class LivenessAnalyzer
             Vector<IRBaseInstruction> insts = block.getInstructions();
             for (int i = 0; i < insts.size(); i++) {
                 IRBaseInstruction inst = insts.elementAt(i);
+                inst.updateLive();
                 inst.setConflict(graph);
             }
         }

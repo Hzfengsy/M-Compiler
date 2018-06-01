@@ -1,13 +1,12 @@
 package Hzfengsy.IR.IRExpr;
 
-import Hzfengsy.CodeGenerator.*;
-
 import java.util.regex.*;
 
-public class IRVar extends IRExpr
+public class IRVar extends IRExpr implements Comparable
 {
     private String name;
     private Boolean globe;
+    private Integer liveTime = 0;
 
     public IRVar(String name, Boolean globe) {
         this.name = name;
@@ -43,5 +42,17 @@ public class IRVar extends IRExpr
     public boolean isTemp() {
         Pattern pattern = Pattern.compile("[0-9]*");
         return pattern.matcher(name).matches();
+    }
+
+    public void updateLive() {
+        liveTime++;
+    }
+
+
+    @Override
+    public int compareTo(Object o) {
+        IRVar var = (IRVar) o;
+        if (this.liveTime == var.liveTime) return 0;
+        return this.liveTime > var.liveTime ? 1 : -1;
     }
 }

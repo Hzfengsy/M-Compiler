@@ -8,7 +8,7 @@ import java.util.*;
 public class ConflictGraph
 {
     private Map<IRVar, Set<IRVar>> conflict = new HashMap<>();
-    private Set<IRVar> unhandled = new HashSet<>();
+    private List<IRVar> unhandled = new ArrayList<>();
     private final int regs = Register.registerNum();
     private StringData stringData = StringData.getInstance();
 
@@ -26,6 +26,7 @@ public class ConflictGraph
     }
 
     public void allocate() {
+        Collections.sort(unhandled);
         for (int registerIndex = 0; registerIndex < regs; registerIndex++) {
             for (IRVar var : unhandled) {
                 if (RegisterAllocator.get(var) != null) continue;
