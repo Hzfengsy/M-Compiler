@@ -66,6 +66,8 @@ public class LivenessAnalyzer
             instruction.analyze();
         }
 
+        if (funcNode.getUsedVar().size() > 300) return;
+
         do {
             flag = true;
             for (IRBaseInstruction instruction : instructions)
