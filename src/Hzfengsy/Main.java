@@ -108,6 +108,7 @@ public class Main
 
         InlineOptim optim = new InlineOptim(IRProg);
         optim.optim();
+//        System.err.println(IRProg);
 
         String code = codeGenrate(IRProg);
         System.err.println(IRProg);

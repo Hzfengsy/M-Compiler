@@ -70,6 +70,14 @@ public abstract class IRBaseInstruction
             if (!def.equals(b)) graph.setConflict(def, b);
     }
 
+    public void clear() {
+        def = null;
+        in.clear();
+        out.clear();
+        use.clear();
+        used = false;
+    }
+
     public boolean isUsed() {
         return used;
     }

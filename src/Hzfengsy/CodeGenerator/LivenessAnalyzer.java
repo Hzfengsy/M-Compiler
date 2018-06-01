@@ -42,8 +42,10 @@ public class LivenessAnalyzer
         getSucc(funcNode);
         for (IRVar var : funcNode.getUsedVar())
             graph.setVar(var);
-        for (IRBaseInstruction instruction : instructions)
+        for (IRBaseInstruction instruction : instructions) {
             instruction.analyze();
+            instruction.useInst();
+        }
         boolean flag;
         do {
             flag = true;
@@ -52,30 +54,33 @@ public class LivenessAnalyzer
         } while (!flag);
         for (IRBasicBlock block : funcNode.getContainNodes()) {
             Vector<IRBaseInstruction> insts = block.getInstructions();
-            for (int i = 0 ; i < insts.size(); i++) {
+            for (int i = 0; i < insts.size(); i++) {
                 IRBaseInstruction inst = insts.elementAt(i);
-                if (inst.isUsed()) inst.setConflict(graph);
-                else {
-                    block.getInstructions().remove(inst);
-                    i--;
-                }
+                inst.setConflict(graph);
             }
         }
+        graph.allocate();
+
+        for (IRBaseInstruction instruction : instructions) {
+            instruction.clear();
+            instruction.analyze();
+        }
+
+        do {
+            flag = true;
+            for (IRBaseInstruction instruction : instructions)
+                flag &= instruction.update();
+        } while (!flag);
         for (IRBasicBlock block : funcNode.getContainNodes()) {
             Vector<IRBaseInstruction> insts = block.getInstructions();
-            for (int i = 0 ; i < insts.size(); i++) {
+            for (int i = 0; i < insts.size(); i++) {
                 IRBaseInstruction inst = insts.elementAt(i);
-                if (inst.isUsed()) inst.setConflict(graph);
-                else {
+                if (!inst.isUsed())  {
                     block.getInstructions().remove(inst);
                     i--;
                 }
             }
-
         }
-
-
-        graph.allocate();
     }
 
 

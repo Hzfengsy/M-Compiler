@@ -2,8 +2,6 @@ package Hzfengsy.CodeGenerator;
 
 import Hzfengsy.IR.IRExpr.*;
 
-import javax.swing.text.html.parser.*;
-import java.security.*;
 import java.util.*;
 
 public class RegisterAllocator
