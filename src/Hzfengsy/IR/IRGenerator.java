@@ -332,6 +332,15 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             right_expr = ((IRBasicBlock) right).getResult();
         }
         else right_expr = (IRExpr) right;
+        if (left_expr instanceof IRConst && right_expr instanceof IRConst) {
+            Integer left_value = ((IRConst) left_expr).getValue();
+            Integer right_value = ((IRConst) right_expr).getValue();
+            Integer answer;
+            if (ctx.op.getText().equals("+"))
+                answer = left_value + right_value;
+            else answer = left_value - right_value;
+            return new IRConst(answer);
+        }
         IRVar result = variables.insertTempVar();
         (funcStack.empty() ? funcNodeMap.get("main") : funcStack.peek()).addVar(result);
         if (typeRecorder.get(ctx.expr(0)) instanceof StringType || typeRecorder.get(ctx.expr(1)) instanceof StringType) {
@@ -627,6 +636,17 @@ public class IRGenerator extends MBaseVisitor<IRBase>
             right_expr = ((IRBasicBlock) right).getResult();
         }
         else right_expr = (IRExpr) right;
+        if (left_expr instanceof IRConst && right_expr instanceof IRConst) {
+            Integer left_value = ((IRConst) left_expr).getValue();
+            Integer right_value = ((IRConst) right_expr).getValue();
+            Integer answer;
+            if (ctx.op.getText().equals("*"))
+                answer = left_value * right_value;
+            else if (ctx.op.getText().equals("/"))
+                answer = left_value / right_value;
+            else answer = left_value % right_value;
+            return new IRConst(answer);
+        }
         IRVar result = variables.insertTempVar();
         (funcStack.empty() ? funcNodeMap.get("main") : funcStack.peek()).addVar(result);
         IROperations.binaryOp op;

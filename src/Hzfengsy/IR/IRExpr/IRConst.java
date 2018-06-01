@@ -11,4 +11,8 @@ public class IRConst extends IRExpr
     public String toString() {
         return value.toString();
     }
+
+    public Integer getValue() {
+        return value;
+    }
 }
