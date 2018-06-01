@@ -101,6 +101,7 @@ public class InlineOptim
                 }
                 else if (funcInst instanceof IRUnaryExprInstruction) {
                     IRUnaryExprInstruction instruction = (IRUnaryExprInstruction) funcInst;
+                    if (instruction.getResult() == instruction.getRight()) continue;
                     newBlock.join(new IRUnaryExprInstruction(get(varMap, instruction.getResult()), instruction.getOperator(), get(varMap, instruction.getRight())));
                 }
                 else if (funcInst instanceof IRCallInstruction) {
