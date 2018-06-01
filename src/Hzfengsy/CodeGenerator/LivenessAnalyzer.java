@@ -36,8 +36,8 @@ public class LivenessAnalyzer
     }
 
     public void analyze(IRFuncNode funcNode) {
-        if (funcNode.getUsedVar().size() > 700) return;
         if (funcNode.isExtend()) return;
+        if (funcNode.getUsedVar().size() > 800) return;
         instructions.clear();
         getSucc(funcNode);
         for (IRVar var : funcNode.getUsedVar())
