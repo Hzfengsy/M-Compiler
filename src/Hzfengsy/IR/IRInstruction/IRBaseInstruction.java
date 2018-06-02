@@ -93,4 +93,16 @@ public abstract class IRBaseInstruction
     public void updateLive() {
         for (IRVar var : out) var.updateLive();
     }
+
+    public Set<IRVar> getOut() {
+        return out;
+    }
+
+    public IRVar getDef() {
+        return def;
+    }
+
+    public Set<IRVar> getIn() {
+        return in;
+    }
 }

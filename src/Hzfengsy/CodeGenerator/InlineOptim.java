@@ -26,8 +26,8 @@ public class InlineOptim
         int insts = 0;
         if (funcNode.isExtend()) return false;
         if (funcNode.getName().equals("main")) return false;
-        if (funcNode.getContainNodes().size() > 2) return false;
-        for (IRBasicBlock block : funcNode.getContainNodes()) {
+        if (funcNode.getContainBlocks().size() > 2) return false;
+        for (IRBasicBlock block : funcNode.getContainBlocks()) {
             //            for (IRBaseInstruction inst : block.getInstructions())
             //                if (inst instanceof IRCallInstruction) return false;
             insts += block.getInstructions().size();
@@ -40,7 +40,7 @@ public class InlineOptim
 
         if (funcNode.isExtend()) return;
         int requests = 0;
-        for (IRBasicBlock block : funcNode.getContainNodes()) {
+        for (IRBasicBlock block : funcNode.getContainBlocks()) {
             for (IRBaseInstruction inst : block.getInstructions())
                 if (inst instanceof IRCallInstruction) {
                     if (!linkTo.get(((IRCallInstruction) inst).getFunc()).contains(funcNode))
@@ -75,7 +75,7 @@ public class InlineOptim
             IRCallInstruction call = (IRCallInstruction) inst;
             if (!inlineable.contains(call.getFunc())) continue;
             IRFuncNode func = call.getFunc();
-            if (func.getContainNodes().size() == 0) continue;
+            if (func.getContainBlocks().size() == 0) continue;
             Map<IRVar, IRVar> varMap = new HashMap<>();
             for (IRVar var : func.getUsedVar()) {
                 IRVar tempVar = variables.insertTempVar();
@@ -90,7 +90,7 @@ public class InlineOptim
             for (int j = 0; j < call.getArgs().length; j++) {
                 newBlock.join(new IRUnaryExprInstruction(varMap.get(func.getArgs()[j]), IROperations.unaryOp.MOV, call.getArgs()[j]));
             }
-            for (IRBaseInstruction funcInst : func.getContainNodes().elementAt(0).getInstructions()) {
+            for (IRBaseInstruction funcInst : func.getContainBlocks().elementAt(0).getInstructions()) {
                 if (funcInst instanceof IRRetInstruction) {
                     IRRetInstruction instruction = (IRRetInstruction) funcInst;
                     newBlock.join(new IRUnaryExprInstruction(call.getResult(), IROperations.unaryOp.MOV, get(varMap, instruction.getVal())));
@@ -139,7 +139,7 @@ public class InlineOptim
             if (!InlineAble(func)) continue;
             inlineable.add(func);
             for (IRFuncNode nextFunc : linkTo.get(func)) {
-                for (IRBasicBlock block : nextFunc.getContainNodes())
+                for (IRBasicBlock block : nextFunc.getContainBlocks())
                     setInline(nextFunc, block);
                 int requests = request.get(nextFunc) - 1;
                 if (requests == 0) waiting.offer(nextFunc);
@@ -151,7 +151,7 @@ public class InlineOptim
         }
 
         for (IRFuncNode func : progNode.getFuncs())
-            for (IRBasicBlock block : func.getContainNodes())
+            for (IRBasicBlock block : func.getContainBlocks())
                 block.updateLink();
 
     }

@@ -102,4 +102,8 @@ public class IRBasicBlock extends IRBase
         return linkTo = linkTo.updateLink();
     }
 
+    public void linkTo(IRBasicBlock block) {
+        linkTo = block;
+    }
+
 }

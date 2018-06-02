@@ -134,23 +134,6 @@ public class CodeGenerator
         }
     }
 
-    private String var2Str32(IRVar var) {
-        if (stringData.containLabel(var)) {
-            return var.getName();
-        }
-        else if (var.isGlobe()) {
-            return "dword [" + var.getName() + "]";
-        }
-        else if (RegisterAllocator.get(var) != null) {
-            return RegisterAllocator.get(var).Reg32();
-        }
-        else {
-            Integer offset = allocor.getOffset(var);
-            String offsetString = offset < 0 ? offset.toString() : "+" + offset.toString();
-            return "dword [" + Register.rbp + offsetString + "]";
-        }
-    }
-
     private void load(IRExpr var, Register reg) {
         if (var instanceof IRConst) {
             ans.append("\tmov\t" + reg + ", " + var + "\n");
@@ -427,14 +410,14 @@ public class CodeGenerator
             analyzer.analyze(funcNode);
         ans.append(readFile("buildin.asm"));
         for (IRFuncNode funcNode : program.getFuncs()) {
-            if (funcNode.getContainNodes().size() == 0) continue;
+            if (funcNode.getContainBlocks().size() == 0) continue;
             funcNode.allocStack();
             allocor = funcNode.getAlloc();
-            Integer size = funcNode.getContainNodes().size();
-            endLable = funcNode.getContainNodes().get(size - 1).getLabel();
+            Integer size = funcNode.getContainBlocks().size();
+            endLable = funcNode.getContainBlocks().get(size - 1).getLabel();
             boolean first = true;
-            for (int i = 0; i < funcNode.getContainNodes().size(); i++) {
-                IRBasicBlock baseBlock = funcNode.getContainNodes().elementAt(i);
+            for (int i = 0; i < funcNode.getContainBlocks().size(); i++) {
+                IRBasicBlock baseBlock = funcNode.getContainBlocks().elementAt(i);
                 ans.append(baseBlock.getLabel().getName() + ":\n");
                 if (first) {
                     enterFunc();
@@ -449,14 +432,14 @@ public class CodeGenerator
                     else if (inst instanceof IRjumpInstruction) {
                         if (inst == baseBlock.getInstructions().elementAt(baseBlock.getInstructions().size() - 1)
                             && ((IRjumpInstruction) inst).getExpr() == null
-                            && i < funcNode.getContainNodes().size() - 1
-                            && ((IRjumpInstruction) inst).getBlock() == funcNode.getContainNodes().elementAt(i + 1))
+                            && i < funcNode.getContainBlocks().size() - 1
+                            && ((IRjumpInstruction) inst).getBlock() == funcNode.getContainBlocks().elementAt(i + 1))
                             continue;
                         jumpOperator((IRjumpInstruction) inst);
                     }
                     else if (inst instanceof IRRetInstruction) {
                         if (inst == baseBlock.getInstructions().elementAt(baseBlock.getInstructions().size() - 1)
-                            && i == funcNode.getContainNodes().size() - 1)
+                            && i == funcNode.getContainBlocks().size() - 1)
                             continue;
                         retOperator((IRRetInstruction) inst);
                     }

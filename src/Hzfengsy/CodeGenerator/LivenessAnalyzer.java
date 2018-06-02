@@ -12,7 +12,7 @@ public class LivenessAnalyzer
     private ConflictGraph graph = new ConflictGraph();
 
     private void getSucc(IRFuncNode funcNode) {
-        for (IRBasicBlock baseBlock : funcNode.getContainNodes()) {
+        for (IRBasicBlock baseBlock : funcNode.getContainBlocks()) {
             Vector<IRBaseInstruction> blockInsts = baseBlock.getInstructions();
             instructions.addAll(blockInsts);
             for (int i = 0; i < blockInsts.size(); i++) {
@@ -49,10 +49,10 @@ public class LivenessAnalyzer
         boolean flag;
         do {
             flag = true;
-            for (int i = instructions.size() - 1; i >= 0 ;i--)
+            for (int i = instructions.size() - 1; i >= 0; i--)
                 flag &= instructions.elementAt(i).update();
         } while (!flag);
-        for (IRBasicBlock block : funcNode.getContainNodes()) {
+        for (IRBasicBlock block : funcNode.getContainBlocks()) {
             Vector<IRBaseInstruction> insts = block.getInstructions();
             for (int i = 0; i < insts.size(); i++) {
                 IRBaseInstruction inst = insts.elementAt(i);
@@ -63,7 +63,6 @@ public class LivenessAnalyzer
         graph.allocate();
 
 
-
         if (funcNode.getUsedVar().size() > 300) return;
         for (IRBaseInstruction instruction : instructions) {
             instruction.clear();
@@ -72,14 +71,19 @@ public class LivenessAnalyzer
 
         do {
             flag = true;
-            for (int i = instructions.size() - 1; i >= 0 ;i--)
+            for (int i = instructions.size() - 1; i >= 0; i--)
                 flag &= instructions.elementAt(i).update();
         } while (!flag);
-        for (IRBasicBlock block : funcNode.getContainNodes()) {
+        for (IRSuperBlock superBlock : funcNode.getSuperBlocks())
+            if (!superBlock.analyze())
+                for (IRBasicBlock block : superBlock.getBlocks())
+                    funcNode.getContainBlocks().remove(block);
+
+        for (IRBasicBlock block : funcNode.getContainBlocks()) {
             Vector<IRBaseInstruction> insts = block.getInstructions();
             for (int i = 0; i < insts.size(); i++) {
                 IRBaseInstruction inst = insts.elementAt(i);
-                if (!inst.isUsed())  {
+                if (!inst.isUsed()) {
                     block.getInstructions().remove(inst);
                     i--;
                 }

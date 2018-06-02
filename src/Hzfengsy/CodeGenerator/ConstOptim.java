@@ -24,7 +24,7 @@ public class ConstOptim
 
     public void optim() {
         for (IRFuncNode funcNode : progNode.getFuncs())
-            for (IRBasicBlock block : funcNode.getContainNodes()) {
+            for (IRBasicBlock block : funcNode.getContainBlocks()) {
                 constVar.clear();
 
                 for (int i = 0; i < block.getInstructions().size(); i++) {

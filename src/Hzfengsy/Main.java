@@ -99,7 +99,7 @@ public class Main
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         String program;
         if (args.length > 0) program = readTestFile(args[0]);
         else program = readTestFile("program.txt");

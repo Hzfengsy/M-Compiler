@@ -10,7 +10,8 @@ public class IRFuncNode extends IRBase
 {
     private String funcName;
     private IRVar[] args;
-    private Vector<IRBasicBlock> containNodes = new Vector<>();
+    private Vector<IRBasicBlock> containBlocks = new Vector<>();
+    private Vector<IRSuperBlock> superBlocks = new Vector<>();
     private Set<IRVar> usedVar = new HashSet<>();
     private StackAlloc alloc = new StackAlloc();
     private boolean extend = false;
@@ -46,13 +47,17 @@ public class IRFuncNode extends IRBase
 
     private String instToString() {
         StringBuilder ans = new StringBuilder();
-        for (IRBasicBlock node : containNodes)
+        for (IRBasicBlock node : containBlocks)
             ans.append(node.toString());
         return ans.toString();
     }
 
-    public void appendNode(IRBasicBlock nextNode) {
-        this.containNodes.add(nextNode);
+    public void appendBlock(IRBasicBlock nextNode) {
+        this.containBlocks.add(nextNode);
+    }
+
+    public void appendSuperBlock(IRSuperBlock superBlock) {
+        this.superBlocks.add(superBlock);
     }
 
     @Override
@@ -65,8 +70,8 @@ public class IRFuncNode extends IRBase
         return args[0];
     }
 
-    public Vector<IRBasicBlock> getContainNodes() {
-        return containNodes;
+    public Vector<IRBasicBlock> getContainBlocks() {
+        return containBlocks;
     }
 
     public void addVar(IRVar var) {
@@ -102,5 +107,9 @@ public class IRFuncNode extends IRBase
 
     public Set<IRVar> getUsedVar() {
         return usedVar;
+    }
+
+    public Vector<IRSuperBlock> getSuperBlocks() {
+        return superBlocks;
     }
 }

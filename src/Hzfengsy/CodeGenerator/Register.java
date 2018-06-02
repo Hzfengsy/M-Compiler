@@ -106,18 +106,6 @@ public class Register
         }
     }
 
-    public static int allocIndex(Register reg) {
-        if (reg == rdi) return 0;
-        if (reg == rsi) return 1;
-        if (reg == r8) return 2;
-        if (reg == r9) return 3;
-        if (reg == r10) return 4;
-        if (reg == r11) return 5;
-        if (reg == r12) return 6;
-        if (reg == r13) return 7;
-        return -1;
-    }
-
     public String Reg32() {
         return this.name32;
     }
