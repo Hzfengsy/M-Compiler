@@ -49,8 +49,8 @@ public class LivenessAnalyzer
         boolean flag;
         do {
             flag = true;
-            for (IRBaseInstruction instruction : instructions)
-                flag &= instruction.update();
+            for (int i = instructions.size() - 1; i >= 0 ;i--)
+                flag &= instructions.elementAt(i).update();
         } while (!flag);
         for (IRBasicBlock block : funcNode.getContainNodes()) {
             Vector<IRBaseInstruction> insts = block.getInstructions();
@@ -62,17 +62,18 @@ public class LivenessAnalyzer
         }
         graph.allocate();
 
+
+
+        if (funcNode.getUsedVar().size() > 300) return;
         for (IRBaseInstruction instruction : instructions) {
             instruction.clear();
             instruction.analyze();
         }
 
-        if (funcNode.getUsedVar().size() > 300) return;
-
         do {
             flag = true;
-            for (IRBaseInstruction instruction : instructions)
-                flag &= instruction.update();
+            for (int i = instructions.size() - 1; i >= 0 ;i--)
+                flag &= instructions.elementAt(i).update();
         } while (!flag);
         for (IRBasicBlock block : funcNode.getContainNodes()) {
             Vector<IRBaseInstruction> insts = block.getInstructions();

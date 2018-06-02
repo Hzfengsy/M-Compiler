@@ -73,9 +73,11 @@ public class ConstOptim
                                     temp = new IRConst(exprConst_1.getValue() * exprConst_2.getValue());
                                     break;
                                 case DIV:
+                                    if (exprConst_2.getValue() == 0) continue;
                                     temp = new IRConst(exprConst_1.getValue() / exprConst_2.getValue());
                                     break;
                                 case MOD:
+                                    if (exprConst_2.getValue() == 0) continue;
                                     temp = new IRConst(exprConst_1.getValue() % exprConst_2.getValue());
                                     break;
                                 case LSHIFT:
@@ -93,6 +95,8 @@ public class ConstOptim
                                 case AND:
                                     temp = new IRConst(exprConst_1.getValue() & exprConst_2.getValue());
                                     break;
+                                default:
+                                    continue;
                             }
                             if (inst.getResult() instanceof IRVar)
                                 constVar.put((IRVar) inst.getResult(), temp);

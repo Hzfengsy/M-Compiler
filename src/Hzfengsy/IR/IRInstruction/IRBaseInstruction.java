@@ -13,9 +13,12 @@ public abstract class IRBaseInstruction
 
     private Set<IRVar> in = new HashSet<>();
     private Set<IRVar> out = new HashSet<>();
-    public Set<IRBaseInstruction> succ = new HashSet<>();
+    public Vector<IRBaseInstruction> succ = new Vector<>();
     private Set<IRVar> use = new HashSet<>();
     private IRVar def = null;
+    private Set<IRVar> _in = new HashSet<>();
+    private Set<IRVar> _out = new HashSet<>();
+
     protected boolean used = false;
 
     public abstract void analyze();
@@ -46,22 +49,27 @@ public abstract class IRBaseInstruction
         return true;
     }
 
+    public void start() {
+        in.addAll(use);
+    }
+
     public boolean update() {
-        Set<IRVar> _in = new HashSet<>();
+        _in.clear();
+        _out.clear();
         _in.addAll(in);
-        Set<IRVar> _out = new HashSet<>();
         _out.addAll(out);
+        out.clear();
+        for (IRBaseInstruction inst : succ) {
+            out.addAll(inst.in);
+        }
         in.clear();
         if (out.contains(def)) useInst();
         in.addAll(use);
         for (IRVar var : out) {
             if (!var.equals(def)) in.add(var);
         }
-        out.clear();
-        for (IRBaseInstruction inst : succ) {
-            out.addAll(inst.in);
-        }
-        return setEqual(in, _in) && setEqual(out, _out);
+        boolean flag = setEqual(in, _in) && setEqual(out, _out);
+        return flag;
     }
 
     public void setConflict(ConflictGraph graph) {
