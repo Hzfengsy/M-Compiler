@@ -150,17 +150,9 @@ public class InlineOptim
             progNode.getFuncs().remove(func);
         }
 
-        //        if (inlineable.size() == 0) return;
-        //        boolean flag;
-        //        do {
-        //            flag = false;
-        //            for (IRFuncNode func : progNode.getFuncs()) {
-        //                for (IRBasicBlock block : func.getContainNodes())
-        //                    flag |= setInline(func, block);
-        //            }
-        //        } while (flag);
-        //        for (IRFuncNode func : inlineable) {
-        //            progNode.getFuncs().remove(func);
-        //        }
+        for (IRFuncNode func : progNode.getFuncs())
+            for (IRBasicBlock block : func.getContainNodes())
+                block.updateLink();
+
     }
 }

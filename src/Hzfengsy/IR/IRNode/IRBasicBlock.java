@@ -12,6 +12,7 @@ public class IRBasicBlock extends IRBase
     private IRExpr result;
     private IRLable label = null;
     private Vector<IRBasicBlock> nextNodes = new Vector<>();
+    private IRBasicBlock linkTo = this;
 
     private void updateResult() {
         if (instructions.isEmpty()) return;
@@ -90,4 +91,15 @@ public class IRBasicBlock extends IRBase
         instructions.get(instructions.size() - 1).setResult(result);
         setResult(result);
     }
+
+    public IRBasicBlock updateLink() {
+        if (linkTo == null && instructions.size() == 1) {
+            IRBaseInstruction inst = instructions.elementAt(0);
+            if (inst instanceof IRjumpInstruction && ((IRjumpInstruction) inst).getExpr() == null)
+                linkTo = ((IRjumpInstruction) inst).getBlock();
+        }
+        if (linkTo == this) return this;
+        return linkTo = linkTo.updateLink();
+    }
+
 }

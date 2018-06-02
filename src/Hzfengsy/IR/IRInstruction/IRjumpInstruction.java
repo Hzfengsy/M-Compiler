@@ -44,7 +44,7 @@ public class IRjumpInstruction extends IRBaseInstruction
     }
 
     public IRLable getLable() {
-        return block.getLabel();
+        return block.updateLink().getLabel();
     }
 
     public IROperations.jmpOp getOp() {
