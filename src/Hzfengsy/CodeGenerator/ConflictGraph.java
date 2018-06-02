@@ -7,7 +7,7 @@ import java.util.*;
 
 public class ConflictGraph
 {
-    private Map<IRVar, Set<IRVar>> conflict = new HashMap<>();
+    private Map<IRVar, Vector<IRVar>> conflict = new HashMap<>();
     private Set<IRVar> unhandled = new HashSet<>();
     private final int regs = Register.registerNum();
     private StringData stringData = StringData.getInstance();
@@ -22,7 +22,7 @@ public class ConflictGraph
     public void setVar(IRVar var) {
         if (var.isGlobe()) return;
         unhandled.add(var);
-        conflict.put(var, new HashSet<>());
+        conflict.put(var, new Vector<>());
     }
 
     public void allocate() {

@@ -99,7 +99,8 @@ public class Main
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        System.in.read();
         String program;
         if (args.length > 0) program = readTestFile(args[0]);
         else program = readTestFile("program.txt");
@@ -108,6 +109,7 @@ public class Main
 
         InlineOptim optim = new InlineOptim(IRProg);
         optim.optim();
+        System.gc();
 //        System.err.println(IRProg);
 
         String code = codeGenrate(IRProg);
@@ -115,5 +117,6 @@ public class Main
         if (args.length > 0) writeFile(code, "code.asm");
         else System.out.println(code);
         System.err.println(RegisterAllocator.print());
+        System.in.read();
     }
 }
