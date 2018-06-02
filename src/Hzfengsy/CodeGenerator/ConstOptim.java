@@ -53,6 +53,7 @@ public class ConstOptim
                                 constVar.put((IRVar) inst.getResult(), temp);
                             block.getInstructions().setElementAt(new IRUnaryExprInstruction(inst.getResult(), IROperations.unaryOp.MOV, temp), i);
                         }
+                        else constVar.remove(instruction.getResult());
                     }
                     else if (inst instanceof IRBinaryExprInstruction) {
                         IRBinaryExprInstruction instruction = (IRBinaryExprInstruction) inst;
@@ -102,7 +103,9 @@ public class ConstOptim
                                 constVar.put((IRVar) inst.getResult(), temp);
                             block.getInstructions().setElementAt(new IRUnaryExprInstruction(inst.getResult(), IROperations.unaryOp.MOV, temp), i);
                         }
+                        else constVar.remove(instruction.getResult());
                     }
+                    else if (inst.getResult() != null) constVar.remove(inst.getResult());
                 }
             }
     }
