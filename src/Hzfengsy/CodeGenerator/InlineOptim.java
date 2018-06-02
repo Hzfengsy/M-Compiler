@@ -10,7 +10,7 @@ import java.util.*;
 public class InlineOptim
 {
     private IRProgNode progNode;
-    private int threshold = 20;
+    private int threshold = 50;
 
     private Map<IRFuncNode, Set<IRFuncNode>> linkTo = new HashMap<>();
     private Map<IRFuncNode, Integer> request = new HashMap<>();

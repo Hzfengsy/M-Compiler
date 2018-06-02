@@ -100,23 +100,24 @@ public class Main
     }
 
     public static void main(String[] args) throws IOException {
-        System.in.read();
         String program;
         if (args.length > 0) program = readTestFile(args[0]);
         else program = readTestFile("program.txt");
         semantic(program);
         IRProgNode IRProg = IRGenerate();
 
-        InlineOptim optim = new InlineOptim(IRProg);
-        optim.optim();
+        InlineOptim inlineOptim = new InlineOptim(IRProg);
+        inlineOptim.optim();
         System.gc();
+
+        ConstOptim constOptim  = new ConstOptim(IRProg);
+        constOptim.optim();
 //        System.err.println(IRProg);
 
         String code = codeGenrate(IRProg);
-        System.err.println(IRProg);
+//        System.err.println(IRProg);
         if (args.length > 0) writeFile(code, "code.asm");
         else System.out.println(code);
-        System.err.println(RegisterAllocator.print());
-        System.in.read();
+//        System.err.println(RegisterAllocator.print());
     }
 }

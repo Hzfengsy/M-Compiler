@@ -62,13 +62,12 @@ public class LivenessAnalyzer
         }
         graph.allocate();
 
-        if (funcNode.getUsedVar().size() > 300) return;
-
         for (IRBaseInstruction instruction : instructions) {
             instruction.clear();
             instruction.analyze();
         }
 
+        if (funcNode.getUsedVar().size() > 300) return;
 
         do {
             flag = true;

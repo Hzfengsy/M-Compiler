@@ -8,7 +8,7 @@ import java.util.*;
 public class ConflictGraph
 {
     private Map<IRVar, Vector<IRVar>> conflict = new HashMap<>();
-    private Set<IRVar> unhandled = new HashSet<>();
+    private Vector<IRVar> unhandled = new Vector<>();
     private final int regs = Register.registerNum();
     private StringData stringData = StringData.getInstance();
 
