@@ -71,7 +71,10 @@ public abstract class IRBaseInstruction
     public void setConflict(ConflictGraph graph) {
         if (def == null) return;
         for (IRVar b : out)
-            if (!def.equals(b)) graph.setConflict(def, b);
+            if (!def.equals(b) && !graph.containConflict(def, b)) {
+                graph.setConflict(def, b);
+                def.conflicts += 1;
+            }
     }
 
     public void clear() {
@@ -86,7 +89,9 @@ public abstract class IRBaseInstruction
         return used;
     }
 
-    public void updateLive() {
+    public void updateVar() {
+        if (def != null) def.uses += 1;
+        for (IRVar var : use) var.uses += 1;
         for (IRVar var : out) var.updateLive();
     }
 

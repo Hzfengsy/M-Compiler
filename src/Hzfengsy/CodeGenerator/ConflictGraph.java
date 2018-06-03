@@ -7,10 +7,14 @@ import java.util.*;
 
 public class ConflictGraph
 {
-    private Map<IRVar, Vector<IRVar>> conflict = new HashMap<>();
+    private Map<IRVar, Set<IRVar>> conflict = new HashMap<>();
     private Vector<IRVar> unhandled = new Vector<>();
     private final int regs = Register.registerNum();
     private StringData stringData = StringData.getInstance();
+
+    public boolean containConflict(IRVar a, IRVar b) {
+        return conflict.containsKey(a) && conflict.get(a).contains(b);
+    }
 
     public void setConflict(IRVar a, IRVar b) {
         if (a.isGlobe() || b.isGlobe()) return;
@@ -22,10 +26,11 @@ public class ConflictGraph
     public void setVar(IRVar var) {
         if (var.isGlobe()) return;
         unhandled.add(var);
-        conflict.put(var, new Vector<>());
+        conflict.put(var, new HashSet<>());
     }
 
     public void allocate() {
+        Collections.sort(unhandled);
         for (int registerIndex = 0; registerIndex < regs; registerIndex++) {
             for (IRVar var : unhandled) {
                 if (RegisterAllocator.get(var) != null) continue;

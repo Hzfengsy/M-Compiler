@@ -7,6 +7,8 @@ public class IRVar extends IRExpr implements Comparable
     private String name;
     private Boolean globe;
     private Integer liveTime = 0;
+    public int uses = 0;
+    public int conflicts = 0;
 
     public IRVar(String name, Boolean globe) {
         this.name = name;
@@ -48,11 +50,14 @@ public class IRVar extends IRExpr implements Comparable
         liveTime++;
     }
 
+    public double getPriority() {
+        return ((double)uses) / conflicts;
+    }
 
     @Override
     public int compareTo(Object o) {
         IRVar var = (IRVar) o;
-        if (this.liveTime == var.liveTime) return 0;
-        return this.liveTime > var.liveTime ? 1 : -1;
+        if (this.getPriority() == var.getPriority()) return 0;
+        return this.getPriority() > var.getPriority() ? 1 : -1;
     }
 }
