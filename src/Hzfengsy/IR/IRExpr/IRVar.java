@@ -51,6 +51,7 @@ public class IRVar extends IRExpr implements Comparable
     }
 
     public double getPriority() {
+        if (conflicts == 0) return 0;
         return ((double)uses) / conflicts;
     }
 
