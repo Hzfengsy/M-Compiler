@@ -14,7 +14,6 @@ public class IRSuperBlock
     public IRSuperBlock(IRBasicBlock head, IRBasicBlock tail) {
         this.head = head;
         this.tail = tail;
-        blocks.add(head);
     }
 
     public void appendBlock(IRBasicBlock block) {
@@ -34,7 +33,7 @@ public class IRSuperBlock
                     flag = true;
                     break;
                 }
-                if ((inst.getResult() != null && inst.getResult() instanceof IRMem ) ||out.contains(inst.getDef())) {
+                if ((inst.getResult() instanceof IRVar && ((IRVar)inst.getResult()).isGlobe()) || inst.getResult() instanceof IRMem ||out.contains(inst.getDef())) {
                     flag = true;
                     break;
                 }
