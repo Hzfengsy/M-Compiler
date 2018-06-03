@@ -49,10 +49,6 @@ public abstract class IRBaseInstruction
         return true;
     }
 
-    public void start() {
-        in.addAll(use);
-    }
-
     public boolean update() {
         _in.clear();
         _out.clear();
