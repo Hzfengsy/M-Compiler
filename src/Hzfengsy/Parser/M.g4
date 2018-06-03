@@ -40,8 +40,8 @@ expr: expr op=('++'|'--')                  # Postfix
     | expr '&' expr                        # And
     | expr '^' expr                        # Xor
     | expr '|' expr                        # Or
-    | expr '&&' expr                       # LAnd
-    | expr '||' expr                       # LOr
+    | <assoc=right>expr '&&' expr          # LAnd
+    | <assoc=right>expr '||' expr          # LOr
     | NUM                                  # Number
     | TRUE                                 # True
     | FALSE                                # False
