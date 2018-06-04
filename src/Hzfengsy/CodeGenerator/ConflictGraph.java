@@ -13,7 +13,7 @@ public class ConflictGraph
     private StringData stringData = StringData.getInstance();
     private Stack<IRVar> varStack = new Stack<>();
     private Map<IRVar, Integer> degree = new HashMap<>();
-    private Queue<IRVar> toDeleteVars = new LinkedList<>();
+    private Set<IRVar> toDeleteVars = new HashSet<>();
 
     public boolean containConflict(IRVar a, IRVar b) {
         return conflict.containsKey(a) && conflict.get(a).contains(b);
@@ -45,7 +45,7 @@ public class ConflictGraph
             if (unhandled.contains(neighbor)) {
                 Integer varDegree = degree.get(neighbor) - 1;
                 degree.put(neighbor, varDegree);
-                if (varDegree < regs) toDeleteVars.add(neighbor);
+                if (varDegree <= regs) toDeleteVars.add(neighbor);
             }
         varStack.push(var);
         unhandled.remove(var);

@@ -9,7 +9,7 @@ import java.util.*;
 public class LivenessAnalyzer
 {
     private Vector<IRBaseInstruction> instructions = new Vector<>();
-    private ConflictGraph graph = new ConflictGraph();
+    private ConflictGraph graph;
 
     private void getSucc(IRFuncNode funcNode) {
         for (IRBasicBlock baseBlock : funcNode.getContainBlocks()) {
@@ -36,6 +36,7 @@ public class LivenessAnalyzer
     }
 
     public void analyze(IRFuncNode funcNode) {
+        graph = new ConflictGraph();
         if (funcNode.isExtend()) return;
         if (funcNode.getUsedVar().size() > 800) return;
         instructions.clear();
