@@ -197,7 +197,20 @@ public class CodeGenerator
         ans.append("\n");
     }
 
+    private Register getReg(IRExpr expr) {
+        if (!(expr instanceof IRVar)) return null;
+        return RegisterAllocator.get((IRVar) expr);
+    }
+
     private void addLikeOperator(IRExpr dest, IRExpr lhs, IROperations.binaryOp op, IRExpr rhs) {
+        if (getReg(dest) != null && getReg(dest) == getReg(lhs) && (getReg(rhs) != null || rhs instanceof IRConst)) {
+            ans.append("\t" + op.toNASM() + "\t" + getReg(dest) + ", " + (rhs instanceof IRConst ? rhs : var2Str((IRVar) rhs)) + "\n");
+            return;
+        }
+        if (getReg(dest) != null && getReg(dest) == getReg(rhs) && (getReg(lhs) != null || lhs instanceof IRConst)) {
+            ans.append("\t" + op.toNASM() + "\t" + getReg(dest) + ", " + (lhs instanceof IRConst ? lhs : var2Str((IRVar) lhs)) + "\n");
+            return;
+        }
         Register destination = Register.rax;
         load(lhs, destination);
         if (rhs instanceof IRConst) {
