@@ -207,7 +207,7 @@ public class CodeGenerator
             ans.append("\t" + op.toNASM() + "\t" + getReg(dest) + ", " + (rhs instanceof IRConst ? rhs : var2Str((IRVar) rhs)) + "\n");
             return;
         }
-        if (getReg(dest) != null && getReg(dest) == getReg(rhs) && (getReg(lhs) != null || lhs instanceof IRConst)) {
+        if (op != IROperations.binaryOp.SUB && getReg(dest) != null && getReg(dest) == getReg(rhs) && (getReg(lhs) != null || lhs instanceof IRConst)) {
             ans.append("\t" + op.toNASM() + "\t" + getReg(dest) + ", " + (lhs instanceof IRConst ? lhs : var2Str((IRVar) lhs)) + "\n");
             return;
         }
