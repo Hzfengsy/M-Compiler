@@ -59,6 +59,6 @@ public class IRVar extends IRExpr implements Comparable
     public int compareTo(Object o) {
         IRVar var = (IRVar) o;
         if (this.getPriority() == var.getPriority()) return 0;
-        return this.getPriority() > var.getPriority() ? 1 : -1;
+        return this.getPriority() < var.getPriority() ? 1 : -1;
     }
 }
