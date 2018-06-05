@@ -401,11 +401,11 @@ public class CodeGenerator
         if (inst.getFunc().isExtend()) {
             Vector<Register> regs = Register.caller();
             for (int i = regs.size() - 1; i >= 0 ;i--)
-                ans.append("\tpush\t" + regs.elementAt(i) + "\n");
+                ans.append("\tpop\t" + regs.elementAt(i) + "\n");
         }
         else {
             for (int i = Register.registerNum() - 1; i >= 0; i--) {
-                if (i < 8 && !inst.getFunc().isExtend() && !usedRegs.contains(Register.alloc(i)))
+                if (i < 8 && !usedRegs.contains(Register.alloc(i)))
                     continue;
                 ans.append("\tpop\t" + Register.alloc(i) + "\n");
             }
