@@ -227,10 +227,6 @@ public class IRGenerator extends MBaseVisitor<IRBase>
 
     @Override
     public IRBase visitAssign_Define(MParser.Assign_DefineContext ctx) {
-        String varName  = ctx.id().getText();
-        if (!varUses.valid(varName)) {
-            return new IRBasicBlock();
-        }
         IRBase expr = visit(ctx.expr());
         if (funcStack.empty() && classStack.empty()) {
             variables.insertVar(renameMap.get(ctx), true);
@@ -796,7 +792,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     @Override
     public IRBase visitAssignment(MParser.AssignmentContext ctx) {
         String varName = getVar(ctx.expr(0).getText());
-        if (!varUses.valid(varName)) {
+        if (!(typeRecorder.get(ctx) instanceof ArrayType) && !varUses.valid(varName) && !(ctx.expr(1) instanceof MParser.PrefixContext)) {
             return new IRBasicBlock();
         }
         IRBase right = visit(ctx.expr(1));
@@ -998,9 +994,10 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         }
         else nowBody.join(new IRjumpInstruction(bodyBlock));
         func.appendBlock(tail);
+        superBlocks.remove(superBlocks.size() - 1);
+        appendToSuperBlock(tail);
         loopBreak.pop();
         loopContinue.pop();
-        superBlocks.remove(superBlocks.size() - 1);
         return new IRNode(new IRBasicBlock(new IRjumpInstruction(head)), tail);
     }
 

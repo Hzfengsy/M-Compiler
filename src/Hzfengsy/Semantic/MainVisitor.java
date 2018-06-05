@@ -613,6 +613,7 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
             operationError("=", left.getType(), right.getType(), ctx);
         if (!left.isLeft()) leftError(ctx.expr(0).getText(), ctx);
         ASTSet.getInstance().putLeftValue(ctx.expr(0));
+        typeRecorder.put(ctx, left.getType());
         return new SemanticExprNode(left.getType(), false);
     }
 

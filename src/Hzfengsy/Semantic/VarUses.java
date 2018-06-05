@@ -6,6 +6,7 @@ public class VarUses
 {
     private Map<String, Integer> count = new HashMap<>();
     private static VarUses varUses = new VarUses();
+    private boolean used = false;
 
     public static VarUses getInstance() {
         return varUses;
@@ -26,6 +27,12 @@ public class VarUses
     }
 
     public boolean valid(String name) {
-        return (count.containsKey(name) && count.get(name) != 0);
+        if (count.containsKey(name) && count.get(name) != 0)
+            return used = true;
+        else return false;
+    }
+
+    public boolean isUsed() {
+        return used;
     }
 }
