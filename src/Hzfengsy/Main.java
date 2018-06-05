@@ -119,10 +119,10 @@ public class Main
         dpOptim.optim();
 
         String code = codeGenrate(IRProg);
-        System.err.println(IRProg);
+//        System.err.println(IRProg);
 
         if (args.length > 0) writeFile(code, "code.asm");
         else System.out.println(code);
-        System.err.println(RegisterAllocator.print());
+//        System.err.println(RegisterAllocator.print());
     }
 }
