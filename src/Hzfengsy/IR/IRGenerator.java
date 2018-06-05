@@ -27,10 +27,19 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     private Stack<IRBasicBlock> loopBreak = new Stack<>();
     private TypeRecorder typeRecorder = TypeRecorder.getInstance();
     private IRBasicBlock globeVariable = new IRBasicBlock();
+    private VarUses varUses = VarUses.getInstance();
 
     private Set<String> builtin = new HashSet<>();
     private StringData stringData = StringData.getInstance();
     private Vector<IRSuperBlock> superBlocks = new Vector<>();
+
+    private String getVar(String name) {
+        StringBuilder ans = new StringBuilder();
+        for (int i = 0; i < name.length(); i++)
+            if (name.charAt(i) == '.' || name.charAt(i) == '[') return ans.toString();
+            else ans.append(name.charAt(i));
+        return ans.toString();
+    }
 
     private void appendToSuperBlock(IRBasicBlock block) {
         for (IRSuperBlock superBlock : superBlocks)
@@ -218,6 +227,10 @@ public class IRGenerator extends MBaseVisitor<IRBase>
 
     @Override
     public IRBase visitAssign_Define(MParser.Assign_DefineContext ctx) {
+        String varName  = ctx.id().getText();
+        if (!varUses.valid(varName)) {
+            return new IRBasicBlock();
+        }
         IRBase expr = visit(ctx.expr());
         if (funcStack.empty() && classStack.empty()) {
             variables.insertVar(renameMap.get(ctx), true);
@@ -782,6 +795,10 @@ public class IRGenerator extends MBaseVisitor<IRBase>
 
     @Override
     public IRBase visitAssignment(MParser.AssignmentContext ctx) {
+        String varName = getVar(ctx.expr(0).getText());
+        if (!varUses.valid(varName)) {
+            return new IRBasicBlock();
+        }
         IRBase right = visit(ctx.expr(1));
         IRBase left = visit(ctx.expr(0));
         IRBasicBlock ans = new IRBasicBlock();

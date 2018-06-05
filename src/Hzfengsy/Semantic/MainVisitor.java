@@ -22,6 +22,8 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
     private Stack<SemanticBaseNode> classStack = new Stack<>();
     private TypeChecker typeChecker = TypeChecker.getInstance();
     private TypeRecorder typeRecorder = TypeRecorder.getInstance();
+    private VarUses varUses = VarUses.getInstance();
+    private boolean isLeft = false;
 
     private void error(String message, ParserRuleContext ctx) {
         BaseType inClass = classStack.empty() ? null : classStack.peek().getType();
@@ -315,6 +317,7 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
         }
         try {
             if (found) {
+                if (!this.isLeft) varUses.add(rename);
                 renameMap.put(ctx, rename);
                 if (var == null) var = variables.query(rename);
                 return new SemanticExprNode(var, true);
@@ -327,6 +330,7 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
     @Override
     public SemanticBaseNode visitSubscript(MParser.SubscriptContext ctx) {
         BaseType expr0 = visit(ctx.expr(0)).getType();
+        this.isLeft = false;
         BaseType expr1 = visit(ctx.expr(1)).getType();
         Boolean ans0 = expr0 instanceof ArrayType;
         if (!ans0) {
@@ -341,6 +345,7 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
     @Override
     public SemanticBaseNode visitMembervar(MParser.MembervarContext ctx) {
         BaseType Class = visit(ctx.expr()).getType();
+        this.isLeft = false;
         typeRecorder.put(ctx.expr(), Class);
         BaseType var = null;
         try { var = Class.queryVar(ctx.id().getText()); } catch (Exception e) {
@@ -600,7 +605,9 @@ public class MainVisitor extends MBaseVisitor<SemanticBaseNode>
 
     @Override
     public SemanticBaseNode visitAssignment(MParser.AssignmentContext ctx) {
+        this.isLeft = true;
         SemanticBaseNode left = visit(ctx.expr(0));
+        this.isLeft = false;
         SemanticBaseNode right = visit(ctx.expr(1));
         if (!typeChecker.typeCheck(typeChecker.Assign, left.getType(), right.getType()))
             operationError("=", left.getType(), right.getType(), ctx);
