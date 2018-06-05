@@ -111,7 +111,7 @@ public class Register
     }
 
     public static int registerNum() {
-        return 8;
+        return 6;
     }
 
     @Override
