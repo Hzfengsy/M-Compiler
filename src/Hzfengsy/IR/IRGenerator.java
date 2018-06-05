@@ -8,6 +8,7 @@ import Hzfengsy.Semantic.*;
 import Hzfengsy.Semantic.Type.*;
 import Hzfengsy.Semantic.Type.VarType.*;
 import javafx.util.*;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
 import java.util.*;
@@ -33,12 +34,14 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     private StringData stringData = StringData.getInstance();
     private Vector<IRSuperBlock> superBlocks = new Vector<>();
 
-    private String getVar(String name) {
-        StringBuilder ans = new StringBuilder();
-        for (int i = 0; i < name.length(); i++)
-            if (name.charAt(i) == '.' || name.charAt(i) == '[') return ans.toString();
-            else ans.append(name.charAt(i));
-        return ans.toString();
+    private String getVar(ParserRuleContext ctx) {
+        if (ctx instanceof MParser.IdentityContext)
+            return renameMap.get(ctx);
+        else if (ctx instanceof MParser.SubscriptContext)
+            return getVar(((MParser.SubscriptContext) ctx).expr(0));
+        else if (ctx instanceof MParser.MembervarContext)
+            return getVar(((MParser.MembervarContext) ctx).id());
+        return "";
     }
 
     private void appendToSuperBlock(IRBasicBlock block) {
@@ -791,7 +794,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
 
     @Override
     public IRBase visitAssignment(MParser.AssignmentContext ctx) {
-        String varName = getVar(ctx.expr(0).getText());
+        String varName = getVar(ctx.expr(0));
         if (funcStack.peek().getArgs().length == 0 && !(typeRecorder.get(ctx) instanceof ArrayType) && !varUses.valid(varName) && !(ctx.expr(1) instanceof MParser.PrefixContext)) {
             return new IRBasicBlock();
         }
