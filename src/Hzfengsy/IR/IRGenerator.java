@@ -17,7 +17,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
 {
     private Classes classes = Classes.getInstance();
     private Functions functions = Functions.getInstance();
-    private Map<String, IRFuncNode> funcNodeMap = new HashMap<>();
+    static public Map<String, IRFuncNode> funcNodeMap = new HashMap<>();
     private Stack<IRFuncNode> funcStack = new Stack<>();
     private Stack<UserType> classStack = new Stack<>();
     private RenameMap renameMap = RenameMap.getInstance();

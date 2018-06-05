@@ -15,6 +15,7 @@ public class IRFuncNode extends IRBase
     private Set<IRVar> usedVar = new HashSet<>();
     private StackAlloc alloc = new StackAlloc();
     private boolean extend = false;
+    public boolean dp = false;
 
     public IRFuncNode(String funcName, IRVar... args) {
         this.funcName = funcName;

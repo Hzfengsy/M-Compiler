@@ -112,6 +112,9 @@ public class Main
 
         ConstOptim constOptim  = new ConstOptim(IRProg);
         constOptim.optim();
+
+        DPOptim dpOptim = new DPOptim(IRProg);
+        dpOptim.optim();
         System.err.println(IRProg);
 
         String code = codeGenrate(IRProg);
