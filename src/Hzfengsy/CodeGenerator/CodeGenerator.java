@@ -367,7 +367,8 @@ public class CodeGenerator
         IRExpr[] args = inst.getArgs();
         Set<Register> usedRegs = inst.getFunc().getUsedReg();
         for (int i = 0; i < Register.registerNum(); i++) {
-            if (!inst.getFunc().isExtend() && !usedRegs.contains(Register.alloc(i))) continue;
+            if (i < 8 && !inst.getFunc().isExtend() && !usedRegs.contains(Register.alloc(i)))
+                continue;
             ans.append("\tpush\t" + Register.alloc(i) + "\n");
         }
         for (int i = 0; i < args.length && i < 2; i++) {
@@ -386,7 +387,7 @@ public class CodeGenerator
         if (args.length > 2)
             ans.append("\tadd\trsp, " + Integer.toString((args.length - 2) * 8) + "\n");
         for (int i = Register.registerNum() - 1; i >= 0; i--) {
-            if (!inst.getFunc().isExtend() && !usedRegs.contains(Register.alloc(i))) continue;
+            if (i < 8 && !inst.getFunc().isExtend() && !usedRegs.contains(Register.alloc(i))) continue;
             ans.append("\tpop\t" + Register.alloc(i) + "\n");
         }
         if (inst.getResult() != null) {
