@@ -108,7 +108,9 @@ public class Main
 
         InlineOptim inlineOptim = new InlineOptim(IRProg);
         inlineOptim.optim();
-        System.gc();
+
+        GlobalVarOptim globalVarOptim = new GlobalVarOptim(IRProg);
+        globalVarOptim.optim();
 
         ConstOptim constOptim  = new ConstOptim(IRProg);
         constOptim.optim();

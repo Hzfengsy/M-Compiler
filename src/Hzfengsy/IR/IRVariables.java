@@ -46,5 +46,10 @@ public class IRVariables
     public Collection<IRVar> getGlobe() {
         return globe;
     }
+
+    public void CleanGlobe() {
+        globe.clear();
+        for (IRVar var : variables.values()) var.cleanGlobe();
+    }
 }
 

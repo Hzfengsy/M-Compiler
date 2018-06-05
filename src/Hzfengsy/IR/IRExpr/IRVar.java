@@ -61,4 +61,8 @@ public class IRVar extends IRExpr implements Comparable
         if (this.getPriority() == var.getPriority()) return 0;
         return this.getPriority() < var.getPriority() ? 1 : -1;
     }
+
+    public void cleanGlobe() {
+        globe = false;
+    }
 }
