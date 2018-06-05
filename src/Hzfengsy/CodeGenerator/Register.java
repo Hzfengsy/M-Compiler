@@ -101,6 +101,10 @@ public class Register
                 return r14;
             case 7:
                 return r15;
+            case 8:
+                return rsi;
+            case 9:
+                return rdi;
             default:
                 return null;
         }
@@ -111,7 +115,7 @@ public class Register
     }
 
     public static int registerNum() {
-        return 6;
+        return 10;
     }
 
     @Override

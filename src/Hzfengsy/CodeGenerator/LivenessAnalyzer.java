@@ -10,6 +10,7 @@ public class LivenessAnalyzer
 {
     private Vector<IRBaseInstruction> instructions = new Vector<>();
     private ConflictGraph graph;
+    public static Map<IRVar, Vector<Register>> conflict = new HashMap<>();
 
     private void getSucc(IRFuncNode funcNode) {
         for (IRBasicBlock baseBlock : funcNode.getContainBlocks()) {
@@ -59,6 +60,25 @@ public class LivenessAnalyzer
                 IRBaseInstruction inst = insts.elementAt(i);
                 inst.updateVar();
                 inst.setConflict(graph);
+                if (inst instanceof IRCallInstruction) {
+                    IRCallInstruction call = (IRCallInstruction) inst;
+                    for (int j = 1; j < call.getArgs().length; j++) {
+                        IRExpr expr = call.getArgs()[j];
+                        if (expr instanceof IRVar) {
+                            if (!conflict.containsKey((IRVar) expr))
+                                conflict.put((IRVar) expr, new Vector<>());
+                            conflict.get((IRVar) expr).add(Register.rdi);
+                        }
+                    }
+                    for (int j = 2; j < call.getArgs().length; j++) {
+                        IRExpr expr = call.getArgs()[j];
+                        if (expr instanceof IRVar) {
+                            if (!conflict.containsKey((IRVar) expr))
+                                conflict.put((IRVar) expr, new Vector<>());
+                            conflict.get((IRVar) expr).add(Register.rsi);
+                        }
+                    }
+                }
             }
         }
         graph.allocate();

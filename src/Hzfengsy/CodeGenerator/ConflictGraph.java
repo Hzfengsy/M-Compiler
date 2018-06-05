@@ -70,6 +70,8 @@ public class ConflictGraph
         while (!varStack.isEmpty()) {
             neighborReg.clear();
             IRVar var = varStack.pop();
+            if (LivenessAnalyzer.conflict.get(var) != null)
+                neighborReg.addAll(LivenessAnalyzer.conflict.get(var));
             unhandled.add(var);
             Set<IRVar> varConflict = conflict.get(var);
             for (IRVar neighbor : varConflict)
