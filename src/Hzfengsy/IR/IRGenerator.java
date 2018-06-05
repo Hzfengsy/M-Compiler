@@ -40,7 +40,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
         else if (ctx instanceof MParser.SubscriptContext)
             return getVar(((MParser.SubscriptContext) ctx).expr(0));
         else if (ctx instanceof MParser.MembervarContext)
-            return getVar(((MParser.MembervarContext) ctx).id());
+            return getVar(((MParser.MembervarContext) ctx).expr());
         return "";
     }
 
