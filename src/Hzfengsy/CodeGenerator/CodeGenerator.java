@@ -98,7 +98,8 @@ public class CodeGenerator
 
     private void storeArgs(IRFuncNode func) {
         IRVar[] args = func.getArgs();
-        for (int i = 0; i < args.length && i < 2; i++) {
+        for (int i = 0; i < 2; i++) {
+            if (i >= args.length) continue;
             Register reg = RegisterAllocator.get(args[i]);
             if (reg != null) ans.append("\tmov\t" + reg + ", " + Register.getParm(i) + "\n");
             else ans.append("\tmov\t" + var2Mem(args[i]) + ", " + Register.getParm(i) + "\n");
@@ -371,9 +372,12 @@ public class CodeGenerator
                 continue;
             ans.append("\tpush\t" + Register.alloc(i) + "\n");
         }
-        for (int i = 0; i < args.length && i < 2; i++) {
+
+        for (int i = 0; i < 2; i++) {
+            if (i >= args.length) continue;
             load(args[i], Register.getParm(i));
         }
+
         for (int i = args.length - 1; i >= 2; i--) {
             if (args[i] instanceof IRConst) {
                 ans.append("\tpush\t" + args[i] + "\n");
@@ -383,11 +387,13 @@ public class CodeGenerator
 
             }
         }
+
         ans.append("\tcall\t" + inst.getFunc().getName() + "\n");
         if (args.length > 2)
             ans.append("\tadd\trsp, " + Integer.toString((args.length - 2) * 8) + "\n");
         for (int i = Register.registerNum() - 1; i >= 0; i--) {
-            if (i < 8 && !inst.getFunc().isExtend() && !usedRegs.contains(Register.alloc(i))) continue;
+            if (i < 8 && !inst.getFunc().isExtend() && !usedRegs.contains(Register.alloc(i)))
+                continue;
             ans.append("\tpop\t" + Register.alloc(i) + "\n");
         }
         if (inst.getResult() != null) {

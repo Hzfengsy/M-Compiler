@@ -37,6 +37,13 @@ public class LivenessAnalyzer
     }
 
     public void analyze(IRFuncNode funcNode) {
+        if (funcNode.getArgs().length > 0) {
+            IRVar var = funcNode.getArgs()[0];
+            if (!conflict.containsKey(var))
+                conflict.put(var, new Vector<>());
+            conflict.get(var).add(Register.rsi);
+        }
+
         graph = new ConflictGraph();
         if (funcNode.isExtend()) return;
         if (funcNode.getUsedVar().size() > 800) return;
