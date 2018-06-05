@@ -792,7 +792,7 @@ public class IRGenerator extends MBaseVisitor<IRBase>
     @Override
     public IRBase visitAssignment(MParser.AssignmentContext ctx) {
         String varName = getVar(ctx.expr(0).getText());
-        if (!(typeRecorder.get(ctx) instanceof ArrayType) && !varUses.valid(varName) && !(ctx.expr(1) instanceof MParser.PrefixContext)) {
+        if (funcStack.peek().getArgs().length == 0 && !(typeRecorder.get(ctx) instanceof ArrayType) && !varUses.valid(varName) && !(ctx.expr(1) instanceof MParser.PrefixContext)) {
             return new IRBasicBlock();
         }
         IRBase right = visit(ctx.expr(1));
