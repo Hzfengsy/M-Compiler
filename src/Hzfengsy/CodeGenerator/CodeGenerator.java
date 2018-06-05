@@ -367,11 +367,18 @@ public class CodeGenerator
     private void call(IRCallInstruction inst) {
         IRExpr[] args = inst.getArgs();
         Set<Register> usedRegs = inst.getFunc().getUsedReg();
-        for (int i = 0; i < Register.registerNum(); i++) {
-            if (i < 8 && !inst.getFunc().isExtend() && !usedRegs.contains(Register.alloc(i)))
-                continue;
-            ans.append("\tpush\t" + Register.alloc(i) + "\n");
+        if (inst.getFunc().isExtend()) {
+            for (Register reg : Register.caller())
+                ans.append("\tpush\t" + reg + "\n");
         }
+        else {
+            for (int i = 0; i < Register.registerNum(); i++) {
+                if (i < 8 && !usedRegs.contains(Register.alloc(i)))
+                    continue;
+                ans.append("\tpush\t" + Register.alloc(i) + "\n");
+            }
+        }
+
 
         for (int i = 0; i < 2; i++) {
             if (i >= args.length) continue;
@@ -391,10 +398,17 @@ public class CodeGenerator
         ans.append("\tcall\t" + inst.getFunc().getName() + "\n");
         if (args.length > 2)
             ans.append("\tadd\trsp, " + Integer.toString((args.length - 2) * 8) + "\n");
-        for (int i = Register.registerNum() - 1; i >= 0; i--) {
-            if (i < 8 && !inst.getFunc().isExtend() && !usedRegs.contains(Register.alloc(i)))
-                continue;
-            ans.append("\tpop\t" + Register.alloc(i) + "\n");
+        if (inst.getFunc().isExtend()) {
+            Vector<Register> regs = Register.caller();
+            for (int i = regs.size() - 1; i >= 0 ;i--)
+                ans.append("\tpush\t" + regs.elementAt(i) + "\n");
+        }
+        else {
+            for (int i = Register.registerNum() - 1; i >= 0; i--) {
+                if (i < 8 && !inst.getFunc().isExtend() && !usedRegs.contains(Register.alloc(i)))
+                    continue;
+                ans.append("\tpop\t" + Register.alloc(i) + "\n");
+            }
         }
         if (inst.getResult() != null) {
             store(inst.getResult(), Register.rax);

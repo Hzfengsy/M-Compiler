@@ -1,5 +1,7 @@
 package Hzfengsy.CodeGenerator;
 
+import java.util.*;
+
 public class Register
 {
     public static Register rax = new Register("rax", "eax", 0);
@@ -108,6 +110,17 @@ public class Register
             default:
                 return null;
         }
+    }
+
+    public static Vector<Register> caller() {
+        Vector<Register> ans = new Vector<>();
+        ans.add(r8);
+        ans.add(r9);
+        ans.add(r10);
+        ans.add(r11);
+        ans.add(rsi);
+        ans.add(rdi);
+        return ans;
     }
 
     public String Reg32() {
